@@ -1,0 +1,135 @@
+body{
+	background-color:#140d0a; 
+	overflow:hidden;
+}
+.button{	
+	font-size:25px;
+	font-family:Serif;
+	border-radius:5px;	
+	background-color:#f2cb9b;
+	color:	#140d0a;	
+}
+.loginFont{
+	font-size:30px;
+	font-weight:600;
+	color:#f2cb9b;
+}
+
+input{
+	width:270px;
+	height:22px;
+	font-size:14px;
+	color:	#140d0a;
+}
+/** login **/
+#connection{
+	/*position and size*/
+	position:absolute;
+	height:200px;
+	width:600px;
+	left:50%;
+	top:50%;
+	margin-left:-300px;
+	margin-top:-150px;	
+	/*color and border*/
+	background-color:rgb(163,37,0);
+	border-radius:10px;	
+	box-shadow:  0px 0px 20px #A32500;
+}
+#label{
+	position:absolute;;
+	height:25%;
+	width:200px;
+	top:20%;
+	left:30px;	
+}
+#input{
+	position:absolute;
+	height:50%;
+	width:300px;
+	top:20%;
+	left:250px;
+}
+#server-address{
+	position:absolute;
+	top:7px;
+}
+#username{
+	position:absolute;
+	top:42px;
+	left:0px;
+}
+
+#buttons{
+	position:relative;
+	width:100%;
+	top:75%;
+	left:85%;
+}
+/** room **/
+#all{
+	position:absolute;
+	width:100%;
+	height:100%;
+	margin-top:-7px;
+	margin-left:-7px;
+	z-index:-2;
+}
+#room{
+	position:absolute;	
+	width:100%;
+	height:100%;
+	margin-top:-6px;
+	margin-left:-6px;	
+	z-index:-1;
+}
+#name{
+	z-index:1;
+}
+#showRoom{
+	position:absolute;
+	top:5%;
+	left:95%;
+}
+/** menu **/
+.menu{
+	background-color: rgba(242, 203, 155, 1.0);
+	box-shadow:  0px 0px 10px rgb(255, 241, 177);
+			 
+}
+#menu-type{
+	position:absolute;
+	width:20%;
+	height:60%;
+	top:20%;
+	left:0%;	
+	overflow:hidden;
+}
+#menu-furniture{
+	position:absolute;
+	width:60%;
+	height:15%;
+	bottom:0%;
+	left:20%;
+	border-radius:10px 10px 0px 0px;
+}
+
+a {	
+	text-decoration:none;
+}
+a:hover{
+	color:rgb(163,37,0);
+}
+a:active{
+	color:#c93c00;
+}
+/**scrollbar menu**/
+.scroll-pane { overflow: auto; width: 99%; float:left; }
+.scroll-content { width: 100%; float: left; }
+.scroll-content-item { width: 80px; height: 80px; float: left; margin: 10px; font-size: 3em; line-height: 96px; text-align: center; }
+.scroll-bar-wrap { clear: left; padding: 0 4px 0 2px; margin: 0 -1px -1px -1px; }
+.scroll-bar-wrap .ui-slider { background: none; border:0; height: 2em; margin: 0 auto;  }
+.scroll-bar-wrap .ui-handle-helper-parent { position: relative; width: 100%; height: 100%; margin: 0 auto; }
+.scroll-bar-wrap .ui-slider-handle { top:.2em; height: 1.5em; }
+.scroll-bar-wrap .ui-slider-handle .ui-icon { margin: -8px auto 0; position: relative; top: 50%; }
+

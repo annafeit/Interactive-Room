@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title> Interactive Room </title> 
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		
+		<!--  jQuery -->
+		<script type="text/javascript" src="externals/jquery/jquery-1.6.1.js"/>
+		<script type="text/javascript" src="externals/js/jquery-ui-1.8.14.custom.min.js"/>
+
+		
+		<!-- KataJS simplifies development of the Sirikata ObjectHost in the browser -->
+		<script type="text/javascript" src="externals/katajs/katajs/core/Core.js"/>
+		
+		<!-- Configuration and Login-->
+		<script type="text/javascript" src="scripts/Login.js"/>
+		<script type="text/javascript" src="scripts/UI.js"/>
+				
+						
+						
+		<script type="text/javascript"><![CDATA[
+			window.onload=init;			
+		]]></script>
+		
+		<!--  CSS-Style of the User Interface -->		
+		<link type="text/css" href="externals/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" media="all" />
+		<link type="text/css" href="style/style.css" rel="stylesheet" media="all" />
+	</head>	
+	<body>
+	
+		<!-- LOGIN -->
+		
+		<div id="connection">
+			<div id="label">
+				<label for="server-address" class="loginFont"> Server address:</label>
+				<label for="username" class="loginFont"> Username:</label>				
+			</div>
+			<div id="input">					
+				<input id="server-address" class="inputFont" value="sirikata://localhost:7777"/>
+				<input id="username" class="inputFont"/>
+			</div>
+			<div id="buttons">
+				<button id="loginButton" onclick="connect($('#server-address').val(), null , $('#username').val())">
+					Login
+				</button>
+			</div>
+		</div>
+		
+		<!-- ROOM -->		
+		<div id="all">
+			<button id="showRoom">Show Room</button>
+			<div id="room"/>				
+			<label id="name" class="loginFont" />		
+		    <div id="menu-type" >
+		    	
+		    	<h3><a href="#sofas">Sofas and armchairs</a></h3>
+		    		<div>
+	    				<a href="#" onclick="categoryClicked(this);">Fabric sofas</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Leather sofas</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Sofa beds</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Modular sofas</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Chaise lounges</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Armchairs</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Footstools and pouffes</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Extra covers</a>  	<br/>				    					
+		    		</div>
+		    	<h3><a href="#TV">TV stand and media solutions</a></h3>
+		    		<div/>
+		    	<h3><a href="#LivingRoom">Living room storage</a></h3>
+			    	<div>
+	    				<a href="#" onclick="categoryClicked(this);">Bookcases</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Shelving units</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">DVD and CD furniture</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Wall shelves</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Cabinets and sideboards</a><br/>
+	    				<a href="#" onclick="categoryClicked(this);">Storage boxes and baskets</a>	<br/>				    						    			
+		    		</div>
+		    	<h3><a href="#Coffetables">Coffee and side tables</a></h3>
+		    		<div/>
+		    	<h3><a href="#Lighting">Living room lighting</a></h3>
+		    		<div>
+		    			<a href="#" onclick="categoryClicked(this);"> Ceiling lamps</a><br/>		    			
+		    			<a href="#" onclick="categoryClicked(this);"> Table lamps</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);"> Shades, bases and cords</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);">Floor lamps</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);">Wall lamps</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);">Spotlights</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);">LED lamps</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);">Integrated lighting</a><br/>
+		    			<a href="#" onclick="categoryClicked(this);">Light bulbs and batteries</a><br/>	
+		    		</div>
+		    </div>		    
+
+			<div id="menu-furniture" class="menu scroll-pane ui-widget ui-corner-all"> 
+				<div id="furniture-content" class="scroll-content"> 
+					<div class="scroll-content-item ui-widget-header">1</div> 
+					<div class="scroll-content-item ui-widget-header">2</div> 
+					<div class="scroll-content-item ui-widget-header">3</div> 
+					<div class="scroll-content-item ui-widget-header">4</div> 
+					<div class="scroll-content-item ui-widget-header">5</div> 
+					<div class="scroll-content-item ui-widget-header">6</div> 
+					<div class="scroll-content-item ui-widget-header">7</div> 
+					<div class="scroll-content-item ui-widget-header">8</div> 
+					<div class="scroll-content-item ui-widget-header">9</div> 
+					<div class="scroll-content-item ui-widget-header">10</div> 
+					<div class="scroll-content-item ui-widget-header">11</div> 
+					<div class="scroll-content-item ui-widget-header">12</div> 
+					<div class="scroll-content-item ui-widget-header">13</div> 
+					<div class="scroll-content-item ui-widget-header">14</div> 
+					 
+				</div> 
+				<div class="scroll-bar-wrap ui-widget-content ui-corner-bottom"> 
+					<div class="scroll-bar"></div> 
+				</div> 
+			</div> 
+		</div>
+	</body>	
+</html>

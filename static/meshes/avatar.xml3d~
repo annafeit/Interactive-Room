@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xml3d id="room3d" xmlns="http://www.xml3d.org/2009/xml3d" style="background-color:rgb(105,165,255); height:100%; width:100%;" activeView="#defaultView" >
+    <defs>
+			        <transform id="boxTransform1" translation="0 -3 3" rotation="1 0 0 0"/>
+					<transform id="boxTransform2" translation="4 0.01 0" />
+			        <transform id="lightTransform" translation="-2 5 10" />
+					
+					<shader id="cubeShader" script="urn:xml3d:shader:phong">
+                        <float3 name="diffuseColor">
+                            0.1 0.8 0
+                        </float3>
+                        <float name="ambientIntensity">
+                            0.2
+                        </float>
+                    </shader>
+					
+					<shader id="groundShader" script="urn:xml3d:shader:phong">
+			            <float3 name="diffuseColor">0.4 0.01 0.8</float3>
+			            <float name="ambientIntensity">0.4</float>
+			        </shader>
+					
+			        <lightshader id="lightShader" script="urn:xml3d:lightshader:point">
+			            <float3 name="intensity">1.0 1.0 .8</float3>
+	
+			            <float3 name="attenuation">1.0 0.01 0.0</float3>
+			        </lightshader>
+			        
+			        <data id="box" >
+			            <int name="index">0 1 2 2 3 0 4 7 5 5 7 6 8 9 10 10 11 8 12 14 13 14 12 15 16 17 18 18 19 16 20 22 21 22 20 23</int>
+			            <float3 name="position">-1.0 -1.0 -1.0 -1.0 1.0 -1.0 1.0 1.0 -1.0 1.0 -1.0 -1.0 -1.0 -1.0 1.0 -1.0 1.0 1.0 1.0 1.0 1.0 1.0 -1.0 1.0 -1.0 -1.0 -1.0 -1.0 -1.0 1.0 -1.0 1.0 1.0 -1.0 1.0 -1.0 1.0 -1.0 -1.0 1.0 -1.0 1.0 1.0 1.0 1.0 1.0 1.0 -1.0 -1.0 1.0 -1.0 -1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 1.0 1.0 -1.0 1.0 1.0 -1.0 -1.0</float3>
+			            <float3 name="normal">0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0</float3>
+			            <float2 name="texcoord">1.0 0.0 1.0 1.0 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 1.0 1.0 1.0 0.0 0.0 0.0 1.0 0.0 1.0 1.0 0.0 1.0 1.0 0.0 0.0 0.0 0.0 1.0 1.0 1.0 0.0 1.0 0.0 0.0 1.0 0.0 1.0 1.0 0.0 0.0 0.0 1.0 1.0 1.0 1.0 0.0</float2>
+	
+			        </data>
+					
+					<data id="ground" >
+			            <int name="index">0 1 2 2 3 0</int>
+			            <float3 name="position">-50.0 -4.0 50.0 50.0 -4.0 50.0 50.0 -4.0 -50.0 -50.0 -4.0 -50.0</float3>
+			            <float3 name="normal">
+							0.0 1.0 0.0
+							0.0 1.0 0.0
+							0.0 1.0 0.0
+							0.0 1.0 0.0
+							</float3>
+			            <float2 name="texcoord">
+	
+			                1.0 0.0 
+							1.0 1.0 
+							0.0 1.0 
+							0.0 0.0 
+							</float2>
+			        </data>
+			    </defs>
+			    
+			    <view id="defaultView" position="-2 -1.5 -8" orientation="0 1 0 3.5"/>    
+				<group style="transform: url(#lightTransform);-moz-transform: url(#lightTransform)">
+			        <light style="shader: url(#lightShader)"/>
+			    </group>
+			
+				<group transform="#boxTransform1" class="box" style="shader:url(#cubeShader)">
+					<mesh src="#box" type="triangles"/>
+	
+					<group id="box2" transform="#boxTransform2" class="alphaBox" style="shader:url(#cubeShader)">
+						<mesh src="#box" type="triangles"/>
+					</group>    
+				</group>    
+				
+				<group shader="#groundShader" >	
+					<mesh src="#ground" type="triangles"/>
+				</group>
+</xml3d>
