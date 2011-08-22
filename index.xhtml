@@ -9,6 +9,9 @@
 		<!--  jQuery -->
 		<script type="text/javascript" src="externals/jquery/jquery-1.6.1.js"/>
 		<script type="text/javascript" src="externals/js/jquery-ui-1.8.14.custom.min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.core.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.widget.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.button.js"/>
 
 		
 		<!-- KataJS simplifies development of the Sirikata ObjectHost in the browser -->
@@ -32,7 +35,7 @@
 	
 		<!-- LOGIN -->
 		
-		<div id="connection">
+		<div id="connection">		
 			<div id="label">
 				<label for="server-address" class="loginFont"> Server address:</label>
 				<label for="username" class="loginFont"> Username:</label>				
@@ -42,7 +45,7 @@
 				<input id="username" class="inputFont"/>
 			</div>
 			<div id="buttons">
-				<button id="loginButton" onclick="connect($('#server-address').val(), null , $('#username').val())">
+				<button id="loginButton" class="ui-button" onclick="connect($('#server-address').val(), null , $('#username').val())">
 					Login
 				</button>
 			</div>
@@ -50,7 +53,6 @@
 		
 		<!-- ROOM -->		
 		<div id="all">
-			<button id="showRoom">Show Room</button>
 			<div id="room"/>				
 			<label id="name" class="loginFont" />		
 		    <div id="menu-type" >

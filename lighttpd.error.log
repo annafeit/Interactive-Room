@@ -73,3 +73,9 @@
 2011-08-10 10:08:20: (log.c.166) server started 
 2011-08-10 12:10:47: (server.c.1503) server stopped by UID = 0 PID = 20433 
 2011-08-11 12:38:48: (log.c.166) server started 
+2011-08-11 17:10:55: (server.c.1503) server stopped by UID = 0 PID = 5024 
+2011-08-20 20:03:40: (log.c.166) server started 
+2011-08-20 21:46:13: (server.c.1503) server stopped by UID = 0 PID = 3744 
+2011-08-21 13:27:05: (log.c.166) server started 
+2011-08-21 23:58:51: (server.c.1503) server stopped by UID = 0 PID = 6778 
+2011-08-22 10:10:41: (log.c.166) server started 

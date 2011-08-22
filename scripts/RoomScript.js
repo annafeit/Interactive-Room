@@ -1,7 +1,7 @@
 var Room = {};
 
 Kata.require([ 
-	'katajs/oh/GraphicsScript.js', 
+	'katajs/oh/Script.js', 
 ],function() {
 	
 	var SUPER = Kata.Script.prototype;

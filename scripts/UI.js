@@ -3,7 +3,43 @@ $(document).ready(
 		$("#menu-type").accordion({
 			autoHeight: false,
 			navigation: true
+		});				
+		
+		/*****	Room Navigation Menu	*****/
+		$("#chooseRoom").click(function(){
+			if ($("#chooseRoom").hasClass("choosingRoomClicked")){
+				$("#chooseRoom").removeClass("choosingRoomClicked");
+			}
+			else{
+				$("#chooseRoom").addClass("choosingRoomClicked");			
+				$("#newRoom").removeClass("choosingRoomClicked");
+				$("#friendRoom").removeClass("choosingRoomClicked");
+			}
 		});
+		
+		$("#newRoom").click(function(){
+			if ($("#newRoom").hasClass("choosingRoomClicked")){
+				$("#newRoom").removeClass("choosingRoomClicked");
+			}
+			else{
+				$("#newRoom").addClass("choosingRoomClicked");			
+				$("#chooseRoom").removeClass("choosingRoomClicked");				
+				$("#friendRoom").removeClass("choosingRoomClicked");
+			}
+		});
+		
+		$("#friendRoom").click(function(){
+			if ($("#friendRoom").hasClass("choosingRoomClicked")){
+				$("#friendRoom").removeClass("choosingRoomClicked");
+			}
+			else{
+				$("#friendRoom").addClass("choosingRoomClicked");				
+				$("#newRoom").removeClass("choosingRoomClicked");
+				$("#chooseRoom").removeClass("choosingRoomClicked");
+			}
+		});
+			
+		
 		/** jQuery scrollbar for furniture Menu**/
 		//scrollpane parts
 		var scrollPane = $( ".scroll-pane" ),

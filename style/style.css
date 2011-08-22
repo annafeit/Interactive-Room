@@ -2,19 +2,32 @@ body{
 	background-color:#140d0a; 
 	overflow:hidden;
 }
-.button{	
-	font-size:25px;
-	font-family:Serif;
-	border-radius:5px;	
-	background-color:#f2cb9b;
-	color:	#140d0a;	
-}
+
 .loginFont{
 	font-size:30px;
 	font-weight:600;
 	color:#f2cb9b;
 }
-
+button{
+	/*font*/
+	font-family:serif;
+	font-size:20px;	
+	letter-spacing:1px;
+	color:#460000;
+	/*color and border*/
+	background-color:#f2cb9b;
+	border:none;
+	border-radius:5px;
+	height:35px;
+	width:100px;
+	box-shadow:0px 0px 10px #680000;	
+}
+button:hover{
+	box-shadow:0px 0px 15px #FFBC45;
+}
+button:active{
+	box-shadow: 0px 0px 10px #680000 inset;
+	}
 input{
 	width:270px;
 	height:22px;
@@ -23,6 +36,7 @@ input{
 }
 /** login **/
 #connection{
+	float:left;
 	/*position and size*/
 	position:absolute;
 	height:200px;
@@ -30,13 +44,14 @@ input{
 	left:50%;
 	top:50%;
 	margin-left:-300px;
-	margin-top:-150px;	
+	margin-top:-150px;		
 	/*color and border*/
 	background-color:rgb(163,37,0);
 	border-radius:10px;	
 	box-shadow:  0px 0px 20px #A32500;
 }
 #label{
+	float:left;
 	position:absolute;;
 	height:25%;
 	width:200px;
@@ -44,6 +59,7 @@ input{
 	left:30px;	
 }
 #input{
+	float:left;
 	position:absolute;
 	height:50%;
 	width:300px;
@@ -61,10 +77,56 @@ input{
 }
 
 #buttons{
+	float:left;
 	position:relative;
 	width:100%;
-	top:75%;
-	left:85%;
+	top:75%;	
+}
+#loginButton{
+	position:relative;
+	left:81%;
+}
+/**choosing room**/
+.choosingRoom{
+	position:absolute;
+	background-color:rgb(163,37,0);
+	border-radius:10px;	
+	box-shadow:  0px 0px 20px #A32500;
+	height:200px;
+	width:200px;
+	top:25%;
+	margin-top:-100px;
+	margin-left: -100px;
+}
+.choosingRoom:hover{
+	box-shadow:0px 0px 50px #A32500;
+}
+.choosingRoom:active{
+	box-shadow:0px 0px 30px #260000 inset;
+}
+.choosingRoomClicked{
+	box-shadow:0px 0px 30px #260000 inset;
+}
+#chooseRoom{
+	left:25%;
+}
+#friendRoom{
+	left:50%;
+}
+#newRoom{
+	left:75%;
+}
+.choosingRoomTab{
+	/*position and size*/
+	position:absolute;
+	top:45%;	
+	left:25%;
+	margin-left:-100px;	
+	height:25%;
+	width:66%;
+	/* color and border*/
+	border-radius:10px;
+	background-color:#f2cb9b;	
 }
 /** room **/
 #all{
@@ -75,22 +137,22 @@ input{
 	margin-left:-7px;
 	z-index:-2;
 }
+xml3d{
+	margin-left:3px;
+	margin-top:3px;
+}
 #room{
 	position:absolute;	
 	width:100%;
 	height:100%;
-	margin-top:-6px;
-	margin-left:-6px;	
+	margin-top:-4px;
+	margin-left:-4px;	
 	z-index:-1;
 }
 #name{
 	z-index:1;
 }
-#showRoom{
-	position:absolute;
-	top:5%;
-	left:95%;
-}
+
 /** menu **/
 .menu{
 	background-color: rgba(242, 203, 155, 1.0);
