@@ -40,6 +40,31 @@ $(document).ready(
 		});
 			
 		
+		/** Test Scrollbar **/
+		
+		// Easing equation, borrowed from jQuery easing plugin
+		// http://gsgd.co.uk/sandbox/jquery/easing/
+		jQuery.easing.easeOutQuart = function (x, t, b, c, d) {
+			return -c * ((t=t/d-1)*t*t*t - 1) + b;
+		};
+
+		
+		$('#content').serialScroll({
+			items:'li',
+			prev:'#roomBrowser #prev',
+			next:'#roomBrowser #next',
+			offset:-105, //when scrolling to object, stop 105 before reaching it (from the left)
+			start:1, //as we are centering it, start at the 2nd
+			duration:1200,
+			force:true,
+			stop:true,
+			lock:false,
+			cycle:false, //don't pull back once you reach the end
+			//easing:'easeOutQuart', //use this easing equation for a funny effect
+			
+		});
+	
+		
 		/** jQuery scrollbar for furniture Menu**/
 		//scrollpane parts
 		var scrollPane = $( ".scroll-pane" ),

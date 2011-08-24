@@ -12,6 +12,8 @@
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.core.js"/>
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.widget.js"/>
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.button.js"/>
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.scrollTo-min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.serialScroll-min.js"/>
 		
     <!-- Configuration and Login-->
 		<script type="text/javascript" src="scripts/Login.js"/>
@@ -35,7 +37,24 @@
   	
   	</div>
   	
-  	<div id="chooseRoomTab" class="choosingRoomTab">
+  	<div id="roomBrowser">
+		<a id="prev" href="#" class = "browserNavigation">prev</a>
+		<div id="content">
+			<ul>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			<li> <div class = "browserContent"/> </li>
+			
+			</ul>
+		</div>
+		<a id="next" href="#" class = "browserNavigation">next</a>
   	</div>
   
   </body>

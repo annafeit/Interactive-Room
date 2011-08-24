@@ -116,18 +116,50 @@ input{
 #newRoom{
 	left:75%;
 }
-.choosingRoomTab{
+#roomBrowser{
 	/*position and size*/
 	position:absolute;
 	top:45%;	
-	left:25%;
-	margin-left:-100px;	
+	left:25%;	
 	height:25%;
 	width:66%;
+	margin-left:-100px;
 	/* color and border*/
 	border-radius:10px;
 	background-color:#f2cb9b;	
 }
+#content{
+	background-color:red;
+	position:absolute;
+	left:5%;
+	height:100%;
+	width:90%;
+	float:left;
+	overflow:hidden;
+		
+}
+	#content ul{
+		width:2400px;
+		list-style-type:none;
+	}
+	#content li{
+			float:left;
+			margin:0 16px;
+			cursor:pointer;
+		}
+	#content .browserContent{		
+		background-color: green;
+		width: 100px;
+		height: 100px;
+		border-radius: 5px;		
+	}
+#prev{
+	float:left;
+}
+#next{
+	float:right;
+}
+
 /** room **/
 #all{
 	position:absolute;
