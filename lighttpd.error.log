@@ -79,3 +79,15 @@
 2011-08-21 13:27:05: (log.c.166) server started 
 2011-08-21 23:58:51: (server.c.1503) server stopped by UID = 0 PID = 6778 
 2011-08-22 10:10:41: (log.c.166) server started 
+2011-08-22 13:04:54: (log.c.166) server started 
+2011-08-22 13:11:12: (server.c.1503) server stopped by UID = 0 PID = 2932 
+2011-08-22 13:11:12: (log.c.166) server started 
+2011-08-22 15:10:52: (server.c.1503) server stopped by UID = 0 PID = 5055 
+2011-08-23 13:08:21: (log.c.166) server started 
+2011-08-23 13:56:56: (server.c.1503) server stopped by UID = 0 PID = 2642 
+2011-08-23 13:56:56: (log.c.166) server started 
+2011-08-23 14:04:08: (server.c.1503) server stopped by UID = 0 PID = 2677 
+2011-08-23 14:04:08: (log.c.166) server started 
+2011-08-23 14:53:45: (server.c.1503) server stopped by UID = 0 PID = 32192 
+2011-08-23 14:53:46: (log.c.166) server started 
+2011-08-23 14:55:04: (server.c.1503) server stopped by UID = 0 PID = 32471 
