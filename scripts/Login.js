@@ -13,9 +13,7 @@ var address;
 var username;
 var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I need that??
 
-function init(){			
-	 $("#all").hide();	 	 						
-};
+
 
 //To connect to the server we do:
 //1. Create MainThread, which
@@ -58,11 +56,9 @@ function connect(address, mesh, name){
 function graphicsReady() {
 	var scriptArgs ={
 			space: SpaceURL,
-			username: this.username,
-			//loc: {scale:[0,0,0,this.avatarScale]},
+			username: this.username,			
 			visual: {mesh:avatarURL},			
-			//level: this.world,
-			//avatar: this.avatarURL
+			loc:{scale: "1.0"}	//just to match the code..
 	}	
 	
 	try{     

@@ -12,7 +12,9 @@
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.core.js"/>
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.widget.js"/>
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.button.js"/>
-
+		<!-- jQuery slider menu -->
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.scrollTo-min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.serialScroll-min.js"/>		
 		
 		<!-- KataJS simplifies development of the Sirikata ObjectHost in the browser -->
 		<script type="text/javascript" src="externals/katajs/katajs/core/Core.js"/>
@@ -51,6 +53,43 @@
 			</div>
 		</div>
 		
+		<!-- CHOOSE A ROOM -->
+		<div id="choose">
+			<div id="chooseRoom" class="choosingRoom">
+		    	<p class="choosingRoomText">edit room</p>
+		    </div>
+		    
+		    <div id="friendRoom" class="choosingRoom">
+		    	<p class="choosingRoomText">shared rooms</p>
+		    </div>
+		    
+		  	<div id="newRoom" class="choosingRoom">
+		  		<p class="choosingRoomText">new room</p>
+		  	</div>
+		  	
+		  	<div id="chooseMenu">
+		  	  	<div id="roomBrowser">
+					<div id="content">
+						<ul>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							
+						</ul>
+					</div>
+					<a id="prev" href="#" class="browserNavigation"> &lt; </a>
+					<a id="next" href="#" class="browserNavigation"> &gt; </a>	
+			  	</div>			  	
+			  </div>
+		</div>
+	  	
 		<!-- ROOM -->		
 		<div id="all">
 			<div id="room"/>				

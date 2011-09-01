@@ -2,6 +2,7 @@ var Room = {};
 
 Kata.require([ 
 	'katajs/oh/Script.js', 
+	kata_base_offset + 'scripts/UserScript.js'
 ],function() {
 	
 	var SUPER = Kata.Script.prototype;
@@ -16,8 +17,8 @@ Kata.require([
 	Kata.extend(Room.RoomScript, SUPER);
 	
 	Room.RoomScript.prototype.connected = function(presence){
-
+	    
 	};
 		
 	
-}, kata_base_offset + "script/UserScript.js");
+}, kata_base_offset + "scripts/RoomScript.js");

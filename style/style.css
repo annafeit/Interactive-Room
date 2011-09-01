@@ -86,7 +86,15 @@ input{
 	position:relative;
 	left:81%;
 }
+
+
+
 /**choosing room**/
+#choose{
+	position:absolute;
+	width:100%;
+	height:100%;
+}
 .choosingRoom{
 	position:absolute;
 	background-color:rgb(163,37,0);
@@ -98,13 +106,31 @@ input{
 	margin-top:-100px;
 	margin-left: -100px;
 }
+.choosingRoomText{
+	/*position and size*/
+	position:absolute;
+	left:10px;
+	top:40px;
+	margin-top:0px;
+	height:180px;
+	width:180px;
+	/*font and color*/
+	font-family: "League-Gothic", Courier;
+	color:#541200;
+	font-size: 50px; 
+	text-transform: uppercase; 
+	text-align: center;
+	text-shadow: 0px 2px 3px #DE3E0D;	
+}
 .choosingRoom:hover{
-	box-shadow:0px 0px 50px #A32500;
+	background-color:#BA340B;
+	box-shadow:0px 0px 50px #BA340B;
 }
 .choosingRoom:active{
 	box-shadow:0px 0px 30px #260000 inset;
 }
 .choosingRoomClicked{
+	background-color:#BA340B;
 	box-shadow:0px 0px 30px #260000 inset;
 }
 #chooseRoom{
@@ -116,30 +142,33 @@ input{
 #newRoom{
 	left:75%;
 }
-#roomBrowser{
-	/*position and size*/
+#chooseMenu{
+	display:none;
 	position:absolute;
-	top:45%;	
-	left:25%;	
-	height:25%;
-	width:66%;
-	margin-left:-100px;
-	/* color and border*/
-	border-radius:10px;
-	background-color:#f2cb9b;	
+	width:70%;
+	height:30%;
+	top:60%;
+	left:15%;	
 }
-#content{
-	background-color:red;
+#roomBrowser{	
+	/*position and size*/
+	position:absolute;	
+	top:25%;
+	left:3%;
+	height:60%;
+	width:100%;
+}
+#content{	
 	position:absolute;
-	left:5%;
 	height:100%;
-	width:90%;
+	width:92%;
 	float:left;
 	overflow:hidden;
 		
 }
-	#content ul{
+	#content ul{	
 		width:2400px;
+		left:0px;
 		list-style-type:none;
 	}
 	#content li{
@@ -147,18 +176,43 @@ input{
 			margin:0 16px;
 			cursor:pointer;
 		}
-	#content .browserContent{		
-		background-color: green;
+	#content .browserContent{	
+		background-color:rgba(242, 203, 155,0.8);
 		width: 100px;
 		height: 100px;
 		border-radius: 5px;		
 	}
+	#content .browserContent:hover{
+		box-shadow: 0px 0px 10px #f2cb9b;
+	}
+
+.browserNavigation{
+	color:#f2cb9b;
+	font-family: "League-Gothic", Courier;
+	font-size: 50px; 	
+	position:absolute;
+	top:30%;
+}
+.browserNavigation:hover{
+	color:#f2cb9b;
+	text-shadow: 0px 0px 10px #f2cb9b;	
+}
+
+.browserNavigation:active{
+	color:#f2cb9b;
+	text-shadow: 0px 0px 0px #f2cb9b;	
+}
+
 #prev{
 	float:left;
+	left:-5%;
 }
 #next{
 	float:right;
+	right:0%;
 }
+
+
 
 /** room **/
 #all{
@@ -217,13 +271,5 @@ a:hover{
 a:active{
 	color:#c93c00;
 }
-/**scrollbar menu**/
-.scroll-pane { overflow: auto; width: 99%; float:left; }
-.scroll-content { width: 100%; float: left; }
-.scroll-content-item { width: 80px; height: 80px; float: left; margin: 10px; font-size: 3em; line-height: 96px; text-align: center; }
-.scroll-bar-wrap { clear: left; padding: 0 4px 0 2px; margin: 0 -1px -1px -1px; }
-.scroll-bar-wrap .ui-slider { background: none; border:0; height: 2em; margin: 0 auto;  }
-.scroll-bar-wrap .ui-handle-helper-parent { position: relative; width: 100%; height: 100%; margin: 0 auto; }
-.scroll-bar-wrap .ui-slider-handle { top:.2em; height: 1.5em; }
-.scroll-bar-wrap .ui-slider-handle .ui-icon { margin: -8px auto 0; position: relative; top: 50%; }
+
 
