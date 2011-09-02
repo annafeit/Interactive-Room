@@ -14,6 +14,8 @@ Kata.require([
 	 * Constructor
 	 */
 	User.UserScript = function(channel, args){
+		var t = document.getElementsByTagName("xml3d");
+		this.xml3d = t[0];
 		//initialize viewer in the origin
 		this.initialLocation = Kata.LocationIdentityNow();						
 		//save arguments
@@ -101,6 +103,13 @@ Kata.require([
  		this.presence.setLocation(loc);		
     };
     
+    User.UserScript.prototype.setCam = function(pos){
+    	var now = new Date();
+ 		var loc = this.presence.predictedLocationAtTime(now); 		
+ 		loc.pos = pos; 	 		
+ 		this.presence.setLocation(loc);		
+    };
+    
 	/**
 	 * Callback that is triggered when object is connected to the space	  
 	 */
@@ -140,7 +149,7 @@ Kata.require([
 	};
 	
 	//Handle messages from GUI
-	User.UserScript.prototype._handleGUIMessage = function (channel, msg) {
+	User.UserScript.prototype._handleGUIMessage = function (channel, msg) {		
 		if(msg.msg=="loaded" && msg.mesh==this.roomMesh){
 			this.setCamToDoor();
 		}
@@ -155,8 +164,14 @@ Kata.require([
             if ( !this.keyIsDown[this.Keys.LEFT] && !this.keyIsDown[this.Keys.RIGHT])
                 this.presence.setAngularVelocity(Kata.Quaternion.identity());
 		}
-		if (msg.msg == "keydown"){			
-			var origOrient = this.presence.predictedOrientation(new Date());
+		if (msg.msg == "keydown"){		
+			var now = new Date();
+			var preOrient = this.presence.predictedOrientation(now);
+			var origOrient = new Kata.Quaternion();
+			origOrient[0] = preOrient[0];
+			origOrient[1] = preOrient[1];
+			origOrient[2] = preOrient[2];
+			origOrient[3] = preOrient[3];
 			var avMat = Kata.QuaternionToRotation(origOrient);
             var avSpeed = 15;
             var full_rot_seconds = 10.0;	            	          
@@ -173,15 +188,16 @@ Kata.require([
            
             if (this.keyIsDown[this.Keys.UP]) {
             	if (this.ctrl){
-            		//var inv = origOrient.inverse;
-            		var deflt = Kata.Quaternion.fromAxisAngle([0, 0, 1], 0.0);
-            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], 0.17); //0.17 ca. 10°
-            		var res = deflt.multiply(up);
+            		//new rotation N = inv(O) * V * O 
+            		var inv = origOrient.inverse();
+            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], 0.085); //0.085 ca. 5°
             		
-            		var loc = this.presence.predictedLocationAtTime(now);
-            		loc.orient=res.multiply(origOrient);
-            		this.presence.setLocation(loc);
-            		
+            		var rotateBack = origOrient.multiply(inv);
+            		var rotateVert = rotateBack.multiply(up)
+            		//TODO find out why not reversed (the function call)
+                    var res = origOrient.multiply(up);
+            		//TODO how to make it smooth
+            		this.presence.setOrientation(res);
             	}
             	else{
             		this.presence.setVelocity([-avZX, -avZY, -avZZ]);
@@ -190,7 +206,15 @@ Kata.require([
             }
             if (this.keyIsDown[this.Keys.DOWN]) {
             	if (this.ctrl){
-            		//TODO
+            		//new rotation N = inv(O) * V * O 
+            		var inv = origOrient.inverse();            		
+            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], -0.085); //0.085 ca. 5°
+            		
+            		var rotateBack = origOrient.multiply(inv);
+            		var rotateVert = rotateBack.multiply(up)
+                    var res = origOrient.multiply(up);
+            		
+            		this.presence.setOrientation(res);
             	}
             	else{
             		this.presence.setVelocity([avZX, avZY, avZZ]);
