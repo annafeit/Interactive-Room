@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
+	<defs>
+	    <transform id="lightTransform" translation="300 240 -175"/>
+	    
+		<shader id="material" script="urn:xml3d:shader:phong">
+		    <float3 name="diffuseColor">
+		    0.6 0.6 0.6
+		    </float3>
+		    <float name="ambientIntensity">
+		    0.7
+		    </float>
+		</shader>
+		
+        <lightshader id="light" script="urn:xml3d:lightshader:point">
+		    <float3 name="intensity">1.0 1.0 1.0</float3>
+		    <float3 name="attenuation">1 0 0</float3>
+		</lightshader>
+
+	    
+		<data id="floorData" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 0
+	            	0 0 -350
+	            	600 0 -350
+	            	600 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0	            		            	
+	            </float3>
+	    </data>
+	    <data id="ceilingData" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 250 0
+	            	0 250 -350
+	            	600 250 -350
+	            	600 250 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0	            		            	
+	            </float3>
+	    </data>
+	    <data id="wall1Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 0
+	            	0 250 0 
+	            	600 250 0 
+	            	600 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 -1 
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1	            	
+	            </float3>
+	    </data>
+	     <data id="wall2Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 0
+	            	0 250 0 
+	            	0 250 -350
+	            	0 0 -350
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	1 0 0
+	            	1 0 0
+	            	1 0 0
+	            	1 0 0
+	            </float3>
+	    </data>
+	    <data id="wall3Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 -350
+	            	0 250 -350
+	            	600 250 -350
+	            	600 0 -350
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 1
+	            	0 0 1
+	            	0 0 1
+	            	0 0 1
+	            </float3>
+	    </data>
+	    <data id="wall4Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">	            	
+	            	600 0-350
+	            	600 250 -350
+	            	600 250 0
+	            	600 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	-1 0 0
+	            	-1 0 0 
+	            	-1 0 0 
+	            	-1 0 0  
+	            </float3>
+	    </data>
+    </defs>
+    
+    <view id="door" position="580 150 -175" orientation="0 1 0 1.57"/>       
+    
+     <group transform="#lightTransform" >
+	 <light shader="#light" intensity="0.8" />
+	</group>
+	     		  
+    <group id="floor" style="shader:url(#material)">
+      <mesh src="#floorData" type="triangles"/>
+    </group>
+    <group id="ceiling" style="shader:url(#material)">
+      <mesh src="#ceilingData" type="triangles"/>
+    </group>
+    <group id="wall1" style="shader:url(#material)">
+      <mesh src="#wall1Data" type="triangles"/>
+    </group>
+    <group id="wall2" style="shader:url(#material)">
+      <mesh src="#wall2Data" type="triangles"/>
+    </group>
+    <group id="wall3" style="shader:url(#material)">
+      <mesh src="#wall3Data" type="triangles"/>
+    </group>
+    <group id="wall4" style="shader:url(#material)">
+      <mesh src="#wall4Data" type="triangles"/>
+    </group>   
+</xml3d>

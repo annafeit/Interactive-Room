@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
+	<defs>
+	    <transform id="lightTransform1" translation="100 240 -200"/>
+	    <transform id="lightTransform2" translation="500 240 -200"/>
+	    
+		<shader id="material" script="urn:xml3d:shader:phong">
+		    <float3 name="diffuseColor">
+		    0.6 0.6 0.6
+		    </float3>
+		    <float name="ambientIntensity">
+		    0.7
+		    </float>
+		</shader>
+		
+        <lightshader id="light" script="urn:xml3d:lightshader:point">
+		    <float3 name="intensity">1.0 1.0 1.0</float3>
+		    <float3 name="attenuation">1 0 0</float3>
+		</lightshader>
+
+	    
+		<data id="floorData" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            	4 2 5
+	            	5 6 4
+	            	7 5 8 
+	            	8 9 7	            	
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 0
+	            	0 0 -400
+	            	200 0 -400
+	            	200 0 0 
+	            	200 0 -150
+	            	400 0 -400
+	            	400 0 -150
+	            	400 0 0
+	            	600 0 -400
+	            	600 0 0
+	             
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            </float3>
+	    </data>
+	    <data id="ceilingData" >
+	           <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            	4 2 5
+	            	5 6 4
+	            	7 5 8 
+	            	8 9 7	            	
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 250 0
+	            	0 250 -400
+	            	200 250 -400
+	            	200 250 0 
+	            	200 250 -150
+	            	400 250 -400
+	            	400 250 -150
+	            	400 250 0
+	            	600 250 -400
+	            	600 250 0
+	             
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            </float3>
+	    </data>
+	    <data id="wall1Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 0
+	            	0 250 0 
+	            	200 250 0 
+	            	200 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 -1 
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1	            	
+	            </float3>
+	    </data>
+	     <data id="wall2Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 0
+	            	0 250 0 
+	            	0 250 -400
+	            	0 0 -400
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	1 0 0
+	            	1 0 0
+	            	1 0 0
+	            	1 0 0
+	            </float3>
+	    </data>
+	    <data id="wall3Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 -400 
+	            	0 250 -400
+	            	600 250 -400
+	            	600 0 -400
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 1
+	            	0 0 1
+	            	0 0 1
+	            	0 0 1
+	            </float3>
+	    </data>
+	    <data id="wall4Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">	            	
+	            	600 0 -400
+	            	600 250 -400
+	            	600 250 0
+	            	600 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	-1 0 0
+	            	-1 0 0 
+	            	-1 0 0 
+	            	-1 0 0  
+	            </float3>
+	    </data>
+	    <data id="wall5Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">	            	
+					400 0 0
+					400 250 0
+					600 250 0
+	            	600 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1  
+	            </float3>
+	    </data>
+	    <data id="wall6Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">	            						
+	            	400 0 -150
+	            	400 250 -150
+	            	400 250 0
+	            	400 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	1 0 0
+	            	1 0 0 
+	            	1 0 0 
+	            	1 0 0  
+	            </float3>
+	    </data>
+	    <data id="wall7Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">	            						
+	            	200 0 -150
+	            	200 250 -150
+	            	400 250 -150
+	            	400 0 -150
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1  
+	            </float3>
+	    </data>
+	    <data id="wall8Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            </int>
+	            
+	            <float3 name="position">	            						
+	            	200 0 0
+	            	200 250 0 
+	            	200 250 -150
+	            	200 0 -150   
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1
+	            	0 0 -1  
+	            </float3>
+	    </data>
+    </defs>
+    
+    <view id="door" position="300 150 -380" orientation="0 1 0 3.14"/>       
+    
+    <group id="light1" transform="#lightTransform1" >
+	 <light shader="#light" intensity="0.8" />
+	</group>
+	<group id="light2" transform="#lightTransform2" >
+	 <light shader="#light" intensity="0.8" />
+	</group>
+	     		  
+    <group id="floor" style="shader:url(#material)">
+      <mesh src="#floorData" type="triangles"/>
+    </group>
+    <group id="ceiling" style="shader:url(#material)">
+      <mesh src="#ceilingData" type="triangles"/>
+    </group>
+    <group id="wall1" style="shader:url(#material)">
+      <mesh src="#wall1Data" type="triangles"/>
+    </group>
+    <group id="wall2" style="shader:url(#material)">
+      <mesh src="#wall2Data" type="triangles"/>
+    </group>
+    <group id="wall3" style="shader:url(#material)">
+      <mesh src="#wall3Data" type="triangles"/>
+    </group>
+    <group id="wall4" style="shader:url(#material)">
+      <mesh src="#wall4Data" type="triangles"/>
+    </group>
+    <group id="wall5" style="shader:url(#material)">
+      <mesh src="#wall5Data" type="triangles"/>
+    </group>
+    <group id="wall6" style="shader:url(#material)">
+      <mesh src="#wall6Data" type="triangles"/>
+    </group>
+    <group id="wall7" style="shader:url(#material)">
+      <mesh src="#wall7Data" type="triangles"/>
+    </group>
+    <group id="wall8" style="shader:url(#material)">
+      <mesh src="#wall8Data" type="triangles"/>
+    </group>
+</xml3d>
