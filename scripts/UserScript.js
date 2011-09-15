@@ -14,13 +14,14 @@ Kata.require([
 	 * Constructor
 	 */
 	User.UserScript = function(channel, args){
+		//save the xml3d element
 		var t = document.getElementsByTagName("xml3d");
 		this.xml3d = t[0];
-		//initialize viewer in the origin
-		this.initialLocation = Kata.LocationIdentityNow();						
+		this.roomMesh = args.world;
 		//save arguments
 		this.username = args.username;
 		this.space=args.space;
+		this.database = args.database;
 		
 		//to save which key is pressed
 		this.keyIsDown = {};
@@ -61,14 +62,14 @@ Kata.require([
         this.setCameraPosOrient(this.presence.predictedPosition(now),
                                 this.presence.predictedOrientation(now),
                                 0.1);	//lag:0.1 just to match the code...
+        this.checkWalls();
         
     };
     
     /** 
      * Creates the room, the user wants to login to
      */
-    User.UserScript.prototype.createRoom = function(){
-    	this.roomMesh = "static/meshes/staticWorld.xml3d";
+    User.UserScript.prototype.createRoom = function(){    	
     	this.createObject(kata_base_offset + "scripts/RoomScript.js", 
 	   			"Room.RoomScript", 
 				{ space:this.space,
@@ -129,6 +130,10 @@ Kata.require([
 		presence.setQueryHandler(Kata.bind(this.proxEvent, this));
         presence.setQuery(0);                  		
 		
+        //save the activeView
+        var id = this.xml3d.getAttribute("activeview");
+        this.camera = $(id)[0];
+        
 		//create Room of user
 		this.createRoom();				  
 		
@@ -139,6 +144,15 @@ Kata.require([
 		//display username
 		document.getElementById("name").innerHTML=username;
 	}; 
+	
+	/**
+	 * check if the camera is out of the room and make walls invisible if this is true.
+	 */
+	User.UserScript.prototype.checkWalls = function(){
+		var x = Math.round(this.xml3d.offsetWidth/2);
+		var y = Math.round(this.xml3d.offsetHeight/2);
+		var obj = this.xml3d.getElementByPoint(x,y);
+	}
 	
 	//Enum for Keycode
     User.UserScript.prototype.Keys = {
@@ -173,7 +187,7 @@ Kata.require([
 			origOrient[2] = preOrient[2];
 			origOrient[3] = preOrient[3];
 			var avMat = Kata.QuaternionToRotation(origOrient);
-            var avSpeed = 15;
+            var avSpeed = 50;
             var full_rot_seconds = 10.0;	            	          
             
             var avXX = avMat[0][0] * avSpeed;
@@ -188,15 +202,25 @@ Kata.require([
            
             if (this.keyIsDown[this.Keys.UP]) {
             	if (this.ctrl){
-            		//new rotation N = inv(O) * V * O 
-            		var inv = origOrient.inverse();
-            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], 0.085); //0.085 ca. 5°
+            		/*
+            		var dir = this.camera.getDirection();
+            		var up = this.camera.getUpVector();
+            		var axis = up.cross(dir);
+            		this.presence.setAngularVelocity(
+    	                    Kata.Quaternion.fromAxisAngle([dir.x, dir.y, dir.z], 2.0*Math.PI/full_rot_seconds)
+    	                );*/
             		
-            		var rotateBack = origOrient.multiply(inv);
-            		var rotateVert = rotateBack.multiply(up)
+            		
+            		//new rotation N = inv(O) * V * O 
+            		//FIXME still doesn't work correctly?
+            		var inv = origOrient.inverse();
+            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], 0.017); //0.017 ca. 5°
+            		
+            		var rotateBack = inv.multiply(origOrient);
+            		var rotateVert = up.multiply(rotateBack);
             		//TODO find out why not reversed (the function call)
                     var res = origOrient.multiply(up);
-            		//TODO how to make it smooth
+            		//TODO how to make it smooth (like Velocity)            		
             		this.presence.setOrientation(res);
             	}
             	else{
@@ -208,7 +232,7 @@ Kata.require([
             	if (this.ctrl){
             		//new rotation N = inv(O) * V * O 
             		var inv = origOrient.inverse();            		
-            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], -0.085); //0.085 ca. 5°
+            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], -0.017); //0.017 ca. 1°
             		
             		var rotateBack = origOrient.multiply(inv);
             		var rotateVert = rotateBack.multiply(up)
@@ -246,5 +270,7 @@ Kata.require([
 		this.updateGFX(this.presence);
 		
 	};
+	
+	
 	
 }, kata_base_offset + "scripts/UserScript.js");

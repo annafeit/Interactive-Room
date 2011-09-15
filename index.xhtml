@@ -36,25 +36,58 @@
 	<body>
 	
 		<!-- LOGIN -->
-		
-		<div id="connection">		
-			<div id="label">
-				<label for="server-address" class="loginFont"> Server address:</label>
-				<label for="username" class="loginFont"> Username:</label>				
-			</div>
-			<div id="input">					
-				<input id="server-address" class="inputFont" value="sirikata://localhost:7777"/>
-				<input id="username" class="inputFont"/>
-			</div>
-			<div id="buttons">
-				<button id="loginButton" class="ui-button" onclick="connect($('#server-address').val(), null , $('#username').val())">
-					Login
-				</button>
+		<div id="index">
+			<button id="debug" onclick="connect($('#server-address').val(), '../static/meshes/room1.xml3d', $('#username').val());"> DEBUG </button>
+			<div id="connection" class="dialogue">				
+				<form id="flogin" action="scripts/login.php" method="post" class="loginFont">
+					<!-- form fields -->
+					server address: <input id="server-address" class="loginInput" type="text" name="server-address" value="sirikata://localhost:7777"/><br/>
+					username: 		<input id="username" class="loginInput" type="text" name="username" /><br/>
+					password:		 <input id="password" class="loginInput" type="password" name="pwd" />
+					<!-- buttons -->
+					<div id="buttons">
+						<button id="loginButton" type="submit"> <!-- onclick="$('#index').hide(); $('#choose').show();"> -->				 
+							Login
+						</button>
+						<button id="registerButton" type="button" onclick="$('#overlayRegister').show();">				 
+							Register
+						</button>
+					</div>
+				</form> 
+				 		
+			</div>		
+			
+			<div id="overlayRegister" class="overlay">				
+				<div id="register" class="dialogue">			
+					<p>Please choose a username and a password.</p>
+					<form id="fregister" action="scripts/register.php" method="post" class="loginFont registerFont">
+						<!-- form fields -->
+						username: 			<input id="newUsername" class="registerInput" type="text" name="newUsername"/><br/>
+						password:			<input id="newPassword" class="registerInput" type="password" name="newPassword"/><br/>
+						confirm password:	<input id="newPasswordConf" class="registerInput" type="password" name="newPasswordConf"/>
+					<!-- buttons -->								
+						<button id="registerOverlayButton" name="registerOverlayButton" type="submit"><!--onclick="register( $('#newUsername').val(), $('#newPassword').val(), $('#newPasswordConf').val());">-->
+							Register
+						</button>																		
+					</form>
+					<button class="closeButton" onclick="$('#overlayRegister').hide();">x</button>
+				</div>
 			</div>
 		</div>
-		
 		<!-- CHOOSE A ROOM -->
-		<div id="choose">
+			
+		<div id="choose">	
+			<div id="overlay" class="overlay">
+				<div id="createNewRoom" class="dialogue">
+					<div id="roomMesh"/>	
+					<div id="createNewRoomInput">			
+						<label for="title" class="loginFont"> Title:</label>																					
+						<input id="title" class="inputFont"/>				
+					</div>
+					<button id="createNewRoomButton" onclick="createNewRoom( $('#title').val() );"> Create</button>
+					<button class="closeButton" onclick="$('#overlay').hide();">x</button>
+				</div> 			
+			</div>			
 			<div id="chooseRoom" class="choosingRoom">
 		    	<p class="choosingRoomText">edit room</p>
 		    </div>
@@ -68,7 +101,13 @@
 		  	</div>
 		  	
 		  	<div id="chooseMenu">
-		  	  	<div id="roomBrowser">
+		  		<div id="chooseNewRoom" style="display:none">
+		  			<div id="room1" class = "newRoomContent" onclick="chooseNewRoom('room1')"/>
+		  			<div id="room2" class = "newRoomContent" onclick="chooseNewRoom('room2')"/>
+		  			<div id="room3" class = "newRoomContent" onclick="chooseNewRoom('room3')"/>
+		  			<div id="room4" class = "newRoomContent" onclick="chooseNewRoom('room4')"/>
+		  		</div>
+		  	  	<div id="roomBrowser" style="display:none">
 					<div id="content">
 						<ul>
 							<li> <div class = "browserContent"/> </li>
@@ -134,27 +173,23 @@
 		    		</div>
 		    </div>		    
 
-			<div id="menu-furniture" class="menu scroll-pane ui-widget ui-corner-all"> 
-				<div id="furniture-content" class="scroll-content"> 
-					<div class="scroll-content-item ui-widget-header">1</div> 
-					<div class="scroll-content-item ui-widget-header">2</div> 
-					<div class="scroll-content-item ui-widget-header">3</div> 
-					<div class="scroll-content-item ui-widget-header">4</div> 
-					<div class="scroll-content-item ui-widget-header">5</div> 
-					<div class="scroll-content-item ui-widget-header">6</div> 
-					<div class="scroll-content-item ui-widget-header">7</div> 
-					<div class="scroll-content-item ui-widget-header">8</div> 
-					<div class="scroll-content-item ui-widget-header">9</div> 
-					<div class="scroll-content-item ui-widget-header">10</div> 
-					<div class="scroll-content-item ui-widget-header">11</div> 
-					<div class="scroll-content-item ui-widget-header">12</div> 
-					<div class="scroll-content-item ui-widget-header">13</div> 
-					<div class="scroll-content-item ui-widget-header">14</div> 
-					 
-				</div> 
-				<div class="scroll-bar-wrap ui-widget-content ui-corner-bottom"> 
-					<div class="scroll-bar"></div> 
-				</div> 
+			<div id="furnitureBrowser" class="menu">
+					<div id="furnitureContent">
+						<ul>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>
+							<li> <div class = "browserContent"/> </li>						
+						</ul>
+					</div>
+					<a id="prev" href="#" class="browserNavigation"> &lt; </a>
+					<a id="next" href="#" class="browserNavigation"> &gt; </a>	
 			</div> 
 		</div>
 	</body>	

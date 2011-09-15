@@ -1,17 +1,18 @@
 body{
-	background-color:#140d0a; 
+	background-color:rgb(20,13,10); 
 	overflow:hidden;
 }
 
 .loginFont{
-	font-size:30px;
+	font-family:sans-serif;
+	font-size:28px;
 	font-weight:600;
-	color:#f2cb9b;
+	color:#f2cb9b;	
 }
 button{
 	/*font*/
-	font-family:serif;
-	font-size:20px;	
+	font-family:sans-serif;
+	font-size:22px;	
 	letter-spacing:1px;
 	color:#460000;
 	/*color and border*/
@@ -28,11 +29,46 @@ button:hover{
 button:active{
 	box-shadow: 0px 0px 10px #680000 inset;
 	}
-input{
+.button{
+	/*font*/
+	font-family:sans-serif;
+	font-size:22px;	
+	letter-spacing:1px;
+	color:#460000;
+	/*color and border*/
+	background-color:#f2cb9b;
+	border:none;
+	border-radius:5px;
+	height:35px;
+	width:100px;
+	box-shadow:0px 0px 10px #680000;	
+}
+.button:hover{
+	box-shadow:0px 0px 15px #FFBC45;
+}
+.button:active{
+	box-shadow: 0px 0px 10px #680000 inset;
+	}
+.input{
 	width:270px;
 	height:22px;
 	font-size:14px;
 	color:	#140d0a;
+}
+.overlay{
+	display:none;
+	background-color:rgba(20,13,10,0.8);
+	position:absolute;
+	width:100%;
+	height:100%;
+	margin-top:-7px;
+	margin-left:-7px;
+	z-index:5;
+}
+.dialogue{
+	background-color:rgb(163,37,0);
+	border-radius:10px;	
+	box-shadow:  0px 0px 20px #A32500;
 }
 /** login **/
 #connection{
@@ -45,48 +81,105 @@ input{
 	top:50%;
 	margin-left:-300px;
 	margin-top:-150px;		
-	/*color and border*/
-	background-color:rgb(163,37,0);
-	border-radius:10px;	
-	box-shadow:  0px 0px 20px #A32500;
 }
-#label{
-	float:left;
-	position:absolute;;
-	height:25%;
-	width:200px;
-	top:20%;
-	left:30px;	
-}
-#input{
-	float:left;
+#flogin{
 	position:absolute;
-	height:50%;
-	width:300px;
-	top:20%;
+	left:15px;
+	top:20px;
+	height:180px;
+	width:580px;	
+}
+.loginInput{
+	position:absolute;	
 	left:250px;
+	height:18px;	
 }
 #server-address{
 	position:absolute;
-	top:7px;
+	top:5px;
+	height:18px;
 }
 #username{
 	position:absolute;
-	top:42px;
-	left:0px;
+	top:39px;
+	height:18px;	
 }
-
+#password{
+	position:absolute;
+	top:74px;
+	height:18px;
+}
 #buttons{
 	float:left;
-	position:relative;
+	position:absolute;
 	width:100%;
 	top:75%;	
 }
 #loginButton{
-	position:relative;
-	left:81%;
+	position:absolute;
+	right:10px;
+}
+#registerButton{
+	position:absolute;
+	right:120px;
 }
 
+
+
+/** OVERLAY - register**/
+.registerFont{
+	font-size:24px;
+}
+#register{	
+	position:absolute;
+	height:270px;
+	width:600px;
+	top:50%;
+	margin-top:-200px;
+	left:50%;
+	margin-left:-300px;	
+}
+	#register p{
+		position:absolute;
+		top:15px;
+		left:20px;
+		font-family:sans-serif;
+		font-size:26px;	
+		letter-spacing:1px;
+		color:#460000;
+	}
+#fregister{
+	position:absolute;
+	left:40px;
+	top:100px;
+	height:170px;
+	width:555px;
+}
+.registerInput{
+	position:absolute;	
+	left:250px;
+	height:18px;	
+}
+#newUsername{
+	position:absolute;
+	top:5px;
+	height:18px;
+}
+#newPassword{
+	position:absolute;
+	top:33px;
+	height:18px;
+}
+#newPasswordConf{
+	position:absolute;
+	top:62px;
+	height:18px;
+}
+#registerOverlayButton{
+	position:absolute;
+	bottom:10px; 
+	right:10px;
+}
 
 
 /**choosing room**/
@@ -131,7 +224,7 @@ input{
 }
 .choosingRoomClicked{
 	background-color:#BA340B;
-	box-shadow:0px 0px 30px #260000 inset;
+	box-shadow:0px 0px 20px #260000 inset;
 }
 #chooseRoom{
 	left:25%;
@@ -142,74 +235,100 @@ input{
 #newRoom{
 	left:75%;
 }
-#chooseMenu{
-	display:none;
+#chooseMenu{	
 	position:absolute;
 	width:70%;
 	height:30%;
 	top:60%;
 	left:15%;	
 }
-#roomBrowser{	
-	/*position and size*/
+/**choose a new Room**/
+#chooseNewRoom{
 	position:absolute;	
-	top:25%;
-	left:3%;
+	top:10%;
+	left:50%;
+	margin-left:-400px;	
 	height:60%;
-	width:100%;
+	width:800px;
 }
-#content{	
-	position:absolute;
-	height:100%;
-	width:92%;
+.newRoomContent{	
 	float:left;
-	overflow:hidden;
-		
+	background-color:rgba(242, 203, 155,0.8);
+	width: 150px;
+	height: 150px;
+	margin:0 20px;
+	border-radius: 5px;
+	background-repeat:no-repeat;
+	background-size:150px 150px;	
 }
-	#content ul{	
-		width:2400px;
-		left:0px;
-		list-style-type:none;
+.newRoomContent:hover{
+	box-shadow: 0px 0px 30px #A32500;
+}
+.newRoomContent:active{
+	box-shadow: 0px 0px 20px #A32500 inset;
+}
+	#room1{
+		background:url(../static/preview/room1.png);		
 	}
-	#content li{
-			float:left;
-			margin:0 16px;
-			cursor:pointer;
-		}
-	#content .browserContent{	
-		background-color:rgba(242, 203, 155,0.8);
-		width: 100px;
-		height: 100px;
-		border-radius: 5px;		
+	#room2{
+		background:url(../static/preview/room2.png);		
 	}
-	#content .browserContent:hover{
-		box-shadow: 0px 0px 10px #f2cb9b;
+	#room3{
+		background:url(../static/preview/room3.png);		
 	}
+	#room4{
+		background:url(../static/preview/room4.png);		
+	}
+	
+/** OVERLAY - new room **/
 
-.browserNavigation{
-	color:#f2cb9b;
-	font-family: "League-Gothic", Courier;
-	font-size: 50px; 	
+#createNewRoom{		
 	position:absolute;
-	top:30%;
+	height:250px;
+	width:500px;
+	top:50%;
+	margin-top:-250px;
+	left:50%;
+	margin-left:-250px;	
 }
-.browserNavigation:hover{
-	color:#f2cb9b;
-	text-shadow: 0px 0px 10px #f2cb9b;	
+#roomMesh{	
+	background-repeat:no-repeat;
+	background-size:100px 100px;
+	position:absolute;
+	top:10px;
+	left: 200px;
+	height:100px;
+	width:100px;
 }
-
-.browserNavigation:active{
-	color:#f2cb9b;
-	text-shadow: 0px 0px 0px #f2cb9b;	
+#createNewRoomInput{
+	position:absolute;
+	top:130px;
+	left:20px;
 }
-
-#prev{
-	float:left;
-	left:-5%;
+	#createNewRoomInput label{
+		position:relative;
+		top:5px;
+	}
+	#createNewRoomInput input{
+		position:relative;
+		margin-left:10px;
+	}
+#createNewRoomButton{
+	position:absolute;
+	height:35px;
+	width:100px;
+	top:200px;
+	left:380px;
 }
-#next{
-	float:right;
-	right:0%;
+.closeButton{	
+	position:absolute;
+	height:23px;
+	width:23px;
+	top:10px;
+	right:10px;	
+	font-family:sans-serif;
+	font-size:18px;
+	font-weight:bold;
 }
 
 
@@ -240,11 +359,6 @@ xml3d{
 }
 
 /** menu **/
-.menu{
-	background-color: rgba(242, 203, 155, 1.0);
-	box-shadow:  0px 0px 10px rgb(255, 241, 177);
-			 
-}
 #menu-type{
 	position:absolute;
 	width:20%;
@@ -253,14 +367,78 @@ xml3d{
 	left:0%;	
 	overflow:hidden;
 }
-#menu-furniture{
+#furnitureBrowser{		
 	position:absolute;
-	width:60%;
-	height:15%;
+	width:808px;
+	height:130px;
 	bottom:0%;
 	left:20%;
 	border-radius:10px 10px 0px 0px;
 }
+/** browser **/
+
+#furnitureContent{	
+	position:absolute;
+	height:100%;
+	width:100%;
+	float:left;
+	overflow:hidden;		
+}
+	#furnitureContent ul{
+		/* size of all pieces together*/	
+		width:1400px;	
+		position:absolute;
+		left:-30px;
+		list-style-type:none;
+	}
+	#furnitureContent li{
+		float:left;
+		margin:0 16px;
+		cursor:pointer;
+	}
+	#furnitureContent .browserContent:hover{
+		box-shadow: 0px 0px 10px #BA340B;
+	}
+	#furnitureContent .browserContent:active{
+		/*TODO*/
+	}
+.browserContent{
+	float:left;
+	background-color:rgb(242, 203, 155);
+	width: 100px;
+	height: 100px;
+	border-radius: 5px;
+	background-repeat:no-repeat;
+	background-size:100px 100px;	
+}
+
+.browserNavigation{
+	color:#f2cb9b;
+	font-family: "League-Gothic", Courier;
+	font-size: 50px; 	
+	position:absolute;
+	top:30%;
+}
+.browserNavigation:hover{
+	color:#f2cb9b;
+	text-shadow: 0px 0px 10px #f2cb9b;	
+}
+
+.browserNavigation:active{
+	color:#f2cb9b;
+	text-shadow: 0px 0px 0px #f2cb9b;	
+}
+
+#prev{
+	float:left;
+	left:-5%;
+}
+#next{
+	float:right;
+	right:-5%%;
+}
+
+
 
 a {	
 	text-decoration:none;

@@ -8,9 +8,10 @@ var driver="XML3D";
 var avatarScale= 1;
 var avatarURL = "static/meshes/avatar.xml3d";
 //use as initial mesh for the world when connecting to server
-var world = "static/meshes/staticWorld.xml3d";
 var address;
 var username;
+var world;
+var db;
 var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I need that??
 
 
@@ -27,38 +28,38 @@ var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I n
 //ObjectHost, which sends all messages to the first object's 
 //script User.js). In this way, the core of the 
 //application is the first object's script(the user).
-function connect(address, mesh, name){          	            	
-	if (name != null && address != null && name != ""){ 
+function connect(address, mesh, name, db){          	            	
 		
 		
 		this.address= address;
 		this.username = name;
+		this.world = mesh;
+		this.db = db;
 		
 		$("#loginButton").attr("disabled", true);
 		
 	  	Kata.require([
 	  		   		'katajs/oh/MainThread.js',	//need that to create MainThread object
 	  		   		'katajs/oh/plugins/sirikata/SirikataSpaceConnection.js',	//to use the sirikata://... protocol
-	  		   		'katajs/oh/GraphicsSimulation.js',
+	  		   		'katajs/oh/GraphicsSimulation.js',	//the first hosted object always communicates with graphics
 	  		   		'katajs/gfx/xml3dgfx.js'
 	    ], function(){
 	  		loadGFX();
 	  		$("#all").show();
-	  		$("#connection").hide();
+	  		$("#index").hide();
+	  		$("#choose").hide();
 	  		}
 	  	);
-	}	
-	else{
-		alert("Fill in server-address and username!")
-	}
 } 
 
 function graphicsReady() {
 	var scriptArgs ={
 			space: SpaceURL,
 			username: this.username,			
-			visual: {mesh:avatarURL},			
-			loc:{scale: "1.0"}	//just to match the code..
+			visual: {mesh:avatarURL},		
+			world: this.world,
+			loc:{scale: "1.0"},	//just to match the code..
+			database: db
 	}	
 	
 	try{     
