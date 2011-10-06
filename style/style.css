@@ -1,3 +1,10 @@
+/**
+COLORS:
+red: rgb(163,37,0), #A32500, lighter: #BA340B
+darkbrown (background): rgb(20,13,10), #680000, text: #460000  
+light yellow(font): #f2cb9b
+**/
+
 body{
 	background-color:rgb(20,13,10); 
 	overflow:hidden;
@@ -6,7 +13,6 @@ body{
 .loginFont{
 	font-family:sans-serif;
 	font-size:28px;
-	font-weight:600;
 	color:#f2cb9b;	
 }
 button{
@@ -29,38 +35,14 @@ button:hover{
 button:active{
 	box-shadow: 0px 0px 10px #680000 inset;
 	}
-.button{
-	/*font*/
-	font-family:sans-serif;
-	font-size:22px;	
-	letter-spacing:1px;
-	color:#460000;
-	/*color and border*/
-	background-color:#f2cb9b;
-	border:none;
-	border-radius:5px;
-	height:35px;
-	width:100px;
-	box-shadow:0px 0px 10px #680000;	
-}
-.button:hover{
-	box-shadow:0px 0px 15px #FFBC45;
-}
-.button:active{
-	box-shadow: 0px 0px 10px #680000 inset;
-	}
-.input{
-	width:270px;
-	height:22px;
-	font-size:14px;
-	color:	#140d0a;
-}
 .overlay{
 	display:none;
 	background-color:rgba(20,13,10,0.8);
 	position:absolute;
 	width:100%;
 	height:100%;
+	top:0px;
+	left:0px;
 	margin-top:-7px;
 	margin-left:-7px;
 	z-index:5;
@@ -127,6 +109,7 @@ button:active{
 
 
 /** OVERLAY - register**/
+
 .registerFont{
 	font-size:24px;
 }
@@ -188,7 +171,7 @@ button:active{
 	width:100%;
 	height:100%;
 }
-.choosingRoom{
+.squareButton{
 	position:absolute;
 	background-color:rgb(163,37,0);
 	border-radius:10px;	
@@ -215,14 +198,14 @@ button:active{
 	text-align: center;
 	text-shadow: 0px 2px 3px #DE3E0D;	
 }
-.choosingRoom:hover{
+.squareButton:hover{
 	background-color:#BA340B;
 	box-shadow:0px 0px 50px #BA340B;
 }
-.choosingRoom:active{
+.squareButton:active{
 	box-shadow:0px 0px 30px #260000 inset;
 }
-.choosingRoomClicked{
+.squareButtonClicked{
 	background-color:#BA340B;
 	box-shadow:0px 0px 20px #260000 inset;
 }
@@ -251,6 +234,17 @@ button:active{
 	height:60%;
 	width:800px;
 }
+	#chooseNewRoom p{
+		position:absolute;
+		height:50px;
+		width:600px;
+		top:-150px;
+		left:25%;
+		/*font and color*/
+		font-family: sans-serif;
+		color:#f2cb9b;
+		font-size: 38px; 		
+	}
 .newRoomContent{	
 	float:left;
 	background-color:rgba(242, 203, 155,0.8);
@@ -261,7 +255,7 @@ button:active{
 	background-repeat:no-repeat;
 	background-size:150px 150px;	
 }
-.newRoomContent:hover{
+.newRoomContent:hover{	
 	box-shadow: 0px 0px 30px #A32500;
 }
 .newRoomContent:active{
@@ -312,6 +306,7 @@ button:active{
 	#createNewRoomInput input{
 		position:relative;
 		margin-left:10px;
+		width:300px
 	}
 #createNewRoomButton{
 	position:absolute;
@@ -357,16 +352,86 @@ xml3d{
 #name{
 	z-index:1;
 }
+/** buttons **/
+.roomButton{
+	/*position and size*/
+	position:relative;
+	margin: 0 5px;
+	width:60px;	
+	height:60px;	
+	/*color and border*/
+	border-radius:13px;
+	box-shadow:  1px 1px 10px #680000;
+	background-size:55px 55px;	
+	background-repeat:no-repeat;
+	background-position:center;
+}
+.roomButton:hover{
+	box-shadow:  1px 1px 20px #680000;
+}
+.roomButton:active{
+	box-shadow: 0px 0px 20px #A32500 inset;
+}
+#roomButtons{
+	position:absolute;
+	top:0px;
+	right:10px;
+	height:100px;
+}
+#camButton{
+	background-image:url(../static/icons/cam.png);
+	background-size:65px 65px;
+}
+	#camButton:hover{
+		background-image:url(../static/icons/camActive.png);	
+	}
+#listButton{
+	background-image:url(../static/icons/list.png);	
+}
+	#listButton:hover{
+		background-image:url(../static/icons/listActive.png);
+	}
+#homeButton{
+	background-image:url(../static/icons/home.png);
+	background-size:50px 50px;	
+}
+	#homeButton:hover{
+		background-image:url(../static/icons/homeActive.png);
+	}
+#logoutButton{
+	background-image:url(../static/icons/logout.png);
+	background-position:center;
+	background-size:40px 40px;
+}
+	#logoutButton:hover{
+		background-image:url(../static/icons/logoutActive.png);
+	}
 
 /** menu **/
 #menu-type{
 	position:absolute;
 	width:20%;
-	height:60%;
+	height:1500px;
 	top:20%;
 	left:0%;	
 	overflow:hidden;
 }
+	.category{
+		text-decoration:none;
+		font-family:sans-serif;
+		font-size:18px;			
+	}	
+	.subcategory{
+		margin-top: 10px;
+		text-decoration:none;
+		font-family:sans-serif;
+		font-size:16px;	
+		color:#460000;	
+		line-height:25px;
+	}
+	.subcategory:hover{
+		color:#c93c00;
+	}
 #furnitureBrowser{		
 	position:absolute;
 	width:808px;
@@ -397,7 +462,7 @@ xml3d{
 		cursor:pointer;
 	}
 	#furnitureContent .browserContent:hover{
-		box-shadow: 0px 0px 10px #BA340B;
+		box-shadow: 0px 0px 20px #A32500;
 	}
 	#furnitureContent .browserContent:active{
 		/*TODO*/
@@ -428,26 +493,36 @@ xml3d{
 	color:#f2cb9b;
 	text-shadow: 0px 0px 0px #f2cb9b;	
 }
-
-#prev{
-	float:left;
-	left:-5%;
+.navButton{
+	position:absolute;
+	top:35px;	
+	height:50px;
+	width:50px;
+	background-size:50px 50px;
 }
+#prev{	
+	float:left;
+	left:-8%;
+	background-image:url(../static/icons/prev.png);	
+}
+	#prev:hover{
+		background-image:url(../static/icons/prevActive.png);
+	}
+	#prev:active{
+		background-image:url(../static/icons/prev.png);
+	}
 #next{
 	float:right;
-	right:-5%%;
+	right:-8%;
+	background-image:url(../static/icons/next.png);	
 }
+	#next:hover{
+		background-image:url(../static/icons/nextActive.png);
+	}
+	#next:active{
+		background-image:url(../static/icons/next.png);
+	}
 
 
-
-a {	
-	text-decoration:none;
-}
-a:hover{
-	color:rgb(163,37,0);
-}
-a:active{
-	color:#c93c00;
-}
 
 
