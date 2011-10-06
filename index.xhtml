@@ -12,6 +12,7 @@
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.core.js"/>
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.widget.js"/>
 		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.button.js"/>
+		
 		<!-- jQuery slider menu -->
 		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.scrollTo-min.js"/>
 		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.serialScroll-min.js"/>		
@@ -21,9 +22,7 @@
 		
 		<!-- Configuration and Login-->
 		<script type="text/javascript" src="scripts/Login.js"/>
-		<script type="text/javascript" src="scripts/UI.js"/>
-				
-						
+		<script type="text/javascript" src="scripts/UI.js"/>					
 						
 		<script type="text/javascript"><![CDATA[
 			window.onload=init;			
@@ -66,7 +65,7 @@
 						password:			<input id="newPassword" class="registerInput" type="password" name="newPassword"/><br/>
 						confirm password:	<input id="newPasswordConf" class="registerInput" type="password" name="newPasswordConf"/>
 					<!-- buttons -->								
-						<button id="registerOverlayButton" name="registerOverlayButton" type="submit"><!--onclick="register( $('#newUsername').val(), $('#newPassword').val(), $('#newPasswordConf').val());">-->
+						<button id="registerOverlayButton" name="registerOverlayButton" type="submit">
 							Register
 						</button>																		
 					</form>
@@ -80,28 +79,30 @@
 			<div id="overlay" class="overlay">
 				<div id="createNewRoom" class="dialogue">
 					<div id="roomMesh"/>	
-					<div id="createNewRoomInput">			
+					<div id="createNewRoomInput">
+					<!-- TODO make form  --> 			
 						<label for="title" class="loginFont"> Title:</label>																					
-						<input id="title" class="inputFont"/>				
+						<input id="title"/>				
 					</div>
 					<button id="createNewRoomButton" onclick="createNewRoom( $('#title').val() );"> Create</button>
 					<button class="closeButton" onclick="$('#overlay').hide();">x</button>
 				</div> 			
 			</div>			
-			<div id="chooseRoom" class="choosingRoom">
+			<div id="chooseRoom" class="squareButton">
 		    	<p class="choosingRoomText">edit room</p>
 		    </div>
 		    
-		    <div id="friendRoom" class="choosingRoom">
+		    <div id="friendRoom" class="squareButton">
 		    	<p class="choosingRoomText">shared rooms</p>
 		    </div>
 		    
-		  	<div id="newRoom" class="choosingRoom">
+		  	<div id="newRoom" class="squareButton">
 		  		<p class="choosingRoomText">new room</p>
 		  	</div>
 		  	
 		  	<div id="chooseMenu">
 		  		<div id="chooseNewRoom" style="display:none">
+		  			<!-- <p>Choose a room template</p> -->
 		  			<div id="room1" class = "newRoomContent" onclick="chooseNewRoom('room1')"/>
 		  			<div id="room2" class = "newRoomContent" onclick="chooseNewRoom('room2')"/>
 		  			<div id="room3" class = "newRoomContent" onclick="chooseNewRoom('room3')"/>
@@ -131,65 +132,69 @@
 	  	
 		<!-- ROOM -->		
 		<div id="all">
-			<div id="room"/>				
+			<div id="room"/>
+			<div id="roomButtons">
+				<button id="camButton" class="squareButton roomButton"/>											
+				<button id="listButton" class="squareButton roomButton"/>
+				<button id="homeButton" class="squareButton roomButton"/>	
+				<button id="logoutButton" class="squareButton roomButton"/>
+			</div>				
 			<label id="name" class="loginFont" />		
 		    <div id="menu-type" >
 		    	
-		    	<h3><a href="#sofas">Sofas and armchairs</a></h3>
-		    		<div>
-	    				<a href="#" onclick="categoryClicked(this);">Fabric sofas</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Leather sofas</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Sofa beds</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Modular sofas</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Chaise lounges</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Armchairs</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Footstools and pouffes</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Extra covers</a>  	<br/>				    					
+		    	<h3 class="category"><a href="#livingRoom" class="categoryColor">Living Room</a></h3>
+	    			<div id="livingRoom">
+	    				<a table="Sofas" href="#" class="subcategory" onclick="categoryClicked(this);">Sofas and armchairs</a><br/>
+	    				<a table="Media" href="#" class="subcategory" onclick="categoryClicked(this);">TV stands and media solutions</a><br/>
+	    				<a table="Storage" href="#" class="subcategory" onclick="categoryClicked(this);">Living room storage</a><br/>
+	    				<a table="Tables" href="#" class="subcategory" onclick="categoryClicked(this);">Coffee and side tables</a><br/>	    					    							    					
 		    		</div>
-		    	<h3><a href="#TV">TV stand and media solutions</a></h3>
-		    		<div/>
-		    	<h3><a href="#LivingRoom">Living room storage</a></h3>
-			    	<div>
-	    				<a href="#" onclick="categoryClicked(this);">Bookcases</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Shelving units</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">DVD and CD furniture</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Wall shelves</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Cabinets and sideboards</a><br/>
-	    				<a href="#" onclick="categoryClicked(this);">Storage boxes and baskets</a>	<br/>				    						    			
+		    	<h3 class="category"><a href="#bedroom" class="category">Bedroom</a></h3>
+		    		<div id="bedroom">
+		    			<a table="Beds" href="#" class="subcategory" onclick="categoryClicked(this);">Beds</a><br/>
+	    				<a table="Mirrors" href="#" class="subcategory" onclick="categoryClicked(this);">Mirrors</a><br/>
+	    				<a table="Storage" href="#" class="subcategory" onclick="categoryClicked(this);">Bedroom storage</a><br/>
+	    				<a table="Rugs" href="#" class="subcategory" onclick="categoryClicked(this);">Rugs</a><br/>
+	    			</div>
+		    	<h3 class="category"><a href="kitchen" class="category">Kitchen</a></h3>
+			    	<div id="kitchen">
+	    				<a table="Cabinets" href="#" class="subcategory" onclick="categoryClicked(this);">Kitchen cabinets</a><br/>
+	    				<a table="Fridges" href="#" class="subcategory" onclick="categoryClicked(this);">Fridges and Freezers</a><br/>
+	    				<a table="Ovens" href="#" class="subcategory" onclick="categoryClicked(this);">Ovens</a><br/>
+	    				<a table="Dishwashers" href="#" class="subcategory" onclick="categoryClicked(this);">Dishwashers</a><br/>	    							    						    			
 		    		</div>
-		    	<h3><a href="#Coffetables">Coffee and side tables</a></h3>
-		    		<div/>
-		    	<h3><a href="#Lighting">Living room lighting</a></h3>
-		    		<div>
-		    			<a href="#" onclick="categoryClicked(this);"> Ceiling lamps</a><br/>		    			
-		    			<a href="#" onclick="categoryClicked(this);"> Table lamps</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);"> Shades, bases and cords</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);">Floor lamps</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);">Wall lamps</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);">Spotlights</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);">LED lamps</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);">Integrated lighting</a><br/>
-		    			<a href="#" onclick="categoryClicked(this);">Light bulbs and batteries</a><br/>	
+		    	<h3 class="category"><a href="#bath" class="category">Bath</a></h3>
+		    		<div id="bath">
+		    			<a table="Washstands" href="#" class="subcategory" onclick="categoryClicked(this);">Wash-stands</a><br/>
+	    				<a table="Storage" href="#" class="subcategory" onclick="categoryClicked(this);">Bathroom storage</a><br/>
+	    				<a table="Mirrors" href="#" class="subcategory" onclick="categoryClicked(this);">Mirrors</a><br/>
+	    				<a table="Washbasins" href="#" class="subcategory" onclick="categoryClicked(this);">Wash-basins</a><br/>
+	    			</div>
+		    	<h3 class="category"><a href="#office" class="category">Office</a></h3>
+		    		<div id="office">
+		    			<a table="Desks" href="#" class="subcategory" onclick="categoryClicked(this);"> Desks and tables</a><br/>		    			
+		    			<a table="Chairs" href="#" class="subcategory" onclick="categoryClicked(this);"> Office Chairs</a><br/>
+		    			<a table="Storage" href="#" class="subcategory" onclick="categoryClicked(this);"> Workspace Storage</a><br/>		    			
 		    		</div>
 		    </div>		    
 
 			<div id="furnitureBrowser" class="menu">
 					<div id="furnitureContent">
 						<ul>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>
-							<li> <div class = "browserContent"/> </li>						
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>
+							<li> <div class = "browserContent furniture"/> </li>						
 						</ul>
 					</div>
-					<a id="prev" href="#" class="browserNavigation"> &lt; </a>
-					<a id="next" href="#" class="browserNavigation"> &gt; </a>	
+					<div id="prev" class="navButton"/>
+					<div id="next" class="navButton"/>
 			</div> 
 		</div>
 	</body>	
