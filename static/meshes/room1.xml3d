@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
-	<defs>
+	<defs>		
 	    <transform id="lightTransform" translation="200 200 -200"/>
+	    <transform id="centerTransform" translation="200 50 -200"/>
+	 
 	        
 		<shader id="material" script="urn:xml3d:shader:phong">
 		    <float3 name="diffuseColor">
@@ -12,15 +14,21 @@
 		    </float>
 		</shader>
 		
-		<shader id="transparentMaterial" script="urn:xml3d:shader:phong">
+		<shader id="materialCenter" script="urn:xml3d:shader:phong">
 		    <float3 name="diffuseColor">
-		    	0.6 0.6 0.6
+		    	1.3 0.4 0.8
 		    </float3>
 		    <float name="ambientIntensity">
 		    	0.7
 		    </float>
+		</shader>
+		
+		<shader id="transparentMaterial" script="urn:xml3d:shader:phong">		    
+		    <float3 name="reflectionColor">
+		    	0.4 0.4 0.4
+		    </float3>		    
 		    <float name="transparency">
-		    	0.5
+		    	1.0
 		    </float>
 		</shader>
 		
@@ -250,42 +258,87 @@
 	            	0 0 1  
 	            </float3>
 	    </data>
+	    <data id="centerData" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0
+	            	1 4 5
+	            	5 2 1
+	            	0 1 4
+	            	4 6 0 
+	            	4 5 6
+	            	5 7 6
+	            	3 2 5 
+	            	5 7 3
+	            	0 6 7
+	            	7 3 0
+	            </int>
+	            
+	            <float3 name="position">	            						
+	            	0 0 0
+	            	0 1 0 
+	            	1 1 0
+	            	1 0 0 
+	            	0 1 -1  
+	            	1 1 -1
+	            	0 0 -1
+	            	1 0 -1  
+	            </float3>
+	            
+	            <float3 name="normal">
+	            	0 0 -1
+	            	0 0 -1
+	            	0 -1 0 
+	            	0 -1 0 
+	            	1 0 0 
+	            	1 0 0
+	            	0 0 1
+	            	0 0 1
+	            	-1 0 0
+	            	-1 0 0
+	            	0 1 0 
+	            	0 1 1  
+	            </float3>
+	    </data>
     </defs>
     
-    <view id="door" position="5 150 -200" orientation="0 1 0 -1.57"/>
+    <view id="door" position="5 150 -200" orientation="0 1 0 -1.57" center="200 150 -200"/>
            
     <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />
     </group>
      		  
-    <group id="floor" type="floor" shader = "#material">
+    <group transform = "wallTransform" id="floor" type="floor" shader = "#material">
       <mesh src="#floorData" type="triangles"/>
     </group>
-    <group id="ceiling" type="ceiling" shader = "#transparentMaterial">
+    <group transform = "wallTransform" id="ceiling" type="ceiling" shader = "#transparentMaterial">
       <mesh src="#ceilingData" type="triangles"/>
     </group>
-    <group id="wall1" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall1" type="wall" shader = "#material">
       <mesh src="#wall1Data" type="triangles"/>
     </group>
-    <group id="wall2" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall2" type="wall" shader = "#material">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group id="wall3" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall3" type="wall" shader = "#material">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
-    <group id="wall4" type="wall" shader= "#material" >
+    <group transform = "wallTransform" id="wall4" type="wall" shader= "#material" >
       <mesh src="#wall4Data" type="triangles"/>
     </group>
-    <group id="wall5" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall5" type="wall" shader = "#material">
       <mesh src="#wall5Data" type="triangles"/>
     </group>
-    <group id="wall6" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall6" type="wall" shader = "#material">
       <mesh src="#wall6Data" type="triangles"/>
     </group>
-    <group id="wall7" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall7" type="wall" shader = "#material">
       <mesh src="#wall7Data" type="triangles"/>
     </group>
-    <group id="wall8" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall8" type="wall" shader = "#material">
       <mesh src="#wall8Data" type="triangles"/>
     </group>
+    <!--<group id="center" shader = "#materialCenter" transform="#centerTransform">
+      <mesh src="#centerData" type="triangles"/>
+    </group>-->
 </xml3d>

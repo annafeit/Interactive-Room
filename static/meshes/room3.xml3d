@@ -197,7 +197,7 @@
 	    
     </defs>
     
-    <view id="door" position="300 150 -5" orientation="0 1 0 0"/>       
+    <view id="door" position="300 150 -5" orientation="0 1 0 0" center="300 50 -225"/>       
     
      <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />

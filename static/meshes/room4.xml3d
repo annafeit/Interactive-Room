@@ -140,7 +140,7 @@
 	    </data>
     </defs>
     
-    <view id="door" position="580 150 -175" orientation="0 1 0 1.57"/>       
+    <view id="door" position="580 150 -175" orientation="0 1 0 1.57" center="300 50 -175"/>       
     
      <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />

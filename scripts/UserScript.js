@@ -2,7 +2,7 @@ var User={};
 
 Kata.require([
 	'katajs/oh/GraphicsScript.js',
-	kata_base_offset + 'scripts/utils.js',
+	kata_base_offset + 'scripts/Utils.js'
 ], function() {
 	/**
 	* Simulate inheritance from GraphicsScript by defining a super variable
@@ -31,6 +31,10 @@ Kata.require([
 		this.keyIsDown[this.Keys.DOWN] = false;
 		this.keyIsDown[this.Keys.RIGHT] = false;
 		this.keyIsDown[this.Keys.LEFT] = false;
+		this.keyIsDown[this.Keys.W] = false;
+		this.keyIsDown[this.Keys.A] = false;
+		this.keyIsDown[this.Keys.S] = false;
+		this.keyIsDown[this.Keys.D] = false;
 		
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
@@ -43,6 +47,32 @@ Kata.require([
 	* Simulate inheritance from GraphicsScript by extending the User class with the methods of the parent(SUPER) class
 	*/
 	Kata.extend(User.UserScript, SUPER);
+	
+	User.UserScript.prototype.parseScene = function(){
+		//camera
+        var activeViewId = this.xml3d.activeView;
+        this.camera = document.getElementById(activeViewId);
+        
+        var materials = document.getElementsByTagName("shader");
+	    var material;
+	    var transparent;
+	     
+	     //finds id of material-shader and transparent-shader
+	     for (var i = 0; i<materials.length; i++){
+	    	 material = materials[i].id;
+	    	 if (material.substr(0,8) == "material" && material.substr(0,14) != "materialCenter"){
+	    		 break;
+	    	 }
+	     }
+	     for (var i = 0; i<materials.length; i++){
+	    	 transparent = materials[i].id;
+	    	 if (transparent.substr(0,19) == "transparentMaterial"){
+	    		 break;
+	    	 }
+	     }
+	     this.material = material;
+	     this.transparentMaterial = transparent;
+	}
 	
 	/**
 	* proximity callback TODO ???
@@ -57,18 +87,19 @@ Kata.require([
         }
     };
 
-/** Camera sync */
+    
+    /** Camera sync */
     User.UserScript.prototype.syncCamera = function() {
         var now = new Date();
         this.setCameraPosOrient(this.presence.predictedPosition(now),
                                 this.presence.predictedOrientation(now),
                                 0.1); //lag:0.1 just to match the code...
-        //this.checkWalls(); -> doesn't work yet
+        this.checkWalls(); 
     };
     
     /**
-* Creates the room, the user wants to login to
-*/
+	* Creates the room, the user wants to login to
+	*/
     User.UserScript.prototype.createRoom = function(){
 	    this.createObject(kata_base_offset + "scripts/RoomScript.js",
 		"Room.RoomScript",
@@ -79,12 +110,12 @@ Kata.require([
     }
     
     /**
-* Sets the camera to the "door-view"
-*/
+	* Sets the camera to the "door-view"
+	*/
     User.UserScript.prototype.setCamToDoor = function(){
 	     var views = document.getElementsByTagName("view");
 	     var view;
-	    
+	     
 	     //finds the viewpoint at the door
 	     for (var i = 0; i<views.length; i++){
 	    	 view = views[i];
@@ -92,6 +123,20 @@ Kata.require([
 	    		 break;
 	    	 }
 	     }
+    	 //set center variable
+    	 var s = view.getAttribute("center").split(" "); 
+    	 this.center = this.xml3d.createXML3DVec3();
+    	 this.center.x = s[0];
+    	 this.center.y = s[1];
+    	 this.center.z = s[2];     	 
+    	 
+    	 var view = this.lookAt(this.center, view);
+    	 
+    	//set initial distance from cam to center
+    	 var dist = view.position.subtract(this.center);
+ 		 this.camCenterDistance = dist.length(); 		
+ 		 
+    	 //set presence position
 	     var now = new Date();
 	     var loc = this.presence.predictedLocationAtTime(now);
 	     var p = view.position;
@@ -102,6 +147,7 @@ Kata.require([
 	     loc.orient = or;
 	 
 	     this.presence.setLocation(loc);
+	     this.syncCamera();	     	    
     };
     
     User.UserScript.prototype.setCam = function(pos){
@@ -129,7 +175,9 @@ Kata.require([
 		
 		presence.setQueryHandler(Kata.bind(this.proxEvent, this));
         presence.setQuery(0);
-
+        
+        var thus = this;
+        
         //save the activeView
         var id = this.xml3d.activeView;
         this.camera = document.getElementById(id);
@@ -162,34 +210,37 @@ Kata.require([
 		var rt2 = Helper.rayIntersectsScene(rayNeg);
 		if (!(rt1 && rt2)){
 			//outside of the room (not a wall on both sides of the camera)			
-			setShaderTransparent();							
+			this.setShaderTransparent();							
 		}
 		else{
-			setShaderSolid();
+			this.setShaderSolid();
 		}
 	}
 	
 
-	function setShaderTransparent(){
+	User.UserScript.prototype.setShaderTransparent = function(){
 		var groups = document.getElementsByTagName("group");		
 		for (var i =0;i<groups.length;i++)
 		{
 			var obj = groups[i];
 			if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
-				obj.setAttribute("shader", "#transparentMaterial" );				
+				obj.setAttribute("shader", "#"+this.transparentMaterial );				
 			}
 		}
+		this.xml3d.update();
 	}
 	
-	function setShaderSolid(){	
+	User.UserScript.prototype.setShaderSolid = function(){	
 		var groups = document.getElementsByTagName("group");		
 		for (var i =0;i<groups.length;i++)
 		{
 			var obj = groups[i];
 			if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
-				obj.setAttribute("shader", "#material" );				
+				obj.setAttribute("shader", "#"+this.material );				
 			}
+			
 		}
+		this.xml3d.update();
 	}
 	
 		
@@ -199,114 +250,508 @@ Kata.require([
 		UP : 38,
 		DOWN : 40,
 		LEFT : 37,
-		RIGHT : 39
+		RIGHT : 39,
+		W : 87,
+		A : 65,
+		S : 83,
+		D : 68
 	};
 
+	//the smaller the speed the faster the turning/moving/zoomin
+	//no mathematical foundation, just a  guess
+	var turnSpeed = 20;	
+	var zoomSpeed = 10;
+	var moveSpeed = 5;
+	
 	//Handle messages from GUI
 	User.UserScript.prototype._handleGUIMessage = function (channel, msg) {
 		if(msg.msg=="loaded" && msg.mesh==this.roomMesh){
 			this.setCamToDoor();
+			this.parseScene();
 		}
-		
+		if(msg.msg == "drag"){
+			
+			if (Math.abs(msg.dx) > Math.abs(msg.dy)){
+				//mouse moved more horizontally
+				if(msg.dx > 0){
+					//mouse moved to the right -> turn left
+					var i = msg.dx;
+					while (i>0){
+						this.turnRight();
+						i = i - turnSpeed;
+					}
+				}
+				else{
+					//mouse moved to the left -> turn right
+					var i = -msg.dx;
+					while (i>0){
+						this.turnLeft();
+						i = i - turnSpeed;
+					}
+				}
+			}
+			else{
+				//mouse moved more vertically
+				if(msg.dy > 0){
+					//mouse moved down -> turn up
+					var i = msg.dy;
+					while (i>0){
+						this.turnUp();
+						i = i - turnSpeed;
+					}
+				}
+				else{
+					//mouse moved up -> turn down
+					var i = -msg.dy;
+					while (i>0){
+						this.turnDown();
+						i = i - turnSpeed;
+					}
+				}
+			}
+		}
+		if(msg.msg == "wheel"){
+			
+			if(msg.dy > 0){
+				// zoom in 
+				var i = msg.dy;
+				while (i>0){
+					this.zoomIn();
+					i = i - zoomSpeed;
+				}
+			}
+			else{
+				//zoom out
+				var i = -msg.dy;
+				while (i>0){
+					this.zoomOut();
+					i = i - zoomSpeed;
+				}
+			}
+		}
 		if(msg.msg == "keyup"){
 			this.keyIsDown[msg.keyCode] = false;
-			
-			//If neither up nor down key is now pressed -> don't go
-			if ( !this.keyIsDown[this.Keys.UP] && !this.keyIsDown[this.Keys.DOWN])
-			    this.presence.setVelocity([0, 0, 0]);
-			//If neither left nor right key is pressed -> don't rotate
-			if ( !this.keyIsDown[this.Keys.LEFT] && !this.keyIsDown[this.Keys.RIGHT])
-			    this.presence.setAngularVelocity(Kata.Quaternion.identity());
-			}
-		if (msg.msg == "keydown"){
-			var now = new Date();
-			var preOrient = this.presence.predictedOrientation(now);
-			var origOrient = new Kata.Quaternion();
-			origOrient[0] = preOrient[0];
-			origOrient[1] = preOrient[1];
-			origOrient[2] = preOrient[2];
-			origOrient[3] = preOrient[3];
-			var avMat = Kata.QuaternionToRotation(origOrient);
-            var avSpeed = 50;
-            var full_rot_seconds = 10.0;
-            
-            var avXX = avMat[0][0] * avSpeed;
-            var avXY = avMat[0][1] * avSpeed;
-            var avXZ = avMat[0][2] * avSpeed;
-            var avZX = avMat[2][0] * avSpeed;
-            var avZY = avMat[2][1] * avSpeed;
-            var avZZ = avMat[2][2] * avSpeed;
-            
+		}
+		
+		if (msg.msg == "keydown"){			
             this.ctrl = msg.ctrlKey;
             this.keyIsDown[msg.keyCode] = true;
-           
-            if (this.keyIsDown[this.Keys.UP]) {
+                       
+            if (this.keyIsDown[this.Keys.UP] || this.keyIsDown[this.Keys.W]) {
             	if (this.ctrl){
-				    /*
-					var dir = this.camera.getDirection();
-					var up = this.camera.getUpVector();
-					var axis = up.cross(dir);
-					this.presence.setAngularVelocity(
-					Kata.Quaternion.fromAxisAngle([dir.x, dir.y, dir.z], 2.0*Math.PI/full_rot_seconds)
-					);*/ //new rotation N = inv(O) * V * O
-		            //FIXME still doesn't work correctly?
-		            var inv = origOrient.inverse();
-		            var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], 0.017); //0.017 ca. 5°
-		            
-		            var rotateBack = inv.multiply(origOrient);
-		            var rotateVert = up.multiply(rotateBack);
-		             //TODO find out why not reversed (the function call)
-		            var res = origOrient.multiply(up);
-		             //TODO how to make it smooth (like Velocity)
-		            this.presence.setOrientation(res);
-		            }
-	             else{
-	            	this.presence.setVelocity([-avZX, -avZY, -avZZ]);
-	             }
+            		var i = 0;
+            		while (i<turnSpeed){
+            			this.turnUp();
+            			i++;
+            		}
+					
+		        }
+	            else{	            	
+	            	var i = 0;
+            		while (i<moveSpeed){
+            			this.moveUp();
+            			i++;
+            		}
+	            }
                 
             }
-            if (this.keyIsDown[this.Keys.DOWN]) {
+            if (this.keyIsDown[this.Keys.DOWN] || this.keyIsDown[this.Keys.S]) {
             	if (this.ctrl){
-            		//new rotation N = inv(O) * V * O
-            		var inv = origOrient.inverse();
-            		var up = Kata.Quaternion.fromAxisAngle([1, 0, 0], -0.017); //0.017 ca. 1°
-		            
-		            var rotateBack = origOrient.multiply(inv);
-		            var rotateVert = rotateBack.multiply(up)
-		            var res = origOrient.multiply(up);
-		            
-		            this.presence.setOrientation(res);
+            		var i = 0;
+	        		while (i<turnSpeed){
+	        			this.turnDown();
+	        			i++;
+	        		}
             	}
 	            else{
-	            	this.presence.setVelocity([avZX, avZY, avZZ]);
+	            	var i = 0;
+            		while (i<moveSpeed){
+            			this.moveDown();
+            			i++;
+            		}
+	            }
+            }            
+            if (this.keyIsDown[this.Keys.LEFT] || this.keyIsDown[this.Keys.A]) {
+            	if (this.ctrl){
+            		var i = 0;
+	        		while (i<turnSpeed){
+	        			this.turnLeft();
+	        			i++;
+	        		}
+            	}
+	            else{
+	            	var i = 0;
+            		while (i<moveSpeed){
+            			this.moveLeft();
+            			i++;
+            		}
 	            }
             }
-            
-            if (this.keyIsDown[this.Keys.LEFT]) {
+            if (this.keyIsDown[this.Keys.RIGHT] || this.keyIsDown[this.Keys.D]) {
             	if (this.ctrl){
-            		this.presence.setAngularVelocity(
-            				Kata.Quaternion.fromAxisAngle([0, 1, 0], 2.0*Math.PI/full_rot_seconds)
-            		);
+            		var i = 0;
+	        		while (i<turnSpeed){
+	        			this.turnRight();
+	        			i++;
+	        		}
             	}
-            	else{
-            		this.presence.setVelocity([-avXX, -avXY, -avXZ]);
-            	}
-            }
-            if (this.keyIsDown[this.Keys.RIGHT]) {
-            	if (this.ctrl){
-            		this.presence.setAngularVelocity(
-            				Kata.Quaternion.fromAxisAngle([0, 1, 0], -2.0*Math.PI/full_rot_seconds)
-            		);
-            	}
-            	else{
-            		this.presence.setVelocity([avXX, avXY, avXZ]);
-            	}
+	            else{
+	            	var i = 0;
+            		while (i<moveSpeed){
+            			this.moveRight();
+            			i++;
+            		}
+	            }
             }
 		}
 	
 		this.updateGFX(this.presence);
 	
 	};
+	
+	
+	/*
+	 * Functions to control the camera.
+	 * 
+	 * Turning:
+	 * 	the camera turns around the center: position and direction of camera changes
+	 * 	max: turning right or left is unlimited,
+	 * 		 turning up and down only in the range from parallel to floor until parallel to y-axis.
+	 * Moving:
+	 *  The camera moves parallel to the floor 
+	 * 	max: position of the center outside the walls
+	 *  position of the camera changes, position of the center changes the same way
+	 * Zooming: 
+	 * 	the camera moves in the looking direction 
+	 *  max. until it has (nearly) the same position as the center. 	 
+	 * 	The center doesn't change but the distance from camera to center changes
+	 * 
+	 * Implementation:
+	 * change position/direction of the tmp-camera and assign it to the presence. Position of actual camera
+	 * in the scene is then changed automatically
+	 */
+	
+		
+	var speed=1;
+	/**
+	 * Helper function to change the looking direction of camera
+	 * 
+	 * point: XML3DVec3
+	 * camera: XML3D view
+	 */	
+	User.UserScript.prototype.lookAt = function(point, cam){
+		var vector = point.subtract(cam.position);
+		vector = vector.normalize();
+		cam.setDirection(vector);
+		return cam;
+	}
+	
+	/**
+	 * helper function to update the presence's position and orientation
+	 */
+	User.UserScript.prototype.updatePresence = function (position, orientation){
+		 var now = new Date();
+	     var loc = this.presence.predictedLocationAtTime(now);		     
+	     //create location
+	     loc.pos = [position.x, position.y, position.z];
+	     var or = Kata._helperQuatFromAxisAngle(
+	                    [orientation.axis.x, orientation.axis.y, orientation.axis.z],
+	                    orientation.angle);
+	     loc.orient = or;		 
+	     this.presence.setLocation(loc);
+	     this.syncCamera();
+	}
+	
+	/**
+	 * Helper function to move the Center
+	 * The center's y-coordinate (height) neer changes
+	 */
+	User.UserScript.prototype.moveCenter = function(x, z){
+		this.center.x = this.center.x + x;		
+		this.center.z = this.center.z + z;
+		this.moveCenterCube(x, z);		
+	}
+	
+	/**
+	 * Helper function to move the center cube
+	 */
+	User.UserScript.prototype.moveCenterCube = function(x, z){
+		//finds the transformation of the cube
+		var transformations = document.getElementsByTagName("transform");
+		var trans;
+	    for (var i = 0; i<transformations.length; i++){
+		    trans = transformations[i];
+		    if (trans.id.substr(0,6) == "center"){
+		    	break;
+		    }
+	    }
+	    trans.translation.x = trans.translation.x + x;
+	    trans.translation.z = trans.translation.z + z;
+	}
+	
+	/**
+	 * Helper function to correct the Distance from the cam to the center
+	 */
+	User.UserScript.prototype.correctCenterCamDistance = function(cam, update){		
+		var dist = cam.position.subtract(this.center);
+		if(update){
+			this.camCenterDistance = dist.length();
+					
+		}
+		else{
+	        var diff = dist.length() - this.camCenterDistance;
+	        if (diff != 0){
+	        	var dir = cam.getDirection();
+	        	dir = dir.normalize();
+	        	cam.position.x = cam.position.x + (dir.x * diff);
+	        	cam.position.z = cam.position.z + (dir.z * diff);
+	        }      
+		}
+        return cam;
+	}
+	
+	/**
+	 * Helper function to change the camera's Up vector to be parallel to the y-axis
+	 */
+	User.UserScript.prototype.setCamUpToY = function(cam){
+		var newUp = this.xml3d.createXML3DVec3();
+		newUp.x = 0;
+		newUp.y = 1;
+		newUp.z = 0;
+		cam.setUpVector(newUp);		
+		return cam;
+	}
+	
+	/**
+	 * Helper function to compute the angle between a vector and the y-axis
+	 */
+	User.UserScript.prototype.angleToY = function(vec){
+		var yAxis = this.xml3d.createXML3DVec3();
+		yAxis.x = 0;
+		yAxis.y = 1;
+		yAxis.z = 0;
+		var alpha = (vec.dot(yAxis)) / (vec.length() * yAxis.length());  
+		return alpha;
+	}
+	
+		
+	User.UserScript.prototype.turnRight = function(){	
+		//make cam parallel to floor		
+		var cam = this.setCamUpToY(this.camera);		
+		
+		var orientMat = cam.orientation.toMatrix();		
+		//x-axis in camera coordinate system
+		var orXX = orientMat.m11 * speed;
+        var orXZ = orientMat.m13 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + orXX;
+        cam.position.z = cam.position.z + orXZ;
+        
+        //change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        cam = this.lookAt(this.center, cam);
+        cam = this.correctCenterCamDistance(cam, false);                
+        this.updatePresence(cam.position, cam.orientation);       
+	}
+	
+	User.UserScript.prototype.turnLeft = function(){
+		//make cam parallel to floor	
+		var cam = this.setCamUpToY(this.camera);
+		
+		var orientMat = cam.orientation.toMatrix();		
+		//x-axis in camera coordinate system
+		var orXX = orientMat.m11 * speed;
+        var orXZ = orientMat.m13 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x - orXX;
+        cam.position.z = cam.position.z - orXZ;
+        
+        //change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        cam = this.lookAt(this.center, cam);        
+        cam = this.correctCenterCamDistance(cam, false);
+        
+        this.updatePresence(cam.position, cam.orientation);  
+	}
+	
+	
+	User.UserScript.prototype.turnUp = function(){
+		var cam = this.camera;
+		
+		//angle of camDirection to y-Axis in the range of 90° - 180°
+		var angle = this.angleToY(cam.getDirection());
+		if(angle < -0.98){
+			return;
+		}
+		
+		var orientMat = cam.orientation.toMatrix();		
+		//y-axis in camera coordinate system
+		var orYX = orientMat.m21 * speed;        
+        var orYY = orientMat.m22 * speed;
+        var orYZ = orientMat.m23 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + orYX;
+        cam.position.y = cam.position.y + orYY;
+        cam.position.z = cam.position.z + orYZ;
+        
+        //change camera's direction such that it looks at the center         
+        cam = this.lookAt(this.center, cam);
+        cam = this.correctCenterCamDistance(cam, false);
+       
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	User.UserScript.prototype.turnDown = function(){
+		var cam = this.camera;
+		
+		//angle of camDirection to y-Axis in the range of 90° - 180°
+		var angle = this.angleToY(cam.getDirection());
+		if(angle > 0){
+			return;
+		}
+		
+		var orientMat = cam.orientation.toMatrix();
+		//y-axis in camera coordinate system
+		var orYX = orientMat.m21 * speed;        
+        var orYY = orientMat.m22 * speed;
+        var orYZ = orientMat.m23 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x - orYX;
+        cam.position.y = cam.position.y - orYY;
+        cam.position.z = cam.position.z - orYZ;
+        
+        //change camera's direction such that it looks at the center         
+        cam = this.lookAt(this.center, cam);
+        cam = this.correctCenterCamDistance(cam, false);
+       
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	
+	User.UserScript.prototype.moveRight = function(){
+		//make cam parallel to floor	
+		var cam = this.setCamUpToY(this.camera);		
+		
+		var orientMat = cam.orientation.toMatrix();
+		//x-axis in camera coordinate system
+		var orXX = orientMat.m11 * speed;
+		var orXY = orientMat.m12 * speed;
+        var orXZ = orientMat.m13 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + orXX;
+        cam.position.y = cam.position.y + orXY;
+        cam.position.z = cam.position.z + orXZ;
+        
+        //move the center, change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        this.moveCenter(orXX, orXZ);        
+        cam = this.lookAt(this.center, cam);        
+        cam = this.correctCenterCamDistance(cam, false);
+        
+        this.updatePresence(cam.position, cam.orientation);    
+	}
+	User.UserScript.prototype.moveLeft = function(){
+		//make cam parallel to floor	
+		var cam = this.setCamUpToY(this.camera);		
+		
+		var orientMat = cam.orientation.toMatrix();
+		//x-axis in camera coordinate system
+		var orXX = orientMat.m11 * speed;
+        var orXZ = orientMat.m13 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x - orXX;
+        cam.position.z = cam.position.z - orXZ;
+        
+        //move the center, change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        this.moveCenter(-orXX, -orXZ);        
+        cam = this.lookAt(this.center, cam);        
+        cam = this.correctCenterCamDistance(cam, false);
+        
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	User.UserScript.prototype.moveUp = function(){
+		//make cam parallel to floor	
+		var cam = this.setCamUpToY(this.camera);		
+		
+		var orientMat = cam.orientation.toMatrix();
+		//z-axis in camera coordinate system
+		var orZX = orientMat.m31 * speed;
+        var orZZ = orientMat.m33 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x - orZX;
+        cam.position.z = cam.position.z - orZZ;
+        
+        //move the center, change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        this.moveCenter(-orZX, -orZZ);        
+        cam = this.lookAt(this.center, cam);        
+        cam = this.correctCenterCamDistance(cam, false);
+        
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	User.UserScript.prototype.moveDown = function(){
+		//make cam parallel to floor	
+		var cam = this.setCamUpToY(this.camera);		
+		
+		var orientMat = cam.orientation.toMatrix();
+		//z-axis in camera coordinate system
+		var orZX = orientMat.m31 * speed;
+        var orZZ = orientMat.m33 * speed;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + orZX;
+        cam.position.z = cam.position.z + orZZ;
+        
+        //move the center, change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        this.moveCenter(orZX, orZZ);        
+        cam = this.lookAt(this.center, cam);        
+        cam = this.correctCenterCamDistance(cam, false);
+        
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	User.UserScript.prototype.zoomIn = function(){		
+		var cam = this.camera;		
+		if (this.camCenterDistance < 5){
+			return;
+		}
+		var dir = cam.getDirection();
+        dir.normalize();
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + (dir.x * speed);
+        cam.position.y = cam.position.y + (dir.y * speed);
+        cam.position.z = cam.position.z + (dir.z * speed);
+        
+        //update distance of camera to center 
+        this.correctCenterCamDistance(cam, true);
+        
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	User.UserScript.prototype.zoomOut = function(){
+		var cam = this.camera;		
+		
+		var dir = cam.getDirection();
+		dir.normalize();
+		
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x - (dir.x * speed);
+        cam.position.y = cam.position.y - (dir.y * speed);
+        cam.position.z = cam.position.z - (dir.z * speed);
+        
+        //update distance of camera to center 
+        this.correctCenterCamDistance(cam, true);
+        
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	
+	
 
 
 
