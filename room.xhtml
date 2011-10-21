@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title> Interactive Room </title> 
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		
+		<!--  jQuery -->
+		<script type="text/javascript" src="externals/jquery/jquery-1.6.1.js"/>
+		<script type="text/javascript" src="externals/js/jquery-ui-1.8.14.custom.min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.core.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.widget.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.button.js"/>
+		
+		<!-- jQuery slider menu -->
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.scrollTo-min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.serialScroll-min.js"/>		
+		
+		<!-- KataJS simplifies development of the Sirikata ObjectHost in the browser -->
+		<script type="text/javascript" src="externals/katajs/katajs/core/Core.js"/>
+		
+		<!-- Configuration and Login-->
+		<script type="text/javascript" src="scripts/Connect.js"/>
+		<script type="text/javascript" src="scripts/UI.js"/>					
+		
+		
+		<!--  CSS-Style of the User Interface -->		
+		<link type="text/css" href="externals/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" media="all" />
+		<link type="text/css" href="style/style.css" rel="stylesheet" media="all" />
+		
+		<script type="text/javascript"><![CDATA[
+			window.onload=initRoom;		
+			connect(this.serverAddress, '../static/meshes/room1.xml3d', '0');
+		]]></script>
+	</head>	
+	<body> 					
+		<div id="room"/>
+		<div id="roomButtons">
+			<button id="camButton" class="squareButton roomButton"/>											
+			<button id="listButton" class="squareButton roomButton"/>
+			<button id="homeButton" class="squareButton roomButton"/>	
+			<button id="logoutButton" class="squareButton roomButton"/>
+		</div>					
+		<label id="name" class="loginFont" />		
+	    <div id="menu-type" >
+	    	
+	    	<h3 class="category"><a href="#livingRoom" class="categoryColor">Living Room</a></h3>
+    			<div id="livingRoom">
+    				<a table="Sofas"  class="subcategory" onclick="categoryClicked(this);">Sofas and armchairs</a><br/>
+    				<a table="Media"  class="subcategory" onclick="categoryClicked(this);">TV stands and media solutions</a><br/>
+    				<a table="Storage"  class="subcategory" onclick="categoryClicked(this);">Living room storage</a><br/>
+    				<a table="Tables"  class="subcategory" onclick="categoryClicked(this);">Coffee and side tables</a><br/>	    					    							    					
+	    		</div>
+	    	<h3 class="category"><a href="#bedroom" class="category">Bedroom</a></h3>
+	    		<div id="bedroom">
+	    			<a table="Beds"  class="subcategory" onclick="categoryClicked(this);">Beds</a><br/>
+    				<a table="Mirrors"  class="subcategory" onclick="categoryClicked(this);">Mirrors</a><br/>
+    				<a table="Storage"  class="subcategory" onclick="categoryClicked(this);">Bedroom storage</a><br/>
+    				<a table="Rugs"  class="subcategory" onclick="categoryClicked(this);">Rugs</a><br/>
+    			</div>
+	    	<h3 class="category"><a href="kitchen" class="category">Kitchen</a></h3>
+		    	<div id="kitchen">
+    				<a table="Cabinets"  class="subcategory" onclick="categoryClicked(this);">Kitchen cabinets</a><br/>
+    				<a table="Fridges"  class="subcategory" onclick="categoryClicked(this);">Fridges and Freezers</a><br/>
+    				<a table="Ovens"  class="subcategory" onclick="categoryClicked(this);">Ovens</a><br/>
+    				<a table="Dishwashers"  class="subcategory" onclick="categoryClicked(this);">Dishwashers</a><br/>	    							    						    			
+	    		</div>
+	    	<h3 class="category"><a href="#bath" class="category">Bath</a></h3>
+	    		<div id="bath">
+	    			<a table="Washstands"  class="subcategory" onclick="categoryClicked(this);">Wash-stands</a><br/>
+    				<a table="Storage"  class="subcategory" onclick="categoryClicked(this);">Bathroom storage</a><br/>
+    				<a table="Mirrors"  class="subcategory" onclick="categoryClicked(this);">Mirrors</a><br/>
+    				<a table="Washbasins"  class="subcategory" onclick="categoryClicked(this);">Wash-basins</a><br/>
+    			</div>
+	    	<h3 class="category"><a href="#office" class="category">Office</a></h3>
+	    		<div id="office">
+	    			<a table="Desks"  class="subcategory" onclick="categoryClicked(this);"> Desks and tables</a><br/>		    			
+	    			<a table="Chairs"  class="subcategory" onclick="categoryClicked(this);"> Office Chairs</a><br/>
+	    			<a table="Storage"  class="subcategory" onclick="categoryClicked(this);"> Workspace Storage</a><br/>		    			
+	    		</div>
+	    </div>		    
+
+		<div id="furnitureBrowser" class="menu">
+				<div id="furnitureContent">
+					<ul id = "furnitureContentList">
+																
+					</ul>
+				</div>
+				<div id="prev" class="browserButton"/>
+				<div id="next" class="browserButton"/>
+		</div> 
+	</body>
+</html> 

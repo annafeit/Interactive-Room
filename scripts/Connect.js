@@ -44,9 +44,6 @@ function connect(address, mesh, name){
 	  		   		'katajs/gfx/xml3dgfx.js'
 	    ], function(){
 	  		loadGFX();
-	  		$("#all").show();
-	  		$("#index").hide();
-	  		$("#choose").hide();
 	  		}
 	  	);
 } 

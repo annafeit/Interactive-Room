@@ -202,12 +202,12 @@ button:active{
 	background-color:#BA340B;
 	box-shadow:0px 0px 50px #BA340B;
 }
-.squareButton:active{
+.squareButton:active{	
 	box-shadow:0px 0px 30px #260000 inset;
 }
 .squareButtonClicked{
-	background-color:#BA340B;
-	box-shadow:0px 0px 20px #260000 inset;
+	background-color:#FF470F;
+	box-shadow:0px 0px 50px #260000 inset;
 }
 #chooseRoom{
 	left:25%;
@@ -329,24 +329,12 @@ button:active{
 
 
 /** room **/
-#all{
-	position:absolute;
-	width:100%;
-	height:100%;
-	margin-top:-7px;
-	margin-left:-7px;
-	z-index:-2;
-}
-xml3d{
-	margin-left:3px;
-	margin-top:3px;
-}
 #room{
 	position:absolute;	
 	width:100%;
 	height:100%;
-	margin-top:-4px;
-	margin-left:-4px;	
+	margin-top:-8px;
+	margin-left:-8px;	
 	z-index:-1;
 }
 #name{
@@ -406,6 +394,20 @@ xml3d{
 	#logoutButton:hover{
 		background-image:url(../static/icons/logoutActive.png);
 	}
+	
+/** camera navigation Buttons**/
+#navigationButtons{
+	position:absolute;
+	width:700px;
+	top:5px;
+	left:50%;
+	margin-left:-400px;
+}
+.navigationButtons{
+	width:100px;
+	height:25px;
+	font-size:14px;
+}
 
 /** menu **/
 #menu-type{
@@ -432,33 +434,35 @@ xml3d{
 	.subcategory:hover{
 		color:#c93c00;
 	}
+	
+/** browser **/	
 #furnitureBrowser{		
 	position:absolute;
-	width:808px;
-	height:130px;
+	width:790px;
+	height:140px;	
 	bottom:0%;
-	left:20%;
-	border-radius:10px 10px 0px 0px;
+	left:50%;
+	margin-left:-395px;
 }
-/** browser **/
 
 #furnitureContent{	
 	position:absolute;
 	height:100%;
-	width:100%;
+	width:100%;	
 	float:left;
-	overflow:hidden;		
+	top:20px;
+	overflow:hidden;	
+	border-radius:10px;		
 }
-	#furnitureContent ul{
-		/* size of all pieces together*/	
-		width:1400px;	
-		position:absolute;
+	#furnitureContentList{
+		/* size of all pieces together*/				
+		position:absolute;		
 		left:-30px;
 		list-style-type:none;
 	}
 	#furnitureContent li{
 		float:left;
-		margin:0 16px;
+		margin:0 15px;
 		cursor:pointer;
 	}
 	#furnitureContent .browserContent:hover{
@@ -467,42 +471,26 @@ xml3d{
 	#furnitureContent .browserContent:active{
 		/*TODO*/
 	}
-.browserContent{
+.browserContent{ /* size of one item: 130px*/
 	float:left;
-	background-color:rgb(242, 203, 155);
 	width: 100px;
 	height: 100px;
 	border-radius: 5px;
 	background-repeat:no-repeat;
-	background-size:100px 100px;	
+	background-size:90px 90px;	
+	background-position:center;  	
 }
 
-.browserNavigation{
-	color:#f2cb9b;
-	font-family: "League-Gothic", Courier;
-	font-size: 50px; 	
+.browserButton{
 	position:absolute;
-	top:30%;
-}
-.browserNavigation:hover{
-	color:#f2cb9b;
-	text-shadow: 0px 0px 10px #f2cb9b;	
-}
-
-.browserNavigation:active{
-	color:#f2cb9b;
-	text-shadow: 0px 0px 0px #f2cb9b;	
-}
-.navButton{
-	position:absolute;
-	top:35px;	
-	height:50px;
-	width:50px;
-	background-size:50px 50px;
+	top:65px;	
+	height:30px;
+	width:30px;
+	background-size:30px 30px;
 }
 #prev{	
 	float:left;
-	left:-8%;
+	left:-30px;
 	background-image:url(../static/icons/prev.png);	
 }
 	#prev:hover{
@@ -513,7 +501,7 @@ xml3d{
 	}
 #next{
 	float:right;
-	right:-8%;
+	right:-30px;
 	background-image:url(../static/icons/next.png);	
 }
 	#next:hover{

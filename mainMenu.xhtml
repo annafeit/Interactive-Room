@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title> Interactive Room </title> 
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		
+		<!--  jQuery -->
+		<script type="text/javascript" src="externals/jquery/jquery-1.6.1.js"/>
+		<script type="text/javascript" src="externals/js/jquery-ui-1.8.14.custom.min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.core.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.widget.js"/>
+		<script type="text/javascript" src="externals/development-bundle/ui/jquery.ui.button.js"/>
+		
+		<!-- jQuery slider menu -->
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.scrollTo-min.js"/>
+		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.serialScroll-min.js"/>		
+		
+		<!-- KataJS simplifies development of the Sirikata ObjectHost in the browser -->
+		<script type="text/javascript" src="externals/katajs/katajs/core/Core.js"/>
+		
+		<!-- Configuration and Login-->
+		<script type="text/javascript" src="scripts/Connect.js"/>
+		<script type="text/javascript" src="scripts/UI.js"/>					
+		
+		
+		<!--  CSS-Style of the User Interface -->		
+		<link type="text/css" href="externals/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" media="all" />
+		<link type="text/css" href="style/style.css" rel="stylesheet" media="all" />
+		
+		<script type="text/javascript"><![CDATA[
+			window.onload=initMainMenu;			
+		]]></script>
+	</head>	
+	<body> 	
+		
+		
+		
+		<div id="overlay" class="overlay">
+			<div id="createNewRoom" class="dialogue">
+				<div id="roomMesh"/>	
+				<div id="createNewRoomInput">
+				<!-- TODO make form  --> 			
+					<label for="title" class="loginFont"> Title:</label>																					
+					<input id="title"/>				
+				</div>
+				<button id="createNewRoomButton" onclick="createNewRoom( $('#title').val() );"> Create</button>
+				<button class="closeButton" onclick="$('#overlay').hide();">x</button>
+			</div> 			
+		</div>			
+		<div id="chooseRoom" class="squareButton">
+	    	<p class="choosingRoomText">edit room</p>
+	    </div>
+	    
+	    <div id="friendRoom" class="squareButton">
+	    	<p class="choosingRoomText">shared rooms</p>
+	    </div>
+	    
+	  	<div id="newRoom" class="squareButton">
+	  		<p class="choosingRoomText">new room</p>
+	  	</div>
+	  	
+	  	<div id="chooseMenu">
+	  		<div id="chooseNewRoom" style="display:none">
+	  			<!-- <p>Choose a room template</p> -->
+	  			<div id="room1" class = "newRoomContent" onclick="chooseNewRoom('room1')"/>
+	  			<div id="room2" class = "newRoomContent" onclick="chooseNewRoom('room2')"/>
+	  			<div id="room3" class = "newRoomContent" onclick="chooseNewRoom('room3')"/>
+	  			<div id="room4" class = "newRoomContent" onclick="chooseNewRoom('room4')"/>
+	  		</div>
+	  	  	<div id="roomBrowser" style="display:none">
+				<div id="content">
+					<ul>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						<li> <div class = "browserContent"/> </li>
+						
+					</ul>
+				</div>
+				<a id="prev"  class="browserNavigation"> &lt; </a>
+				<a id="next"  class="browserNavigation"> &gt; </a>	
+		  	</div>			  	
+		 </div>
+	</body>
+</html>

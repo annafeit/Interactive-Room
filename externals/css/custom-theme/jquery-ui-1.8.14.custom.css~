@@ -59,10 +59,10 @@
 .ui-widget { font-family: Verdana,Arial,serif; font-size: 14px; }
 .ui-widget .ui-widget { font-size: 1em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
-.ui-widget-content { border: 1px solid #aaaaaa; background: #fff0d6 url(images/ui-bg_flat_100_fff0d6_40x100.png) 50% 50% repeat-x; color: #222222; }
-.ui-widget-content a { color: #222222; }
-.ui-widget-header { border: 1px solid #aaaaaa; background: #a32500 url(images/ui-bg_highlight-soft_75_a32500_1x100.png) 50% 50% repeat-x; color: #000000; font-weight: bold; }
-.ui-widget-header a { color: #000000; }
+.ui-widget-content { border: 1px solid #aaaaaa; background: #fff0d6 url(images/ui-bg_flat_100_fff0d6_40x100.png) 50% 50% repeat-x; color: #460000; }
+.ui-widget-content a { color: #460000; }
+.ui-widget-header { border: 1px solid #aaaaaa; background: #a32500 url(images/ui-bg_highlight-soft_75_a32500_1x100.png) 50% 50% repeat-x; color: #460000; font-weight: bold; }
+.ui-widget-header a { color: #460000; }
 
 /* Interaction states
 ----------------------------------*/
@@ -401,7 +401,7 @@
 .ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
 button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
 .ui-button-icons-only { width: 3.4em; } 
-button.ui-button-icons-only { width:  3.7em;background-color: green; } 
+button.ui-button-icons-only { width:  3.7em; background-color: green; } 
 
 /*button text element */
 .ui-button .ui-button-text { display: block; line-height: 1.4;  }
