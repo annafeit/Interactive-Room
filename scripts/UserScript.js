@@ -14,7 +14,7 @@ Kata.require([
 	/**
 	* Constructor
 	*/
-	User.UserScript = function(channel, args){
+	User = function(channel, args){
 		//save the xml3d element
 		var t = document.getElementsByTagName("xml3d");
 		this.xml3d = t[0];
@@ -23,6 +23,9 @@ Kata.require([
 		this.username = args.username;
 		this.space=args.space;
 		this.database = args.database;
+		
+		//to store all furniture of the room
+		this.furniture = new Array();
 		
 		//to save which key is pressed
 		this.keyIsDown = {};
@@ -46,9 +49,9 @@ Kata.require([
 	/**
 	* Simulate inheritance from GraphicsScript by extending the User class with the methods of the parent(SUPER) class
 	*/
-	Kata.extend(User.UserScript, SUPER);
+	Kata.extend(User, SUPER);
 	
-	User.UserScript.prototype.parseScene = function(){
+	User.prototype.parseScene = function(){
 		//camera
         var activeViewId = this.xml3d.activeView;
         this.camera = document.getElementById(activeViewId);
@@ -77,7 +80,7 @@ Kata.require([
 	/**
 	* proximity callback TODO ???
 	*/
-    User.UserScript.prototype.proxEvent = function(remote, added) {
+    User.prototype.proxEvent = function(remote, added) {
         if (added){
          Kata.warn("Camera Discover object.");
             this.presence.subscribe(remote.id());
@@ -89,7 +92,7 @@ Kata.require([
 
     
     /** Camera sync */
-    User.UserScript.prototype.syncCamera = function() {
+    User.prototype.syncCamera = function() {
         var now = new Date();
         this.setCameraPosOrient(this.presence.predictedPosition(now),
                                 this.presence.predictedOrientation(now),
@@ -100,19 +103,42 @@ Kata.require([
     /**
 	* Creates the room, the user wants to login to
 	*/
-    User.UserScript.prototype.createRoom = function(){
+    User.prototype.createRoom = function(){
 	    this.createObject(kata_base_offset + "scripts/RoomScript.js",
-		"Room.RoomScript",
-		{ space:this.space,
-		visual:{mesh:this.roomMesh},
-		loc:{scale: "1.0"} //just to match the code..
-		});
+							"Room",
+							{ space:this.space,
+					    	  visual:{mesh:this.roomMesh},
+					    	  loc:{scale: "1.0"} //just to match the code..
+							});
     }
+    
+    User.prototype.createFurniture = function(obj){
+    	var prev = obj.getAttribute("preview");
+    	var thus = this;
+    	$.post('scripts/getMeshFromFurniturePreview.php', {table: "furniture", preview: prev}, 
+    			function(data, jqxhr){     				
+    				var url = kata_base_offset + "static/meshes/"+data[0];
+    				//create new object in world 
+    		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
+    		    			"Furniture",
+    		    			{ space:thus.space,
+    		    			  center: thus.center,
+    		    			  visual:{mesh: url},
+    		    			  callback:{thus.furnitureCreated},
+    		    			  loc:{scale: "1.0"} //just to match the code..
+    		    			});
+    			},'json');
+    }
+    
+    User.prototype.furnitureCreated = function(obj){
+    	this.furniture.push(obj);
+    }
+    
     
     /**
 	* Sets the camera to the "door-view"
 	*/
-    User.UserScript.prototype.setCamToDoor = function(){
+    User.prototype.setCamToDoor = function(){
 	     var views = document.getElementsByTagName("view");
 	     var view;
 	     
@@ -150,7 +176,7 @@ Kata.require([
 	     this.syncCamera();	     	    
     };
     
-    User.UserScript.prototype.setCam = function(pos){
+    User.prototype.setCam = function(pos){
     	var now = new Date();
     	var loc = this.presence.predictedLocationAtTime(now);
     	loc.pos = pos;
@@ -160,7 +186,7 @@ Kata.require([
 	/**
 	* Callback that is triggered when object is connected to the space
 	*/
-	User.UserScript.prototype.connected = function(presence, space, reason){
+	User.prototype.connected = function(presence, space, reason){
 		//handle connection failure
 		if (presence == null){
 		Kata.error('Failed to connect viewer to '+ space+'. Reason: ' + reason);
@@ -184,7 +210,11 @@ Kata.require([
 		        
 		//create Room of user
 		this.createRoom();
-
+		
+		var thus = this;
+		//attach a handler for the click-event of all current AND future elements with class furniture
+		$(".furniture").live("click",function(){thus.createFurniture(this)});
+		
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
         this.syncCamera();
@@ -196,7 +226,7 @@ Kata.require([
 	/**
 	* check if the camera is out of the room and make walls invisible if this is true.
 	*/
-	User.UserScript.prototype.checkWalls = function(){
+	User.prototype.checkWalls = function(){
 		//create ray with origin in camera and direction in camera direction
 		var ray = this.xml3d.createXML3DRay();
 		ray.origin = this.camera.position;		
@@ -218,7 +248,7 @@ Kata.require([
 	}
 	
 
-	User.UserScript.prototype.setShaderTransparent = function(){
+	User.prototype.setShaderTransparent = function(){
 		var groups = document.getElementsByTagName("group");		
 		for (var i =0;i<groups.length;i++)
 		{
@@ -230,7 +260,7 @@ Kata.require([
 		this.xml3d.update();
 	}
 	
-	User.UserScript.prototype.setShaderSolid = function(){	
+	User.prototype.setShaderSolid = function(){	
 		var groups = document.getElementsByTagName("group");		
 		for (var i =0;i<groups.length;i++)
 		{
@@ -243,10 +273,14 @@ Kata.require([
 		this.xml3d.update();
 	}
 	
+	User.prototype.saveRoom = function(){
+		//TODO insert table entry in
+		//hosts, 
+	}
 		
 	
 	//Enum for Keycode
-	User.UserScript.prototype.Keys = {
+	User.prototype.Keys = {
 		UP : 38,
 		DOWN : 40,
 		LEFT : 37,
@@ -264,7 +298,8 @@ Kata.require([
 	var moveSpeed = 5;
 	
 	//Handle messages from GUI
-	User.UserScript.prototype._handleGUIMessage = function (channel, msg) {
+	User.prototype._handleGUIMessage = function (channel, msg) {
+		//TODO does this script only gets this message from objects hosted by this oh?
 		if(msg.msg=="loaded" && msg.mesh==this.roomMesh){
 			this.setCamToDoor();
 			this.parseScene();
@@ -439,7 +474,7 @@ Kata.require([
 	 * point: XML3DVec3
 	 * camera: XML3D view
 	 */	
-	User.UserScript.prototype.lookAt = function(point, cam){
+	User.prototype.lookAt = function(point, cam){
 		var vector = point.subtract(cam.position);
 		vector = vector.normalize();
 		cam.setDirection(vector);
@@ -449,7 +484,7 @@ Kata.require([
 	/**
 	 * helper function to update the presence's position and orientation
 	 */
-	User.UserScript.prototype.updatePresence = function (position, orientation){
+	User.prototype.updatePresence = function (position, orientation){
 		 var now = new Date();
 	     var loc = this.presence.predictedLocationAtTime(now);		     
 	     //create location
@@ -466,7 +501,7 @@ Kata.require([
 	 * Helper function to move the Center
 	 * The center's y-coordinate (height) neer changes
 	 */
-	User.UserScript.prototype.moveCenter = function(x, z){
+	User.prototype.moveCenter = function(x, z){
 		this.center.x = this.center.x + x;		
 		this.center.z = this.center.z + z;
 		this.moveCenterCube(x, z);		
@@ -475,7 +510,7 @@ Kata.require([
 	/**
 	 * Helper function to move the center cube
 	 */
-	User.UserScript.prototype.moveCenterCube = function(x, z){
+	User.prototype.moveCenterCube = function(x, z){
 		//finds the transformation of the cube
 		var transformations = document.getElementsByTagName("transform");
 		var trans;
@@ -492,7 +527,7 @@ Kata.require([
 	/**
 	 * Helper function to correct the Distance from the cam to the center
 	 */
-	User.UserScript.prototype.correctCenterCamDistance = function(cam, update){		
+	User.prototype.correctCenterCamDistance = function(cam, update){		
 		var dist = cam.position.subtract(this.center);
 		if(update){
 			this.camCenterDistance = dist.length();
@@ -513,7 +548,7 @@ Kata.require([
 	/**
 	 * Helper function to change the camera's Up vector to be parallel to the y-axis
 	 */
-	User.UserScript.prototype.setCamUpToY = function(cam){
+	User.prototype.setCamUpToY = function(cam){
 		var newUp = this.xml3d.createXML3DVec3();
 		newUp.x = 0;
 		newUp.y = 1;
@@ -525,7 +560,7 @@ Kata.require([
 	/**
 	 * Helper function to compute the angle between a vector and the y-axis
 	 */
-	User.UserScript.prototype.angleToY = function(vec){
+	User.prototype.angleToY = function(vec){
 		var yAxis = this.xml3d.createXML3DVec3();
 		yAxis.x = 0;
 		yAxis.y = 1;
@@ -535,7 +570,7 @@ Kata.require([
 	}
 	
 		
-	User.UserScript.prototype.turnRight = function(){	
+	User.prototype.turnRight = function(){	
 		//make cam parallel to floor		
 		var cam = this.setCamUpToY(this.camera);		
 		
@@ -555,7 +590,7 @@ Kata.require([
         this.updatePresence(cam.position, cam.orientation);       
 	}
 	
-	User.UserScript.prototype.turnLeft = function(){
+	User.prototype.turnLeft = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);
 		
@@ -577,7 +612,7 @@ Kata.require([
 	}
 	
 	
-	User.UserScript.prototype.turnUp = function(){
+	User.prototype.turnUp = function(){
 		var cam = this.camera;
 		
 		//angle of camDirection to y-Axis in the range of 90° - 180°
@@ -603,7 +638,7 @@ Kata.require([
        
         this.updatePresence(cam.position, cam.orientation);
 	}
-	User.UserScript.prototype.turnDown = function(){
+	User.prototype.turnDown = function(){
 		var cam = this.camera;
 		
 		//angle of camDirection to y-Axis in the range of 90° - 180°
@@ -630,7 +665,7 @@ Kata.require([
         this.updatePresence(cam.position, cam.orientation);
 	}
 	
-	User.UserScript.prototype.moveRight = function(){
+	User.prototype.moveRight = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
 		
@@ -653,7 +688,7 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);    
 	}
-	User.UserScript.prototype.moveLeft = function(){
+	User.prototype.moveLeft = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
 		
@@ -674,7 +709,7 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);
 	}
-	User.UserScript.prototype.moveUp = function(){
+	User.prototype.moveUp = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
 		
@@ -695,7 +730,7 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);
 	}
-	User.UserScript.prototype.moveDown = function(){
+	User.prototype.moveDown = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
 		
@@ -716,7 +751,7 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);
 	}
-	User.UserScript.prototype.zoomIn = function(){		
+	User.prototype.zoomIn = function(){		
 		var cam = this.camera;		
 		if (this.camCenterDistance < 5){
 			return;
@@ -734,7 +769,7 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);
 	}
-	User.UserScript.prototype.zoomOut = function(){
+	User.prototype.zoomOut = function(){
 		var cam = this.camera;		
 		
 		var dir = cam.getDirection();

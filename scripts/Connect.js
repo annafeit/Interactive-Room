@@ -61,7 +61,7 @@ function graphicsReady() {
    	
    		window.kata = new Kata.MainThread(
    			kata_base_offset + "scripts/UserScript.js", 
-   			"User.UserScript", scriptArgs
+   			"User", scriptArgs
    		);			   			
 			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));                         		   		 	
    }
