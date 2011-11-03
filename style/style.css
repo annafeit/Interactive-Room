@@ -178,9 +178,9 @@ button:active{
 	box-shadow:  0px 0px 20px #A32500;
 	height:200px;
 	width:200px;
-	top:25%;
-	margin-top:-100px;
-	margin-left: -100px;
+	top:100px;	
+	left:50%;
+
 }
 .choosingRoomText{
 	/*position and size*/
@@ -210,28 +210,21 @@ button:active{
 	box-shadow:0px 0px 50px #260000 inset;
 }
 #chooseRoom{
-	left:25%;
+	margin-left:-450px;
 }
-#friendRoom{
-	left:50%;
+#friendRoom{	
+	margin-left: -100px;
 }
 #newRoom{
-	left:75%;
-}
-#chooseMenu{	
-	position:absolute;
-	width:70%;
-	height:30%;
-	top:60%;
-	left:15%;	
+	margin-left:250px;
 }
 /**choose a new Room**/
 #chooseNewRoom{
 	position:absolute;	
-	top:10%;
+	bottom:50px;
 	left:50%;
 	margin-left:-400px;	
-	height:60%;
+	height:200px;
 	width:800px;
 }
 	#chooseNewRoom p{
@@ -250,7 +243,7 @@ button:active{
 	background-color:rgba(242, 203, 155,0.8);
 	width: 150px;
 	height: 150px;
-	margin:0 20px;
+	margin: 20px;
 	border-radius: 5px;
 	background-repeat:no-repeat;
 	background-size:150px 150px;	
@@ -325,7 +318,92 @@ button:active{
 	font-size:18px;
 	font-weight:bold;
 }
+/** choose existing room to edit **/
+.editRoom{
+	position:absolute;
+	top:400px;
+	width:900px;		
+	left:50%;		
+	margin-left:-450px;
+	height:50%;
+}
 
+.roomList{
+	float:left;
+	position:relative;
+	width:50%;
+	height:100%;
+	overflow-y:auto;
+	
+}
+	.roomTable{
+		position:relative;
+		width:100%;			
+	}
+	.roomTable .table-header{
+		font-family:sans-serif;		
+		font-size:18px;
+		color: #fff0d6;		
+	}
+	
+	.roomTable tbody{
+		font-family:sans-serif;
+		background-color:#fff0d6;
+		color:#460000;			
+	}
+	tr{
+		height:30px;
+	}
+	td{
+		height:15px;
+		vertical-align:middle;
+	}
+	.row:hover{		
+		color: #fff0d6;	
+		background: #a32500 url(images/ui-bg_highlight-soft_75_a32500_1x100.png) 50% 50% repeat-x;	
+	}
+	.rowActive{
+		color:#a32500;
+		background-color:#f2cb9b;
+	}
+	
+#roomPreview{		
+	float:left;
+	position:relative;
+	height:200px;
+	width:200px;	
+	left: 25%;
+	margin-left: -100px;
+	background-repeat:no-repeat;
+	background-size:200px 200px; 
+}
+#editRoomButton{	
+	width: 150px;
+	position:absolute;
+	top: 250px;
+	left:75%; 
+	margin-left:-75px;	
+}
+
+/** choose shared rooms**/
+#editSharedRooms{
+	psoition:absolute;
+	top:350px;
+}
+.sharedRoomsButton{
+	position:relative;
+	width: 200px;
+	font-size:18px;	
+}
+.sharedRoomsButtonActive{
+	box-shadow: 0px 0px 10px #680000 inset;
+}
+.sharedRoomsList{
+	position:absolute;
+	height:50%;
+	width:100%;
+	top:50px;
+}
 
 
 /** room **/
@@ -345,6 +423,7 @@ button:active{
 	/*position and size*/
 	position:relative;
 	margin: 0 5px;
+	top:10px;
 	width:60px;	
 	height:60px;	
 	/*color and border*/
@@ -365,6 +444,8 @@ button:active{
 	top:0px;
 	right:10px;
 	height:100px;
+	margin-top:0px;
+	
 }
 #camButton{
 	background-image:url(../static/icons/cam.png);

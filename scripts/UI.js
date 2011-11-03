@@ -23,23 +23,39 @@ function initIndex(){
 	    }
 		$.post('scripts/register.php', {newUsername: username, newPassword: password}, 
 				function(data, jqxhr){
-					$('#overlayRegister').hide();
-					user = username;
 					alert(data);
+					$('#overlayRegister').hide();
+					//show newly registered user name in login window
+					$("#username").val(username);
+					//clear input fields
+					$("#newUsername").val("");
+					$("#newPassword").val("");
+					$("#newPasswordConf").val("");
 				})
 	});
 	$("#flogin").submit(function(event){
 		/* stop form from submitting normally */
-	    event.preventDefault(); 
-		this.username = $("#username").val();
-	    var password = $("#password").val();
-	    this.serverAddress = $("#server-address").val();
+	    event.preventDefault();
+	    
+		var username = $("#username").val();
+	    var password = $("#password").val();	    
+	    var serverAddress = $("#server-address").val();
+	    
 		if(this.username == "" ||password == "" ||this.serverAddress == "" ){
 			alert("Fill in username, password and server address!");
 			return;
 		}
-		//TODO check username and password in Database
-		 document.location.href='mainMenu.xhtml';
+		$.post('scripts/login.php', {username: username, password: password}, 
+				function(data, jqxhr){	
+					if (data[0]){
+						//preserves username and server address
+						window.name= serverAddress  + " " + username;
+						document.location.href='mainMenu.xhtml';						
+					}
+					else{
+						alert("wrong username or password");						
+					}					
+				},'json')
 	});
 			
 }
@@ -48,11 +64,30 @@ function initMainMenu(){
 	$("#chooseRoom").click(function(){
 		if ($("#chooseRoom").hasClass("squareButtonClicked")){
 			$("#chooseRoom").removeClass("squareButtonClicked");
+			$("#roomList").hide();
 		}
 		else{
 			$("#chooseRoom").addClass("squareButtonClicked");			
 			$("#newRoom").removeClass("squareButtonClicked");
 			$("#friendRoom").removeClass("squareButtonClicked");
+			$("#chooseNewRoom").hide();
+			$("#sharedRooms").hide();
+			$("#roomList").show();
+		}
+	});
+	
+	$("#friendRoom").click(function(){
+		if ($("#friendRoom").hasClass("squareButtonClicked")){
+			$("#friendRoom").removeClass("squareButtonClicked");	
+			$("#sharedRooms").hide();
+		}
+		else{
+			$("#friendRoom").addClass("squareButtonClicked");				
+			$("#newRoom").removeClass("squareButtonClicked");
+			$("#chooseRoom").removeClass("squareButtonClicked");
+			$("#chooseNewRoom").hide();
+			$("#roomList").hide();
+			$("#sharedRooms").show();
 		}
 	});
 	
@@ -65,36 +100,69 @@ function initMainMenu(){
 			$("#newRoom").addClass("squareButtonClicked");			
 			$("#chooseRoom").removeClass("squareButtonClicked");				
 			$("#friendRoom").removeClass("squareButtonClicked");
-			$("#chooseNewRoom").show();				
+			$("#chooseNewRoom").show();	
+			$("#sharedRooms").hide();
+			$("#roomList").hide();
 		}
 	});
 	
-	$("#friendRoom").click(function(){
-		if ($("#friendRoom").hasClass("squareButtonClicked")){
-			$("#friendRoom").removeClass("squareButtonClicked");
-		}
-		else{
-			$("#friendRoom").addClass("squareButtonClicked");				
-			$("#newRoom").removeClass("squareButtonClicked");
-			$("#chooseRoom").removeClass("squareButtonClicked");
-		}
+	$("#myRoomsButton").click(function(){
+		$("#myRooms").show(); 
+		$("#otherRooms").hide(); 
+		$(this).addClass("sharedRoomsButtonActive");
+		$("#otherRoomsButton").removeClass("sharedRoomsButtonActive");
 	});
+	
+	$("#otherRoomsButton").click(function(){
+		$("#myRooms").hide(); 
+		$("#otherRooms").show();
+		$(this).addClass("sharedRoomsButtonActive");
+		$("#myRoomsButton").removeClass("sharedRoomsButtonActive");
+});
+	
+	//fill room table
+	var username = window.name.split(" ")[1];
+	$.post('scripts/fillRoomTable.php', {username:username}, 
+			function(data, jqxhr){		
+				console.log(data);
+				for (var i=0;i<data.length;i++){
+					var o = data[i];
+					var a = $("<tr class='row' onclick='rowClicked(this)' ><td>"+o.title+"</td> <td>"+o.lastUpdate+"</td></tr>")[0];
+					$("#roomTable tbody").append(a);
+					a.setAttribute("preview", data[i].preview);
+					a.setAttribute("id", data[i].id);
+					a.setAttribute("mesh", data[i].mesh);					
+				}				
+			},'json');
+	
+
 }
+
+function rowClicked(obj){
+	//change style
+	var rows = document.getElementsByTagName("tr");
+	for(var i=0;i<rows.length;i++){
+		$(rows[i]).removeClass("rowActive");
+	}
+	$(obj).addClass("rowActive");
+	
+	//load preview
+	document.getElementById("editRoomButton").style.visibility="visible";	
+	var url = "url(../"+obj.getAttribute("preview")+")";
+	var div = document.getElementById("roomPreview");
+	div.style.backgroundImage = url;
+	
+	var name = window.name.split(" ");
+	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id");
+	
+}
+	
 function initRoom(){
 
 	$("#menu-type").accordion({
 		autoHeight: false,
 		navigation: true
 	});				
-	
-	/*var l = "1040px";
-	document.getElementById("furnitureContentList").style.width = l;
-	for (i=0;i<8;i++){
-		$("#furnitureContentList").append("<li> <div class = 'browserContent furniture'/> </li>	");
-	}*/
-	
-	
-	
 	
 	
 	$("#furnitureBrowser").hide();
@@ -156,20 +224,21 @@ function categoryClicked(element){
 	//returns the preview url of the furnitures in "group"
 	$.post('scripts/loadFurniture.php', {name:group}, 
 			function(data, jqxhr){	
-				//fill furniture browser with previews
+				//fill furniture browser with previews							
 				var l = (data.length * liSize)+"px";
-				
 				document.getElementById("furnitureContentList").style.width = l;
-				for (i in data){
+				for (var i=0;i<data.length;i++){
 					$("#furnitureContentList").append("<li> <div class = 'browserContent furniture'/> </li>	");
 				}
 				var furniture = document.getElementsByClassName("furniture");
 				
 				for (i=0; i<furniture.length;i++){
-					var url = "url(../static/preview/"+data[i]+")";
+					var url = "url(../"+data[i].preview+")";
 					furniture[i].style.backgroundImage = url;
+					furniture[i].setAttribute("preview", data[i].preview);
+					furniture[i].setAttribute("id", data[i].id);
 				}
-								
+				//initialize browser				
 				$('#furnitureContent').serialScroll({
 					items:'li',
 					prev:'#furnitureBrowser #prev',
@@ -183,7 +252,7 @@ function categoryClicked(element){
 					lock:false,
 					cycle:false, //don't pull back once you reach the end
 					exclude:5 //to prevent scrolling further than to the last element
-				});
+				});								
 				
 				$("#furnitureBrowser").show();
 				
@@ -196,12 +265,9 @@ function categoryClicked(element){
 					$("#next").show();
 				}
 				
-			},'json')
-	
-	
+			},'json');
+		
 }
-
-
 /**
  * string s: the room (room1, room2...)
  */
@@ -215,11 +281,21 @@ function chooseNewRoom(name){
  * string title: the title of the room
  */
 function createNewRoom(title){
-	//TODO create a new entry in 'room' and 'owns' table
+	var args = window.name.split(" ");	
 	var name = $("#roomMesh").attr("name");
-	var url="../static/meshes/" + name + ".xml3d";
-	document.location.href='room.xhtml';
-	connect(this.serverAddress, url, this.username);
+	var mesh ="static/meshes/" + name + ".xml3d";
+	var preview = "static/preview/" + name + ".png"
+	var username = args[1];
+	var space = args[0];
+	var title =  $("#title").val();
+	//create database entry for new room of current user
+	$.post('scripts/createRoom.php', {mesh: mesh, preview: preview, title: title, username: username}, 
+			function(data, jqxhr){
+				console.log("room creation: "+ data);
+				var roomId = data[0];
+				window.name = space + " " + username + " " + mesh + " " + roomId;
+				document.location.href='room.xhtml';
+			},'json');		
 }
 
 

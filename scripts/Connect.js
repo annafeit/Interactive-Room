@@ -28,12 +28,13 @@ var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I n
 //ObjectHost, which sends all messages to the first object's 
 //script User.js). In this way, the core of the 
 //application is the first object's script(the user).
-function connect(address, mesh, name){          	            	
+function connect(address, mesh, name, roomId){          	            	
 		
 		
 		this.address= address;
 		this.username = name;
 		this.world = mesh;
+		this.roomId = roomId;
 		
 		$("#loginButton").attr("disabled", true);
 		
@@ -50,8 +51,9 @@ function connect(address, mesh, name){
 
 function graphicsReady() {
 	var scriptArgs ={
-			space: SpaceURL,
-			username: this.username,			
+			space: this.address,
+			username: this.username,	
+			roomId: this.roomId,
 			visual: {mesh:avatarURL},		
 			world: this.world,
 			loc:{scale: "1.0"},	//just to match the code..

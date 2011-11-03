@@ -29,7 +29,7 @@
 		]]></script>
 	</head>	
 	<body>
-		<button id="debug" onclick="document.location.href='room.xhtml';"> DEBUG </button>
+		<button id="debug" onclick="window.name = 'sirikata://' + window.location.hostname + ':7777' + ' ' + '0' + ' ' + 'static/meshes/room1.xml3d'  + ' ' + '-1'; document.location.href='room.xhtml';"> DEBUG </button>
 		<div id="connection" class="dialogue">				
 			<form id="flogin" action="scripts/login.php" method="post" class="loginFont">
 				<!-- form fields -->

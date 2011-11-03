@@ -30,21 +30,24 @@
 		<link type="text/css" href="style/style.css" rel="stylesheet" media="all" />
 		
 		<script type="text/javascript"><![CDATA[
-			window.onload=initRoom;		
-			connect(this.serverAddress, '../static/meshes/room1.xml3d', '0');
+			window.onload=initRoom;
+			var args = window.name.split(" ");
+			var serverAddress = args[0];
+			var username = args[1];						
+			var mesh = "../"+args[2];			
+			var roomId = args[3];
+			connect(serverAddress, mesh, username, roomId);
 		]]></script>
 	</head>	
-	<body> 					
+	<body> 							
 		<div id="room"/>
 		<div id="roomButtons">
 			<button id="camButton" class="squareButton roomButton"/>											
 			<button id="listButton" class="squareButton roomButton"/>
 			<button id="homeButton" class="squareButton roomButton"/>	
 			<button id="logoutButton" class="squareButton roomButton"/>
-		</div>					
-		<label id="name" class="loginFont" />		
-	    <div id="menu-type" >
-	    	
+		</div>							
+	    <div id="menu-type" >	    	
 	    	<h3 class="category"><a href="#livingRoom" class="categoryColor">Living Room</a></h3>
     			<div id="livingRoom">
     				<a table="Sofas"  class="subcategory" onclick="categoryClicked(this);">Sofas and armchairs</a><br/>

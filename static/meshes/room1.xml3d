@@ -2,7 +2,7 @@
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
 	<defs>		
 	    <transform id="lightTransform" translation="200 200 -200"/>
-	    <transform id="centerTransform" translation="200 50 -200"/>
+	    <transform id="centerTransform" translation="200 150 -200"/>
 	 
 	        
 		<shader id="material" script="urn:xml3d:shader:phong">
@@ -302,7 +302,7 @@
 	    </data>
     </defs>
     
-    <view id="door" position="5 150 -200" orientation="0 1 0 -1.57" center="200 150 -200"/>
+    <view id="door" position="5 250 -200" orientation="0 1 0 -1.57" center="200 150 -200"/>
            
     <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />

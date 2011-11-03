@@ -33,10 +33,7 @@
 			window.onload=initMainMenu;			
 		]]></script>
 	</head>	
-	<body> 	
-		
-		
-		
+	<body> 
 		<div id="overlay" class="overlay">
 			<div id="createNewRoom" class="dialogue">
 				<div id="roomMesh"/>	
@@ -49,6 +46,7 @@
 				<button class="closeButton" onclick="$('#overlay').hide();">x</button>
 			</div> 			
 		</div>			
+		
 		<div id="chooseRoom" class="squareButton">
 	    	<p class="choosingRoomText">edit room</p>
 	    </div>
@@ -58,36 +56,79 @@
 	    </div>
 	    
 	  	<div id="newRoom" class="squareButton">
-	  		<p class="choosingRoomText">new room</p>
+	  		<p class="choosingRoomText">new room</p>	  		
 	  	</div>
 	  	
-	  	<div id="chooseMenu">
-	  		<div id="chooseNewRoom" style="display:none">
+	  	<div class="editRoom">
+	  		<div id="roomList" style="display:none" class="roomList">	  			
+	  			<table id="roomTable" cellspacing="3px;" class="roomTable">
+					<thead>
+						<tr class="ui-widget-header table-header ">
+							<th>Title</th>
+							<th>Last update</th>							
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+	  		</div>
+	  		<div id="roomPreview"/>	  		
+	  		<button id="editRoomButton" style="visibility:hidden" onclick="document.location.href='room.xhtml';"> Edit room</button>
+	  	</div>
+	  	
+	  	<div id="editSharedRooms" class="editRoom">	  	
+	  		<div id="sharedRooms" style="display:none" >
+		  		
+	  			<button id="myRoomsButton" class="sharedRoomsButton" >Visitors of my rooms </button>
+	  			<button id="otherRoomsButton" class="sharedRoomsButton" >Rooms I visit </button>
+		  		
+		  		<div id="myRooms" style="display:none" class="sharedRoomsList">
+		  			<div id="myRoomList" class="roomList" >		  			
+			  			<table id="myRoomListTable" cellspacing="3px;" class="roomTable">
+							<thead>
+								<tr class="ui-widget-header table-header ">
+									<th>Title</th>
+									<th>Last update</th>							
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+			  		</div>
+			  		
+			  		<div id="roomPreview" />	  		
+			  		<button id="editRoomButton" style="visibility:hidden" onclick="document.location.href='room.xhtml';"> Edit room</button>
+			  	</div>
+		  		
+		  		<div id="otherRooms" style="display:none" class="sharedRoomsList">
+		  			<div id="otherRoomList" class="roomList">		  			
+			  			<table id="otherRoomListTable" cellspacing="3px;" class="roomTable">
+							<thead>
+								<tr class="ui-widget-header table-header ">
+									<th>Owner</th>							
+									<th>Title</th>
+									<th>Last update</th>					
+									<th>Permission</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+			  		</div>
+			  		
+			  		<div id="roomPreview"/>	  		
+			  		<button id="editRoomButton" style="visibility:hidden" onclick="document.location.href='room.xhtml';"> Edit room</button>
+		  		</div>
+	  		</div>
+	  	</div>
+	  	
+	  	<div id="chooseNewRoom" style="display:none">
 	  			<!-- <p>Choose a room template</p> -->
 	  			<div id="room1" class = "newRoomContent" onclick="chooseNewRoom('room1')"/>
 	  			<div id="room2" class = "newRoomContent" onclick="chooseNewRoom('room2')"/>
 	  			<div id="room3" class = "newRoomContent" onclick="chooseNewRoom('room3')"/>
 	  			<div id="room4" class = "newRoomContent" onclick="chooseNewRoom('room4')"/>
-	  		</div>
-	  	  	<div id="roomBrowser" style="display:none">
-				<div id="content">
-					<ul>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						<li> <div class = "browserContent"/> </li>
-						
-					</ul>
-				</div>
-				<a id="prev"  class="browserNavigation"> &lt; </a>
-				<a id="next"  class="browserNavigation"> &gt; </a>	
-		  	</div>			  	
-		 </div>
+	  	</div>
+	  	  	
 	</body>
 </html>

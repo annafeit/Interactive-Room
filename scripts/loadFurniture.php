@@ -4,11 +4,11 @@
     $db = new PDO('sqlite:../DB/DBInteractiveRoom');  
     $db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     #prepare Statement
-    $stmt2 = $db->prepare("SELECT preview FROM furniture  join furnituregroupcontent  where groupName == 	:name and id == furnitureId ");           
+    $stmt2 = $db->prepare("SELECT preview, id FROM furniture  join furnituregroupcontent  where groupName == 	:name and id == furnitureId ");           
     $stmt2->bindParam(':name', $_POST['name']);    
     #execute statement
     $stmt2->execute();
-    $result = $stmt2->fetchAll(PDO::FETCH_COLUMN, 0);
+    $result = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     print_r(json_encode($result));
     }
   catch(Exception $e){

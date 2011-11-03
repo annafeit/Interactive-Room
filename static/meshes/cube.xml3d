@@ -64,7 +64,7 @@
 	
     </defs>
      		  
-    <group transform = "#cubeTransform" id="cube" type="floor" shader = "#material">
+    <group transform = "#cubeTransform" id="cube" type="onFloor" shader = "#material">
       <mesh src="#cubeData" type="triangles"/>
     </group>
 </xml3d>
