@@ -17,12 +17,12 @@ Kata.require([
 	User = function(channel, args){
 		//save the xml3d element
 		var t = document.getElementsByTagName("xml3d");
-		this.xml3d = t[0];
-		this.roomMesh = args.world;
+		this.xml3d = t[0];		
 		//save arguments
 		this.username = args.username;
 		this.space=args.space;
-		this.database = args.database;
+		this.roomId=args.roomId;
+		this.roomMesh = args.world;
 		
 		//to store all furniture of the room
 		this.furniture = new Array();
@@ -51,6 +51,149 @@ Kata.require([
 	*/
 	Kata.extend(User, SUPER);
 	
+	
+	/**
+	* proximity callback TODO ???
+	*/
+    User.prototype.proxEvent = function(remote, added) {
+        if (added){
+         Kata.warn("Camera Discover object.");
+            this.presence.subscribe(remote.id());
+        }
+        else{
+         Kata.warn("Camera wiped object");
+        }
+    };
+
+    
+    /** Camera sync */
+    User.prototype.syncCamera = function() {
+        var now = new Date();
+        this.setCameraPosOrient(this.presence.predictedPosition(now),
+                                this.presence.predictedOrientation(now),
+                                0.1); //lag:0.1 just to match the code...
+        this.checkWalls(); 
+    };
+         
+    
+	/**
+	* Callback that is triggered when object is connected to the space
+	*/
+	User.prototype.connected = function(presence, space, reason){
+		//handle connection failure
+		if (presence == null){
+		Kata.error('Failed to connect viewer to '+ space+'. Reason: ' + reason);
+		throw "error";
+		}
+		
+		//save world presence
+		this.presence = presence;
+		
+		//display the object
+		this.enableGraphicsViewport(presence,0);
+		
+		this.presence.setQueryHandler(Kata.bind(this.proxEvent, this));
+        this.presence.setQuery(0);
+        
+        //save the activeView
+        var id = this.xml3d.activeView;
+        this.camera = document.getElementById(id);
+		        
+		//create Room of user
+		this.createRoom();
+		
+		var thus = this;
+		//attach a handler for the click-event of all current AND future elements with class furniture
+		$(".furniture").live("click",function(){thus.createFurniture(this)});
+		
+        //set up camera sync
+        this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
+        this.syncCamera();       
+		
+		document.userScript = this;
+	};
+	
+    /**
+	* Creates the room, the user wants to login to
+	*/
+    User.prototype.createRoom = function(){
+	    this.createObject(kata_base_offset + "scripts/RoomScript.js",
+							"Room",
+							{ space:this.space,
+					    	  visual:{mesh:this.roomMesh},
+					    	  roomId: this.roomId,
+					    	  loc:{scale: "1.0"} //just to match the code..
+							});	    
+	    
+	    
+    }
+    
+    User.prototype.furnitureCreated = function(obj){
+    	this.furniture.push(obj);
+    	var pos = obj.getPosition();
+    	var or = obj.getOrientation();
+    	$.post('scripts/createFurniture.php', {furnitureId: obj.id, roomId: this.roomId, position: pos, orientation: or}, 
+    			function(data, jqxhr){ 
+    				obj.entryId = data[0];
+    			},'json');
+    	
+    }
+    
+    User.prototype.createFurniture = function(obj){
+    	var prev = obj.getAttribute("preview");
+    	var id = obj.getAttribute("id");
+    	var thus = this;
+    	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
+    			function(data, jqxhr){     				
+    				var url = kata_base_offset + data[0];
+    				//create new object in world     				
+    		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
+    		    			"Furniture",
+    		    			{ space:thus.space,    		    		
+    		    			  center: thus.center,
+    		    			  id:id,
+    		    			  visual:{mesh: url},
+    		    			  loc:{scale: "1.0"} //just to match the code..
+    		    			});
+    			},'json');
+    } 
+    
+    /**
+     * checks the database for furniture that are already in that room
+     */
+    //TODO doesn't work correclty
+    User.prototype.fillRoom = function(){
+    	var thus = this;
+    	$.post('scripts/fillRoom.php', {roomId: this.roomId}, 
+    			function(data, jqxhr){
+    				console.log(data);
+    				for (var i = 0;i<data.length;i++){
+    					var obj = data[i];
+    					var url = kata_base_offset + obj.mesh;
+    					var pos = obj.position.split(" ");
+    					pos[0] = parseInt(pos[0]);
+    					pos[1] = parseInt(pos[1]);
+    					pos[2] = parseInt(pos[2]);
+    					var or = obj.orientation.split(" ");
+    					or[0] = parseInt(or[0]);
+    					or[1] = parseInt(or[1]);
+    					or[2] = parseInt(or[2]);
+    					or[3] = parseInt(or[3]);
+    					var id = obj.id;
+    					thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
+        		    			"Furniture",
+        		    			{ space:thus.space,
+    							  position: pos,
+    							  orientation: or,
+        		    			  id:id,
+        		    			  visual:{mesh: url},
+        		    			  loc:{scale: "1.0"} //just to match the code..
+        		    			});
+    				}
+    		
+    			},'json');    	
+    }
+
 	User.prototype.parseScene = function(){
 		//camera
         var activeViewId = this.xml3d.activeView;
@@ -77,65 +220,7 @@ Kata.require([
 	     this.transparentMaterial = transparent;
 	}
 	
-	/**
-	* proximity callback TODO ???
-	*/
-    User.prototype.proxEvent = function(remote, added) {
-        if (added){
-         Kata.warn("Camera Discover object.");
-            this.presence.subscribe(remote.id());
-        }
-        else{
-         Kata.warn("Camera wiped object");
-        }
-    };
-
-    
-    /** Camera sync */
-    User.prototype.syncCamera = function() {
-        var now = new Date();
-        this.setCameraPosOrient(this.presence.predictedPosition(now),
-                                this.presence.predictedOrientation(now),
-                                0.1); //lag:0.1 just to match the code...
-        this.checkWalls(); 
-    };
-    
-    /**
-	* Creates the room, the user wants to login to
-	*/
-    User.prototype.createRoom = function(){
-	    this.createObject(kata_base_offset + "scripts/RoomScript.js",
-							"Room",
-							{ space:this.space,
-					    	  visual:{mesh:this.roomMesh},
-					    	  loc:{scale: "1.0"} //just to match the code..
-							});
-    }
-    
-    User.prototype.createFurniture = function(obj){
-    	var prev = obj.getAttribute("preview");
-    	var thus = this;
-    	$.post('scripts/getMeshFromFurniturePreview.php', {table: "furniture", preview: prev}, 
-    			function(data, jqxhr){     				
-    				var url = kata_base_offset + "static/meshes/"+data[0];
-    				//create new object in world 
-    		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
-    		    			"Furniture",
-    		    			{ space:thus.space,
-    		    			  center: thus.center,
-    		    			  visual:{mesh: url},
-    		    			  callback:{thus.furnitureCreated},
-    		    			  loc:{scale: "1.0"} //just to match the code..
-    		    			});
-    			},'json');
-    }
-    
-    User.prototype.furnitureCreated = function(obj){
-    	this.furniture.push(obj);
-    }
-    
-    
-    /**
+	  /**
 	* Sets the camera to the "door-view"
 	*/
     User.prototype.setCamToDoor = function(){
@@ -182,47 +267,7 @@ Kata.require([
     	loc.pos = pos;
     	this.presence.setLocation(loc);
     };
-    
-	/**
-	* Callback that is triggered when object is connected to the space
-	*/
-	User.prototype.connected = function(presence, space, reason){
-		//handle connection failure
-		if (presence == null){
-		Kata.error('Failed to connect viewer to '+ space+'. Reason: ' + reason);
-		throw "error";
-		}
-		
-		//save world presence
-		this.presence = presence;
-		
-		//display the object
-		this.enableGraphicsViewport(presence,0);
-		
-		presence.setQueryHandler(Kata.bind(this.proxEvent, this));
-        presence.setQuery(0);
-        
-        var thus = this;
-        
-        //save the activeView
-        var id = this.xml3d.activeView;
-        this.camera = document.getElementById(id);
-		        
-		//create Room of user
-		this.createRoom();
-		
-		var thus = this;
-		//attach a handler for the click-event of all current AND future elements with class furniture
-		$(".furniture").live("click",function(){thus.createFurniture(this)});
-		
-        //set up camera sync
-        this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
-        this.syncCamera();
-        
-		//display username
-		document.getElementById("name").innerHTML=username;
-	};
-
+	
 	/**
 	* check if the camera is out of the room and make walls invisible if this is true.
 	*/
@@ -272,12 +317,7 @@ Kata.require([
 		}
 		this.xml3d.update();
 	}
-	
-	User.prototype.saveRoom = function(){
-		//TODO insert table entry in
-		//hosts, 
-	}
-		
+
 	
 	//Enum for Keycode
 	User.prototype.Keys = {
@@ -291,7 +331,7 @@ Kata.require([
 		D : 68
 	};
 
-	//the smaller the speed the faster the turning/moving/zoomin
+	//the smaller the speed the faster the turning/moving/zooming
 	//no mathematical foundation, just a  guess
 	var turnSpeed = 20;	
 	var zoomSpeed = 10;
@@ -299,10 +339,13 @@ Kata.require([
 	
 	//Handle messages from GUI
 	User.prototype._handleGUIMessage = function (channel, msg) {
+		
+		
 		//TODO does this script only gets this message from objects hosted by this oh?
 		if(msg.msg=="loaded" && msg.mesh==this.roomMesh){
 			this.setCamToDoor();
 			this.parseScene();
+			this.fillRoom();
 		}
 		if(msg.msg == "drag"){
 			
@@ -312,7 +355,7 @@ Kata.require([
 					//mouse moved to the right -> turn left
 					var i = msg.dx;
 					while (i>0){
-						this.turnRight();
+						this.turnLeft();
 						i = i - turnSpeed;
 					}
 				}
@@ -320,7 +363,7 @@ Kata.require([
 					//mouse moved to the left -> turn right
 					var i = -msg.dx;
 					while (i>0){
-						this.turnLeft();
+						this.turnRight();
 						i = i - turnSpeed;
 					}
 				}
@@ -410,7 +453,7 @@ Kata.require([
             	if (this.ctrl){
             		var i = 0;
 	        		while (i<turnSpeed){
-	        			this.turnLeft();
+	        			this.turnRight();
 	        			i++;
 	        		}
             	}
@@ -426,7 +469,7 @@ Kata.require([
             	if (this.ctrl){
             		var i = 0;
 	        		while (i<turnSpeed){
-	        			this.turnRight();
+	        			this.turnLeft();
 	        			i++;
 	        		}
             	}

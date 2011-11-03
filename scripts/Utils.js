@@ -8,8 +8,8 @@ Kata.require([
 		 */
 		Helper.objectIntersectsObject= function(obj1, obj2){
 			//if (obj1 instanceof XML3DObject (?) && obj2 instanceof XML3DObject
-			var bb1=obj1.getBoundingBox();
-			var bb2=obj2.getBoundingBox();
+			var bb1=obj1.getBoundingBox();//org.xml3d.util.getWorldBBox(obj1);
+			var bb2=obj2.getBoundingBox();//org.xml3d.util.getWorldBBox(obj2);
 			
 			if( bb1.min.x>bb2.max.x || bb1.min.y > bb2.max.y  || bb1.min.z > bb2.max.z ||
 			    bb2.min.x>bb1.max.x || bb2.min.y > bb1.max.y  || bb2.min.z > bb1.max.z 	){
@@ -30,7 +30,7 @@ Kata.require([
 			vec.x = 'y';
 			vec.x = 'z';
 			if (obj1.getBoundingBox){
-				var bb = obj1.getBoundingBox();		//TODO getBoundingBox not implemented for browser
+				var bb = obj1.getBoundingBox();//org.xml3d.util.getWorldBBox(obj1);		//TODO getBoundingBox not implemented for browser
 				var o = ray.origin;
 				var d = ray.direction;
 				var tnear = -(Number.MAX_VALUE);
