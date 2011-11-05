@@ -34,6 +34,11 @@
 		]]></script>
 	</head>	
 	<body> 
+	
+		<div id="roomButtons">			
+			<button id="logoutButton"  class="squareButton roomButton"/>
+		</div>	
+		
 		<div id="overlay" class="overlay">
 			<div id="createNewRoom" class="dialogue">
 				<div id="roomMesh"/>	
@@ -59,11 +64,12 @@
 	  		<p class="choosingRoomText">new room</p>	  		
 	  	</div>
 	  	
-	  	<div class="editRoom">
-	  		<div id="roomList" style="display:none" class="roomList">	  			
+	  	<div id="editRoom" class="editRoom" style="display:none">
+	  	<label id="descriptionEditRoom" class="loginFont">Choose a room that you want to edit</label>
+	  		<div id="roomList" class="roomList" style="z-index:2">	  			
 	  			<table id="roomTable" cellspacing="3px;" class="roomTable">
 					<thead>
-						<tr class="ui-widget-header table-header ">
+						<tr class="ui-widget-header table-header">
 							<th>Title</th>
 							<th>Last update</th>							
 						</tr>
@@ -71,56 +77,87 @@
 					<tbody>
 					</tbody>
 				</table>
-	  		</div>
-	  		<div id="roomPreview"/>	  		
-	  		<button id="editRoomButton" style="visibility:hidden" onclick="document.location.href='room.xhtml';"> Edit room</button>
+	  		</div>	  		
 	  	</div>
 	  	
-	  	<div id="editSharedRooms" class="editRoom">	  	
-	  		<div id="sharedRooms" style="display:none" >
-		  		
+	  	<div id="editSharedRooms" class="editRoom" style="display:none">	  		
+	  		<div id="editSharedRoomsButtons" style="display:none">	  	
 	  			<button id="myRoomsButton" class="sharedRoomsButton" >Visitors of my rooms </button>
 	  			<button id="otherRoomsButton" class="sharedRoomsButton" >Rooms I visit </button>
-		  		
-		  		<div id="myRooms" style="display:none" class="sharedRoomsList">
-		  			<div id="myRoomList" class="roomList" >		  			
-			  			<table id="myRoomListTable" cellspacing="3px;" class="roomTable">
-							<thead>
-								<tr class="ui-widget-header table-header ">
-									<th>Title</th>
-									<th>Last update</th>							
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
-			  		</div>
-			  		
-			  		<div id="roomPreview" />	  		
-			  		<button id="editRoomButton" style="visibility:hidden" onclick="document.location.href='room.xhtml';"> Edit room</button>
-			  	</div>
-		  		
-		  		<div id="otherRooms" style="display:none" class="sharedRoomsList">
-		  			<div id="otherRoomList" class="roomList">		  			
-			  			<table id="otherRoomListTable" cellspacing="3px;" class="roomTable">
-							<thead>
-								<tr class="ui-widget-header table-header ">
-									<th>Owner</th>							
-									<th>Title</th>
-									<th>Last update</th>					
-									<th>Permission</th>
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
-			  		</div>
-			  		
-			  		<div id="roomPreview"/>	  		
-			  		<button id="editRoomButton" style="visibility:hidden" onclick="document.location.href='room.xhtml';"> Edit room</button>
-		  		</div>
+		  		<button id="newOtherRoomsButton" class="sharedRoomsButton" >Visit a new room </button>
 	  		</div>
+	  		
+	  		<div id="myRooms" style="display:none; z-index:2;" class="sharedRoomsList">
+	  			<label id="descriptionMyRooms" class="loginFont">These users asked to access your room. Deny or allow them the access!</label>
+	  			<div id="myRoomList" class="roomList" >		  			
+		  			<table id="myRoomListTable" cellspacing="3px;" class="roomTable">
+						<thead>
+							<tr class="ui-widget-header table-header ">
+								<th>Title</th>
+								<th>Visitor</th>
+								<th>Permission</th>													
+							</tr>
+						</thead>
+						<tbody>	
+						</tbody>
+					</table>
+		  		</div>		  		
+		  	</div>
+	  		
+	  		<div id="otherRooms" style="display:none; z-index:2;" class="sharedRoomsList">
+	  			<label id="descriptionOtherRooms" class="loginFont">You can only enter a room of an other user if you have the permission and the owner is online</label>
+	  			<div id="otherRoomList" class="roomList">		  			
+		  			<table id="otherRoomListTable" cellspacing="3px;" class="roomTable">
+						<thead>
+							<tr class="ui-widget-header table-header ">
+								<th>Owner</th>							
+								<th>Title</th>
+								<th>Last update</th>					
+								<th>Permission</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>									
+		  		</div>		
+		  		<label id="userNotOnline" class="loginFont" style="display:none;">The owner is not online</label>  				  		
+	  		</div>
+	  		
+	  		<div id="visitNewRoom" style="display:none; z-index:2;" class="sharedRoomsList">
+	  			
+	  			<form id="fsearchRoom"  method="post" class="loginFont">
+					<!-- form fields -->				
+					<label id="usernameSearchLabel" for="#usernameSearch"> Username:</label>	
+					<input id="usernameSearch" class="loginInput" name="username" />
+					<button id="searchRoomButton" type="submit" style="z-index:;"> search	</button>
+					<label id="searchMessage"></label>															
+				</form>	
+					  				  		
+	  			<table id="visitNewRoomListTable" style="display:none;" cellspacing="3px;" class="roomTable">
+					<thead>
+						<tr class="ui-widget-header table-header ">													
+							<th>Title</th>
+							<th >Last update</th>					
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>	
+				<div id="previewAndButtonSearch" style="z-index:0; display:none;">
+				  	<div id="askRoomPreview" class="roomPreview" />	  		
+					<button id="askPermissionButton"> Ask to enter room</button>
+				</div>
+						  		
+	  		</div>
+	
 	  	</div>
+	  	
+	  	
+	  	
+	  	<div id="previewAndButton" style="z-index:0; display:none;">
+		  	<div id="roomPreview" class="roomPreview" />	  		
+			<button id="editRoomButton"  onclick="document.location.href='room.xhtml';"> Edit room</button>
+		</div>
 	  	
 	  	<div id="chooseNewRoom" style="display:none">
 	  			<!-- <p>Choose a room template</p> -->
