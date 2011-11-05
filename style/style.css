@@ -204,6 +204,7 @@ button:active{
 }
 .squareButton:active{	
 	box-shadow:0px 0px 30px #260000 inset;
+	background-color:#FF470F;
 }
 .squareButtonClicked{
 	background-color:#FF470F;
@@ -328,13 +329,18 @@ button:active{
 	height:50%;
 }
 
+
 .roomList{
 	float:left;
 	position:relative;
 	width:50%;
 	height:100%;
 	overflow-y:auto;
-	
+}
+
+#descriptionEditRoom{
+	position:relative;
+	top:-30px;
 }
 	.roomTable{
 		position:relative;
@@ -366,13 +372,21 @@ button:active{
 		color:#a32500;
 		background-color:#f2cb9b;
 	}
-	
-#roomPreview{		
+/** preview of room and button to enter room 
+for all tables the same**/
+#previewAndButton{
+	position:absolute;
+	top:420px;
+	height:50%;
+	left:50%;
+	width:450px;
+}
+.roomPreview{		
 	float:left;
 	position:relative;
 	height:200px;
 	width:200px;	
-	left: 25%;
+	left: 50%;
 	margin-left: -100px;
 	background-repeat:no-repeat;
 	background-size:200px 200px; 
@@ -380,31 +394,141 @@ button:active{
 #editRoomButton{	
 	width: 150px;
 	position:absolute;
-	top: 250px;
-	left:75%; 
+	top: 220px;
+	left:50%; 
 	margin-left:-75px;	
 }
 
 /** choose shared rooms**/
 #editSharedRooms{
-	psoition:absolute;
+	position:absolute;
 	top:350px;
+	z-index:-1;
+}
+#editSharedRoomsButtons{
+	position:absolute;
+	left:145px;
+	height:40px;
+	top:-20px;
+	width:610px;
+	z-index:3;
 }
 .sharedRoomsButton{
 	position:relative;
 	width: 200px;
-	font-size:18px;	
+	height: 35px;
+	font-size:18px;		
+	border-radius:3px;
+	background-color:#a32500;
+	box-shadow: 0px 0px 10px #a32500;		
 }
 .sharedRoomsButtonActive{
 	box-shadow: 0px 0px 10px #680000 inset;
+	background-color:#FF470F;
+	border:none;
 }
+.sharedRoomsButton:hover{
+	background-color:#ba340b;
+	box-shadow: 0px 0px 20px #FF470F;	
+}
+
 .sharedRoomsList{
 	position:absolute;
 	height:50%;
 	width:100%;
 	top:50px;
 }
+#descriptionMyRooms{
+	font-size:24px;
+	position:relative;
+	top:-15px;
+}
+.permissionButton{
+	font-size:14px;	
+	width:130px;
+	height:20px;
+	position:relative;
+	left:50%;
+	margin-left:-65px;
+	box-shadow: 0px 0px 0px #680000 inset;
+}
+.permissionButtonTrue{
+	background-color:#98C828;	
+}
+.permissionButtonFalse{
+	background-color:#FF3A00;
+}
+.permissionButton:active{
+	box-shadow: 0px 0px 10px #680000 inset;
+}
 
+#descriptionOtherRooms{
+	position:relative;
+	top:-15px;
+	font-size:20px;
+}
+#userNotOnline{
+	color:#ba340b;
+	position:absolute;
+	top:250px;
+	left:75%;
+	margin-left:-150px;	
+	z-index:3;
+}
+
+
+/** search for new Rooms to visit **/
+#fsearchRoom{
+	font-size:24px;
+	
+}
+#usernameSearchLabel{
+	position:relative;
+	float:left;
+	top:-3px;
+}
+#usernameSearch{
+	position:relative;
+	float:left;
+	left:30px;
+	width:300px;
+	
+}
+#searchRoomButton{
+	position:absolute;	
+	height:28px;
+	font-size:20px;
+	width:80px;
+	left:470px;	
+	top:-1px;
+}
+#searchMessage{
+	position:absolute;
+	top:50px;
+	left:0;
+	font-size:20px;
+}
+
+#visitNewRoomListTable{
+	position:absolute;
+	width:50%;
+	top:40px;
+}
+#previewAndButtonSearch{
+	position:absolute;
+	width:50%;
+	height:100%;
+	left:50%;
+	top:60px;
+}
+#askPermissionButton{
+	position:absolute;
+	width: 200px;
+	top: 250px;
+	left:50%;
+	font-size:20px; 
+	margin-left:-100px;	
+}
 
 /** room **/
 #room{
@@ -426,6 +550,7 @@ button:active{
 	top:10px;
 	width:60px;	
 	height:60px;	
+	left:0;
 	/*color and border*/
 	border-radius:13px;
 	box-shadow:  1px 1px 10px #680000;
@@ -469,26 +594,13 @@ button:active{
 	}
 #logoutButton{
 	background-image:url(../static/icons/logout.png);
-	background-position:center;
-	background-size:40px 40px;
+	background-position:center center;
+	background-size:50px 50px;
 }
 	#logoutButton:hover{
 		background-image:url(../static/icons/logoutActive.png);
 	}
-	
-/** camera navigation Buttons**/
-#navigationButtons{
-	position:absolute;
-	width:700px;
-	top:5px;
-	left:50%;
-	margin-left:-400px;
-}
-.navigationButtons{
-	width:100px;
-	height:25px;
-	font-size:14px;
-}
+
 
 /** menu **/
 #menu-type{
