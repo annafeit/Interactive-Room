@@ -30,7 +30,7 @@ Kata.require([
 			vec.x = 'y';
 			vec.x = 'z';
 			if (obj1.getBoundingBox){
-				var bb = obj1.getBoundingBox();//org.xml3d.util.getWorldBBox(obj1);		//TODO getBoundingBox not implemented for browser
+				var bb = org.xml3d.util.getWorldBBox(obj1);	
 				var o = ray.origin;
 				var d = ray.direction;
 				var tnear = -(Number.MAX_VALUE);

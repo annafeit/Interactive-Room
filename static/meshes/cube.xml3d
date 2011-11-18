@@ -2,22 +2,31 @@
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
 	<defs>	
 	    <transform id="cubeTransform" scale="20 20 20"/>
-	    <shader id="material" script="urn:xml3d:shader:phong">
-		<float3 name="diffuseColor">
-		    0.1 0.4 0.9
-		</float3>
-		<float name="ambientIntensity">
-		    0.7
-		</float>
+	    
+	    <shader id="normalMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    0.1 0.4 0.9
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
 	    </shader>	
-	    <shader id="activeMaterial" script="urn:xml3d:shader:phong">
-		<float3 name="diffuseColor">
-		    0.5 0.9 0.2
-		</float3>
-		<float name="ambientIntensity">
-		    0.7
-		</float>
-	    </shader>		        
+	    <shader id="redMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    1.0 0.0 0.0
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
+	    </shader>
+	    <shader id="greenMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    0.0 1.0 0.0
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
+	    </shader>			        
 	
 	    <data id="cubeData" >
 		<int name="index">
@@ -64,7 +73,7 @@
 	
     </defs>
      		  
-    <group transform = "#cubeTransform" id="cube" type="onFloor" shader = "#material">
+    <group transform = "#cubeTransform" id="bed" type="onFloor" shader = "#normalMaterial">
       <mesh src="#cubeData" type="triangles"/>
     </group>
 </xml3d>

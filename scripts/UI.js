@@ -450,19 +450,29 @@ function categoryClicked(element){
 	//returns the preview url of the furnitures in "group"
 	$.post('scripts/loadFurniture.php', {name:group}, 
 			function(data, jqxhr){	
-				//fill furniture browser with previews							
-				var l = (data.length * liSize)+"px";
+				//empty furniturebrowser
+				var list = document.getElementById("furnitureContentList");
+				var furniture = document.getElementsByClassName("furniture");
+				var k = furniture.length;
+				for (var i = 0; i<k;i++){
+					var p =furniture[0].parentElement;
+					list.removeChild(p);
+				}
+				//fill furniture browser with previews
+				var l = (data.length * liSize)+"px";				
 				document.getElementById("furnitureContentList").style.width = l;
 				for (var i=0;i<data.length;i++){
 					$("#furnitureContentList").append("<li> <div class = 'browserContent furniture'/> </li>	");
 				}
 				var furniture = document.getElementsByClassName("furniture");
 				
-				for (i=0; i<furniture.length;i++){
+				for (i=0; i<data.length;i++){
 					var url = "url(../"+data[i].preview+")";
 					furniture[i].style.backgroundImage = url;
 					furniture[i].setAttribute("preview", data[i].preview);
 					furniture[i].setAttribute("id", data[i].id);
+					furniture[i].setAttribute("name", data[i].name);
+					furniture[i].setAttribute("type", data[i].type);
 				}
 				//initialize browser				
 				$('#furnitureContent').serialScroll({

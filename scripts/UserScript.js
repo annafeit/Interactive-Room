@@ -24,8 +24,16 @@ Kata.require([
 		this.roomId=args.roomId;
 		this.roomMesh = args.world;
 		
+		this.mRemotePresences = new Array();
+		
+		/**"camera" mode: moving camera by drag 
+		 * "furniture" mode: moving furniture by drag and drop
+		 */		
+		this.mode="camera";	 
+		
 		//to store all furniture of the room
 		this.furniture = new Array();
+		this.activeFurniture;
 		
 		//to save which key is pressed
 		this.keyIsDown = {};
@@ -53,15 +61,17 @@ Kata.require([
 	
 	
 	/**
-	* proximity callback TODO ???
+	* I think: This registers the "near" objects in this.mRemotePresences (with it's presence).
+	* Then the script can use the presences to send messages to the hostedObjects via presence._sendHostedObjectMessage
 	*/
     User.prototype.proxEvent = function(remote, added) {
         if (added){
-         Kata.warn("Camera Discover object.");
-            this.presence.subscribe(remote.id());
+        	Kata.warn("Camera Discover object.");
+	        this.presence.subscribe(remote.id());
+	        this.mOther = remote;
         }
         else{
-         Kata.warn("Camera wiped object");
+        	Kata.warn("Camera wiped object");
         }
     };
 
@@ -92,8 +102,8 @@ Kata.require([
 		//display the object
 		this.enableGraphicsViewport(presence,0);
 		
-		this.presence.setQueryHandler(Kata.bind(this.proxEvent, this));
-        this.presence.setQuery(0);
+		//this.presence.setQueryHandler(Kata.bind(this.proxEvent, this));
+        //this.presence.setQuery(0);
         
         //save the activeView
         var id = this.xml3d.activeView;
@@ -104,7 +114,7 @@ Kata.require([
 		
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
-		$(".furniture").live("click",function(){thus.createFurniture(this)});
+		$(".furniture").live("click",function(){thus.createFurniture(this, false)});
 		
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
@@ -129,19 +139,34 @@ Kata.require([
     }
     
     User.prototype.furnitureCreated = function(obj){
+    	//save furniture
     	this.furniture.push(obj);
-    	var pos = obj.getPosition();
-    	var or = obj.getOrientation();
-    	$.post('scripts/createFurniture.php', {furnitureId: obj.id, roomId: this.roomId, position: pos, orientation: or}, 
-    			function(data, jqxhr){ 
-    				obj.entryId = data[0];
-    			},'json');
+    	//only if object isn't already in DB (and now was recreated) 
+	    if(!obj.inDB){
+	    	//if object was not placed correctly from beginning, it's active and the application is in furniture-mode
+	    	if(obj.active){
+	    		this.activeFurniture = obj;
+	    		this.mode = "furniture";
+	    	}
+	    	//if it was placed correctly, it's not active and we can write it in the DB
+	    	else{
+				//get furniture position and orientation
+				var pos = obj.getPosition();
+				var or = obj.getOrientation();
+				$.post('scripts/createFurniture.php', {furnitureId: obj.furnitureId, roomId: this.roomId, position: pos, orientation: or}, 
+						function(data, jqxhr){ 
+							obj.entryId = data[0];
+						},'json');
+			}
+	    }
     	
     }
-    
-    User.prototype.createFurniture = function(obj){
+        
+    User.prototype.createFurniture = function(obj, inDB){
     	var prev = obj.getAttribute("preview");
-    	var id = obj.getAttribute("id");
+    	var id = obj.getAttribute("id");  
+    	var type = obj.getAttribute("type");   
+    	var name = obj.getAttribute("name");  
     	var thus = this;
     	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
     			function(data, jqxhr){     				
@@ -153,6 +178,9 @@ Kata.require([
     		    			  center: thus.center,
     		    			  id:id,
     		    			  visual:{mesh: url},
+    		    			  inDB:inDB,
+    		    			  type:type,
+    		    			  name:name,
     		    			  loc:{scale: "1.0"} //just to match the code..
     		    			});
     			},'json');
@@ -161,7 +189,6 @@ Kata.require([
     /**
      * checks the database for furniture that are already in that room
      */
-    //TODO doesn't work correclty
     User.prototype.fillRoom = function(){
     	var thus = this;
     	$.post('scripts/fillRoom.php', {roomId: this.roomId}, 
@@ -169,7 +196,11 @@ Kata.require([
     				console.log(data);
     				for (var i = 0;i<data.length;i++){
     					var obj = data[i];
+    					var name = obj.name;
     					var url = kata_base_offset + obj.mesh;
+    					var id = obj.id;
+    					var type = obj.type;
+    					
     					var pos = obj.position.split(" ");
     					pos[0] = parseInt(pos[0]);
     					pos[1] = parseInt(pos[1]);
@@ -179,14 +210,16 @@ Kata.require([
     					or[1] = parseInt(or[1]);
     					or[2] = parseInt(or[2]);
     					or[3] = parseInt(or[3]);
-    					var id = obj.id;
+    					
     					thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
         		    			"Furniture",
         		    			{ space:thus.space,
     							  position: pos,
     							  orientation: or,
         		    			  id:id,
+        		    			  name:name,
         		    			  visual:{mesh: url},
+        		    			  inDB: true,
         		    			  loc:{scale: "1.0"} //just to match the code..
         		    			});
     				}
@@ -342,16 +375,38 @@ Kata.require([
 		
 		
 		//TODO does this script only gets this message from objects hosted by this oh?
-		if(msg.msg=="loaded" && msg.mesh==this.roomMesh){
-			this.setCamToDoor();
-			this.parseScene();
-			this.fillRoom();
+		if(msg.msg=="loaded"){
+			if (msg.mesh==this.roomMesh){
+				this.setCamToDoor();
+				this.parseScene();
+				this.fillRoom();
+			}			
 		}
-		if(msg.msg == "drag"){
+		if(msg.msg=="click"){
+			var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
+			var furn = this.furnitureFromXML3D(obj);
+			if (furn){	
+				this.changeMode(furn);
+			}
+		}
+		if(msg.msg =="mousemove"){
+			msg.x;//TODO activeFurniture should follow mouse
+			msg.y;
+		}
+		if(msg.msg =="drop" && this.mode == "furniture"){
+			//TODO rotate furn	        	
+		}
+		if(msg.msg == "drag" && this.mode == "furniture"){
+			//TODO rotate furn
+		}
+		/** camera Navigation **/
+		if(msg.msg == "drag" && this.mode == "camera"){
 			
 			if (Math.abs(msg.dx) > Math.abs(msg.dy)){
 				//mouse moved more horizontally
 				if(msg.dx > 0){
+					//TODO this is wrong, when dragging and moving the mouse around, it only gets smaller then 0 
+					//when it passes the starting point again. (continues turning in the other direction until then
 					//mouse moved to the right -> turn left
 					var i = msg.dx;
 					while (i>0){
@@ -486,6 +541,61 @@ Kata.require([
 		this.updateGFX(this.presence);
 	
 	};
+	
+	/*
+	 * Helper functions for placing. 
+	 * 
+	 */
+	/**
+	 * obj: xml3d element
+	 * returns the corresponding Furniture object
+	 */
+	User.prototype.furnitureFromXML3D = function (obj){
+		if (obj){
+			if (obj.getAttribute("type").substr(0,2) == "on"){ 
+				//if it's a furniture object (types "onwall", "onfloor" or "onceiling")										
+				for (var i = 0; i<this.furniture.length;i++) {
+		            var furn = this.furniture[i];
+		            if (furn.presence.mID == obj.parentElement.id ){
+		            	return furn;		            	
+		            }		                
+		        }
+			}
+		}
+	}
+	
+	/**
+	 * changes mode and activeFurniture in userscript, changes active state and shader of furniture
+	 * furn: the furniture that was clicked on
+	 * mode: the new mode
+	 */
+	User.prototype.changeMode = function (furn){		
+		//from 'camera' to 'furniture'
+		if (this.mode == "camera"){
+			this.mode = "furniture";
+			this.activeFurniture = furn;
+			furn.setActive(true);
+			//change shader
+			if (this.activeFurniture.shader == "normal"){				
+				this.activeFurniture.changeShader("green");
+			} 
+			   
+		}
+		//from 'furniture' to 'camera'
+		else{
+			if(!(furn.shader == "red") && this.activeFurniture == furn) {			
+				this.mode = "camera";
+				
+				this.activeFurniture.setActive(false);		
+				//change shader
+				if (this.activeFurniture.shader == "green"){				
+					this.activeFurniture.changeShader("normal");
+				}
+				this.activeFurniture = null;
+			}
+		}
+	}
+
 	
 	
 	/*
