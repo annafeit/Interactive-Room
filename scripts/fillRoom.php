@@ -4,7 +4,7 @@
     $db = new PDO('sqlite:../DB/DBInteractiveRoom');  
     $db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     #prepare Statement
-    $stmt = $db->prepare("SELECT id, mesh, position, orientation FROM hosts join furniture where roomId == :roomId AND furnitureId == id");           
+    $stmt = $db->prepare("SELECT id, mesh, type, name, position, orientation FROM hosts join furniture where roomId == :roomId AND furnitureId == id");           
     $stmt->bindParam(':roomId', $_REQUEST['roomId']);    
     #execute statement
     $stmt->execute();
