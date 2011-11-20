@@ -138,9 +138,7 @@ Kata.require([
 	    
     }
     
-    User.prototype.furnitureCreated = function(obj){
-    	//save furniture
-    	this.furniture.push(obj);
+    User.prototype.furnitureCreated = function(obj){    	
     	//only if object isn't already in DB (and now was recreated) 
 	    if(!obj.inDB){
 	    	//if object was not placed correctly from beginning, it's active and the application is in furniture-mode
@@ -217,6 +215,7 @@ Kata.require([
     							  position: pos,
     							  orientation: or,
         		    			  id:id,
+        		    			  type: type,
         		    			  name:name,
         		    			  visual:{mesh: url},
         		    			  inDB: true,
@@ -294,10 +293,15 @@ Kata.require([
 	     this.syncCamera();	     	    
     };
     
-    User.prototype.setCam = function(pos){
+    User.prototype.setCam = function(pos, or){
     	var now = new Date();
     	var loc = this.presence.predictedLocationAtTime(now);
-    	loc.pos = pos;
+    	if(pos){
+    		loc.pos = pos;
+    	}
+    	if (or){
+    		loc.orient = or;
+    	}
     	this.presence.setLocation(loc);
     };
 	
@@ -314,8 +318,8 @@ Kata.require([
 		rayNeg.origin = this.camera.position;
 		rayNeg.direction = this.camera.getDirection().negate();
 				
-		var rt1 = Helper.rayIntersectsScene(ray);
-		var rt2 = Helper.rayIntersectsScene(rayNeg);
+		var rt1 = Helper.rayIntersectsWalls(ray);
+		var rt2 = Helper.rayIntersectsWalls(rayNeg);
 		if (!(rt1 && rt2)){
 			//outside of the room (not a wall on both sides of the camera)			
 			this.setShaderTransparent();							
@@ -364,34 +368,66 @@ Kata.require([
 		D : 68
 	};
 
+	var lastClick = -Number.MAX_VALUE;;
+	
 	//the smaller the speed the faster the turning/moving/zooming
 	//no mathematical foundation, just a  guess
-	var turnSpeed = 20;	
-	var zoomSpeed = 10;
-	var moveSpeed = 5;
-	
+	var turnSpeed = 30;	
+	var zoomSpeed = 20;
+	var moveSpeed = 15;
+		
 	//Handle messages from GUI
 	User.prototype._handleGUIMessage = function (channel, msg) {
-		
-		
 		//TODO does this script only gets this message from objects hosted by this oh?
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
 				this.setCamToDoor();
 				this.parseScene();
 				this.fillRoom();
-			}			
+			
+			}
+			else{
+				for(var i = 0; i<this.furniture.length; i++){
+					var furn = this.furniture[i];
+					if(furn.presence.mID == msg.id){
+						furn.meshLoaded();
+					}
+				}
+			}
+			
+			
 		}
-		if(msg.msg=="click"){
+		if(msg.msg=="click"){	
+			if (msg.event.timeStamp -200 < lastClick ){
+				msg.msg = "doubleclick";
+			}
+			else{
+				var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
+				var furn = this.furnitureFromXML3D(obj);
+				if (furn ||this.mode=="furniture"){	
+					this.changeMode(furn);
+				}
+			}
+			lastClick = msg.event.timeStamp; 			
+		}
+		if(msg.msg == "doubleclick"){
+			//move and rotate camera such that it looks at the center of the object that was clicked on.			
 			var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
 			var furn = this.furnitureFromXML3D(obj);
 			if (furn){	
-				this.changeMode(furn);
+				var pos = Helper.objCenter(obj);
+				var point = this.xml3d.createXML3DVec3();
+				point.x = pos.x;
+				point.y = pos.y;
+				point.z = pos.z;
+				var cam = this.setCamUpToY(this.camera);
+				cam = this.lookAt(point, cam);
+				this.updatePresence(cam.position, cam.orientation);
 			}
 		}
 		if(msg.msg =="mousemove"){
-			msg.x;//TODO activeFurniture should follow mouse
-			msg.y;
+			if(this.mode == "furniture")
+				this.activeFurniture.moveFurnitureToMouse(msg.x, msg.y);			
 		}
 		if(msg.msg =="drop" && this.mode == "furniture"){
 			//TODO rotate furn	        	
@@ -569,30 +605,35 @@ Kata.require([
 	 * furn: the furniture that was clicked on
 	 * mode: the new mode
 	 */
-	User.prototype.changeMode = function (furn){		
+	User.prototype.changeMode = function (furn){					
 		//from 'camera' to 'furniture'
 		if (this.mode == "camera"){
 			this.mode = "furniture";
 			this.activeFurniture = furn;
-			furn.setActive(true);
+			this.activeFurniture.setActive(true);
 			//change shader
 			if (this.activeFurniture.shader == "normal"){				
 				this.activeFurniture.changeShader("green");
 			} 
 			   
 		}
-		//from 'furniture' to 'camera'
-		else{
-			if(!(furn.shader == "red") && this.activeFurniture == furn) {			
-				this.mode = "camera";
-				
-				this.activeFurniture.setActive(false);		
-				//change shader
-				if (this.activeFurniture.shader == "green"){				
-					this.activeFurniture.changeShader("normal");
+		else if(!(this.activeFurniture.shader == "red")){
+				if (this.activeFurniture == furn || !(furn)){
+					this.mode = "camera";
+					this.activeFurniture.setActive(false);											
+					this.activeFurniture.changeShader("normal");				
+					this.activeFurniture = null;
 				}
-				this.activeFurniture = null;
-			}
+				else{
+					this.activeFurniture.setActive(false);								
+					this.activeFurniture.changeShader("normal");
+					furn.setActive(true);
+					if (furn.shader == "normal"){				
+						furn.changeShader("green");
+					}
+					this.activeFurniture = furn;
+				}
+				
 		}
 	}
 
@@ -620,9 +661,8 @@ Kata.require([
 	 */
 	
 		
-	var speed=1;
+	var speed=2;
 	/**
-	 * Helper function to change the looking direction of camera
 	 * 
 	 * point: XML3DVec3
 	 * camera: XML3D view
@@ -631,11 +671,15 @@ Kata.require([
 		var vector = point.subtract(cam.position);
 		vector = vector.normalize();
 		cam.setDirection(vector);
+		this.center = point;
+		this.camCenterDistance = (cam.position.subtract(this.center)).length();				  
 		return cam;
 	}
 	
 	/**
 	 * helper function to update the presence's position and orientation
+	 * position: XML3DVec3
+	 * orientation: XML3DRotation 
 	 */
 	User.prototype.updatePresence = function (position, orientation){
 		 var now = new Date();
