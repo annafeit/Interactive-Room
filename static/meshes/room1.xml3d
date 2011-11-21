@@ -38,42 +38,50 @@
 		</lightshader>
 
 	    
-		<data id="floorData" >
+		<data id="floor1Data" >
 	            <int name="index">
 	            	0 1 2 
-	            	2 3 0
-	            	4 5 6
-	            	6 7 4	            	
+	            	2 3 0	            	
 	            </int>
 	            
 	            <float3 name="position">
 	            	0 0 0
 	            	0 0 -400
 	            	400 0 -400
-	            	400 0 0
-	            	400 0 -100
-	            	400 0 -300
-	            	600 0 -300 
-	            	600 0 -100 
+	            	400 0 0 
 	            </float3>
 	            
 	            <float3 name="normal">
 	            	0 1 0
 	            	0 1 0
 	            	0 1 0
-	            	0 1 0
+	            	0 1 0	            	
+	            </float3>
+	    </data>
+	    <data id="floor2Data">
+	    		<int name="index">
+	            	0 1 2
+	            	2 3 0	            	
+	            </int>
+	            
+	            <float3 name="position">
+	            	400 0 -100
+	            	400 0 -300
+	            	600 0 -300 
+	            	600 0 -100 
+	            </float3>
+	            
+	            <float3 name="normal">	            	
 	            	0 1 0
 	            	0 1 0
 	            	0 1 0
 	            	0 1 0
 	            </float3>
 	    </data>
-	    <data id="ceilingData" >
+	    <data id="ceiling1Data" >
 	            <int name="index">
 	            	0 1 2 
-	            	2 3 0
-	            	4 5 6
-	            	6 7 4	            	
+	            	2 3 0            	
 	            </int>
 	            
 	            <float3 name="position">
@@ -81,10 +89,6 @@
 	            	0 250 -400
 	            	400 250 -400
 	            	400 250 0
-	            	400 250 -100
-	            	400 250 -300
-	            	600 250 -300 
-	            	600 250 -100 
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -92,6 +96,22 @@
 	            	0 -1 0
 	            	0 -1 0
 	            	0 -1 0
+	            </float3>
+	    </data>
+	    <data id="ceiling2Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0	            	
+	            </int>
+	            
+	            <float3 name="position">
+	            	400 250 -100
+	            	400 250 -300
+	            	600 250 -300 
+	            	600 250 -100 
+	            </float3>
+	            
+	            <float3 name="normal">
 	            	0 -1 0
 	            	0 -1 0
 	            	0 -1 0
@@ -308,11 +328,17 @@
 	 <light shader="#light" intensity="0.8" />
     </group>
      		  
-    <group transform = "wallTransform" id="floor" type="floor" shader = "#material">
-      <mesh src="#floorData" type="triangles"/>
+    <group transform = "wallTransform" id="floor1" type="floor" shader = "#material">
+      <mesh src="#floor1Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="ceiling" type="ceiling" shader = "#material">
-      <mesh src="#ceilingData" type="triangles"/>
+    <group transform = "wallTransform" id="floor2" type="floor" shader = "#material">
+      <mesh src="#floor2Data" type="triangles"/>
+    </group>
+    <group transform = "wallTransform" id="ceiling1" type="ceiling" shader = "#material">
+      <mesh src="#ceiling1Data" type="triangles"/>
+    </group>
+    <group transform = "wallTransform" id="ceiling2" type="ceiling" shader = "#material">
+      <mesh src="#ceiling2Data" type="triangles"/>
     </group>
     <group transform = "wallTransform" id="wall1" type="wall" shader = "#material">
       <mesh src="#wall1Data" type="triangles"/>

@@ -126,20 +126,31 @@ Kata.require([
 				var group = groups[i];				
 			    if (group.hasAttribute("type") && group.id != obj.id){
 			    	var b = this.objectIntersectsObject(obj, group);
-			    	if (b) {
-			    		console.log(group); 
-			    		return true;
-			    		}
+			    	if (b) {			    		
+			    		return group;
+			    	}
 			    }
 			}
 			return false;
 		}
 		
 		/**
-		 * returns the center of a given box
+		 * these functions return the center of a given group in world and local coordinates respectively 
+		 * obj: XML3D group element
 		 */
-		Helper.objCenter = function(obj){
+		Helper.objWorldCenter = function(obj){
 			var box = org.xml3d.util.getWorldBBox(obj);
+			var max = box.max;
+			var min = box.min;
+			var x_h = min.x + ((box.max.x - box.min.x)/2);
+			var y_h = min.y + ((box.max.y - box.min.y)/2);
+			var z_h = min.z + ((box.max.z - box.min.z)/2);
+			var ret = {x: x_h, y:y_h, z:z_h };
+			return ret;
+		}
+		
+		Helper.objLocalCenter = function(obj){
+			var box = obj.getBoundingBox();
 			var max = box.max;
 			var min = box.min;
 			var x_h = min.x + ((box.max.x - box.min.x)/2);

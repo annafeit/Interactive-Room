@@ -4,13 +4,15 @@
     $db = new PDO('sqlite:../DB/DBInteractiveRoom');  
     $db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     #prepare Statement
-    $stmt = $db->prepare("SELECT entryId, id, mesh, type, name, position, orientation FROM hosts join furniture where roomId == :roomId AND furnitureId == id");           
-    $stmt->bindParam(':roomId', $_REQUEST['roomId']);    
+    $stmt2 = $db->prepare("UPDATE hosts SET position = :position , orientation = :orientation WHERE entryId == :dbID");           
+    $stmt2->bindParam(':dbID', $_POST['dbID']);    
+    $stmt2->bindParam(':position', $_POST['position']);    
+    $stmt2->bindParam(':orientation', $_POST['orientation']);    
     #execute statement
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    print_r(json_encode($result));
+    $stmt2->execute(); 
+     
     }
+
   catch(Exception $e){
     print 'Exception: '.$e->getMessage();
   }

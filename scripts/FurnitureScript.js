@@ -22,6 +22,7 @@ Kata.require([
 		this.position = args.position;			//only not null when object is recreated in the room
 		this.orientation = args.orientation;	//only not null when object is recreated in the room
 		this.type = args.type;
+		this.dbID = args.dbID;	//the entryID of this furniture in the "host" table of the database. 
 
 		this.name = args.name;
 		this.group = null;
@@ -29,6 +30,7 @@ Kata.require([
 		this.inDB = args.inDB;
 		this.shader = "normal";
 		this.materials = {red: null, green: null, normal: null};
+		
 		
 		this.active = false;		
 		
@@ -87,20 +89,10 @@ Kata.require([
 		
 	}
 	
-	Furniture.prototype.meshLoaded = function(){
-		this.group = document.getElementById(this.name + this.presence.mID);
-		if(this.checkForIntersections()){			
-			this.active = true;			
-		}
-		else{
-			document.userScript.furnitureCreated(this, this.inDB);
-		}
-	}
-	
 	Furniture.prototype.setInitialPos = function(){
+		var now = new Date();
 		if(this.initialPos){
 			//set furniture to the current center
-			var now = new Date();
 		    var loc = this.presence.predictedLocationAtTime(now);		   
 		    var p = this.initialPos;		  
 		    
@@ -122,15 +114,69 @@ Kata.require([
 				default: console.log("furniture " + this.name + this.presence.mID +": wrong type")
 			}
 		}
+		this.lastValidPosition = this.presence.predictedLocationAtTime(now);
 		
 	}
 	
+	Furniture.prototype.meshLoaded = function(){
+		//save corresponding group in xml3d-scene
+		this.group = document.getElementById(this.name + this.presence.mID);
+		this.centerMesh();
+		//check for intersections in initial position
+		if(this.checkForIntersections()){			
+			this.active = true;			
+		}
+		else{
+			this.changeShader("normal");
+		}
+		document.userScript.furnitureCreated(this, this.inDB);
+	}
+	
+	/**
+	 * changes the transformation attributre of the corresponding mesh in such a way,
+	 * that it's centered around (0,0) on the x-z plane for ceiling and floor furnitures
+	 * and on the x-y plane for furnitures with type wall.
+	 * The y-coordinate is 0.1 for floor furnitures and -0.1 for ceiling furnitures.
+	 * The z-coordinate is -0.1 for wall furnitures  
+	 */
+	Furniture.prototype.centerMesh = function(){
+		var transform = document.getElementById(this.group.transform);
+		if(!transform){
+			//TODO create new transformation and assign it
+		}
+		var center = Helper.objLocalCenter(this.group);
+		switch (this.type){
+			case "floor":
+				transform.translation.x = -center.x;
+				transform.translation.y = -0.1
+				transform.translation.z = -center.z;
+			case "wall":
+				transform.translation.x = -center.x;
+				transform.translation.y = -center.y
+				transform.translation.z = -0.1;
+			case "ceiling":
+				transform.translation.x = -center.x;
+				transform.translation.y = 0.1
+				transform.translation.z = -center.z;
+		
+		}
+	}
+	
+	
+	/**
+	 * checks if this object's mesh currently intersects with anything in the world. 
+	 * If so, the shader of the object changes to red, otherwise to green.
+	 * return: a group this object intersects with
+	 */
 	Furniture.prototype.checkForIntersections = function(){		
-		var intersects = Helper.checkForIntersections(this.group);
-		if (intersects){
+		var intersectionGroup = Helper.checkForIntersections(this.group);
+		if (intersectionGroup){
 			this.changeShader("red");			
 		}
-		return intersects;
+		else{
+			this.changeShader("green");
+		}
+		return intersectionGroup;
 	}
 	
 	Furniture.prototype.getPosition = function(){
@@ -160,7 +206,9 @@ Kata.require([
 		this.shader = color;
 	}
 		
-	
+	/**
+	 * parses the xml3d file and saves the different shaders in the material array. 
+	 */
 	Furniture.prototype.parseScene = function(){	
         var materials = document.getElementsByTagName("shader");	    
 	    //finds id of red, green and normal shader
@@ -181,15 +229,16 @@ Kata.require([
 	Furniture.prototype.setActive = function(b){
 		if(this.active && !b && !(this.shader == "red")){
 			//save new position and orientation in DB only if this isn't active any more and placed correctly
-			//this.updateFurnitureInDB();
+			this.updateFurnitureInDB();
 			this.active = b;
 		}		
 		else if(b){
 			this.active = b;
 		}
-	}
+	}	
 	
 	Furniture.prototype.moveFurnitureToMouse = function(x, y){		
+		//look if the a ray from the current mouse position hits a wall of the right type.
 		var ray = this.xml3d.generateRay(x,y);
 		var walls = Helper.getWalls(this.type);
 		var hitPoint = new Array();
@@ -203,6 +252,7 @@ Kata.require([
 				break;
 			}
 		}
+		//move furniture to the hitpoint (if there is one)
 		if(hitPoint.x){
 			switch (this.type){		
 				case "floor": 
@@ -214,6 +264,30 @@ Kata.require([
 					this.movePresence(hitPoint);
 			}
 		}
+		//check for intersections
+		var group = this.checkForIntersections();
+		if(group){
+			var type = group.getAttribute("type");
+			if(type == "wall" || type == "ceiling" || type == "floor"){
+				//object intersects with a wall -> move back to last valid position
+				//TODO doesnt work
+				this.presence.setLocation(this.lastValidPosition);
+				var b = this.checkForIntersections();
+			}
+		}
+		else{
+			var now = new Date();
+			this.lastValidPosition = this.presence.predictedLocationAtTime(now);
+		}
+		
+	}
+	
+	Furniture.prototype.updateFurnitureInDB = function (){
+		var pos = this.getPosition();
+		var or = this.getOrientation();
+		var dbID = this.dbID;
+		$.post('scripts/updateFurniture.php', {dbID: dbID, position: pos, orientation: or}, 
+			function(data, jqxhr){});
 	}
 	
 	/**
@@ -238,9 +312,7 @@ Kata.require([
 	}
 	
 	
-	/*Furniture.protoype.updateFurnitureInDB = function(){
-		//TODO
-	}*/
+	
 	
 
 }, kata_base_offset + "scripts/FurnitureScript.js");

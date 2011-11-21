@@ -152,8 +152,8 @@ Kata.require([
 				var pos = obj.getPosition();
 				var or = obj.getOrientation();
 				$.post('scripts/createFurniture.php', {furnitureId: obj.furnitureId, roomId: this.roomId, position: pos, orientation: or}, 
-						function(data, jqxhr){ 
-							obj.entryId = data[0];
+						function(data, jqxhr){
+							obj.dbID = data[0];
 						},'json');
 			}
 	    }
@@ -169,7 +169,7 @@ Kata.require([
     	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
     			function(data, jqxhr){     				
     				var url = kata_base_offset + data[0];
-    				//create new object in world     				
+    				//create new object in world      				
     		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
     		    			"Furniture",
     		    			{ space:thus.space,    		    		
@@ -180,7 +180,7 @@ Kata.require([
     		    			  type:type,
     		    			  name:name,
     		    			  loc:{scale: "1.0"} //just to match the code..
-    		    			});
+    		    			});    		    	
     			},'json');
     } 
     
@@ -198,6 +198,7 @@ Kata.require([
     					var url = kata_base_offset + obj.mesh;
     					var id = obj.id;
     					var type = obj.type;
+    					var dbID = obj.entryId;
     					
     					var pos = obj.position.split(" ");
     					pos[0] = parseInt(pos[0]);
@@ -219,6 +220,7 @@ Kata.require([
         		    			  name:name,
         		    			  visual:{mesh: url},
         		    			  inDB: true,
+        		    			  dbID: dbID,
         		    			  loc:{scale: "1.0"} //just to match the code..
         		    			});
     				}
@@ -402,8 +404,13 @@ Kata.require([
 				msg.msg = "doubleclick";
 			}
 			else{
-				var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
-				var furn = this.furnitureFromXML3D(obj);
+				var furn = null;
+				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
+				if(mesh){
+					var obj = mesh.parentElement;
+					furn = this.furnitureFromXML3D(obj);
+				}
+				
 				if (furn ||this.mode=="furniture"){	
 					this.changeMode(furn);
 				}
@@ -415,7 +422,7 @@ Kata.require([
 			var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
 			var furn = this.furnitureFromXML3D(obj);
 			if (furn){	
-				var pos = Helper.objCenter(obj);
+				var pos = Helper.objWorldCenter(obj);
 				var point = this.xml3d.createXML3DVec3();
 				point.x = pos.x;
 				point.y = pos.y;
