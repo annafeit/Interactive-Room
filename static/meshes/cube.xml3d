@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
 	<defs>	
-	    <transform id="cubeTransform" scale="50 50 50" />
+	    <transform id="cubeTransform" scale="50 50 50" translation="-25 -1 25"/>
 	    
 	    <shader id="normalMaterial" script="urn:xml3d:shader:phong">
 			<float3 name="diffuseColor">

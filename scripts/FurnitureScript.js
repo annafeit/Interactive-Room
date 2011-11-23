@@ -25,7 +25,7 @@ Kata.require([
 		this.dbID = args.dbID;	//the entryID of this furniture in the "host" table of the database. 
 
 		this.name = args.name;
-		this.group = null;
+		this.group = null;			
 		
 		this.inDB = args.inDB;
 		this.shader = "normal";
@@ -148,15 +148,15 @@ Kata.require([
 		switch (this.type){
 			case "floor":
 				transform.translation.x = -center.x;
-				transform.translation.y = -0.1
+				transform.translation.y = -1
 				transform.translation.z = -center.z;
 			case "wall":
 				transform.translation.x = -center.x;
 				transform.translation.y = -center.y
-				transform.translation.z = -0.1;
+				transform.translation.z = -1;
 			case "ceiling":
 				transform.translation.x = -center.x;
-				transform.translation.y = 0.1
+				transform.translation.y = -1
 				transform.translation.z = -center.z;
 		
 		}
@@ -176,6 +176,7 @@ Kata.require([
 		else{
 			this.changeShader("green");
 		}
+		console.log(intersectionGroup);
 		return intersectionGroup;
 	}
 	
@@ -200,10 +201,10 @@ Kata.require([
 			this.parseScene();
 		}
 		var obj = document.getElementById(this.name+this.presence.mID);
-		obj.setAttribute("shader", "#"+this.materials[color] );		
+		obj.setAttribute("shader", "#"+this.materials[color] );
+		
 		this.shader = color;		
-		this.xml3d.update();
-		this.shader = color;
+		this.xml3d.update();		
 	}
 		
 	/**
@@ -311,6 +312,88 @@ Kata.require([
 	     this.presence.setLocation(loc);	    
 	}
 	
+	/**
+	 * rotates the Furniture by doing the following:
+	 * for type floor:
+	 * (1) take the center of the obj projected on the floor 
+	 *     add dx and dy on the x and z coordinate.
+	 *     subtract the two points to get the new looking direction for this object
+	 *     negate and normalize it.
+	 * (2) take the up vector of the obj (0 1 0) 
+	 *     take the cross product of the up vector and the direction
+	 *     get the rotation with the method XML3DRotation.fromBasis
+	 *     
+	 * basically its done like in the lookAt + setDirection method of the view element.
+	 */
+	Furniture.prototype.rotate = function(dx, dy){
+		var transform = document.getElementById(this.group.transform);
+        var rotation = transform.rotation;
+        
+        //get initial direction vector
+        var init = this.xml3d.createXML3DVec3();
+        init.x = 0; init.y = 0; init.z = -1;
+        init = rotation.rotateVec3(init);
+        
+        //create new direction vector               
+        var mousePos = this.xml3d.createXML3DVec3();
+        var centerVec = this.xml3d.createXML3DVec3();
+        var center = Helper.objWorldCenter(this.group);  
+        var up = this.xml3d.createXML3DVec3();
+        
+        switch(this.type){
+        	case "floor":
+        		centerVec.x = center.x;
+        		centerVec.y = 0;
+                centerVec.z = center.z;
+                
+                mousePos.x = center.x + dx;
+                mousePos.z = center.z + dy;
+                mousePos.y = 0;
+                
+                up.x = 0; up.y = 1; up.z = 0;
+        	case "ceiling":
+        		var box = org.xml3d.util.getWorldBBox(this.getWall());
+        		centerVec.x = center.x;
+        		centerVec.y = box.min.y;
+                centerVec.z = center.z;
+                
+                mousePos.x = center.x + dx;
+                mousePos.z = center.z + dy;
+                mousePos.y = box.min.y;
+        		
+        }        
+        
+        var dir = mousePos.subtract(centerVec);
+        dir = dir.negate().normalize();
+        
+        var right = up.cross(dir).normalize();
+        up = dir.cross(right).normalize();
+        
+        var orientation = XML3DRotation.fromBasis(right, up, dir);       
+        this.movePresence(null, orientation);
+	}	
+	
+	
+	/**
+	 * computes the wall this furniture is actually placed on
+	 */
+	Furniture.prototype.getWall = function(){
+		var camPos = document.userScript.camera.position;		
+		var now = new Date();
+		var meshPos = this.presence.predictedPosition(now);
+		
+		var vec = this.xml3d.createXML3DVec3();
+		vec.x = meshPos[0]; vec.y = meshPos[1]; vec.z = meshPos[2];
+		var direction = vec.subtract(camPos);
+		
+		var ray = this.xml3d.createXML3DRay();
+		ray.origin = camPos;
+		ray.direction = direction;
+		
+		var group = Helper.rayIntersectsWalls(ray, this.type);
+		console.log(group)
+		return 	group;	
+	}
 	
 	
 	

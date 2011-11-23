@@ -30,13 +30,21 @@
 		<link type="text/css" href="style/style.css" rel="stylesheet" media="all" />
 		
 		<script type="text/javascript"><![CDATA[
-			window.onload=initRoom;
+			window.onload=initRoom;			
 			var args = window.name.split(" ");
-			var serverAddress = args[0];
-			var username = args[1];						
-			var mesh = "../"+args[2];			
-			var roomId = args[3];
-			connect(serverAddress, mesh, username, roomId);
+			if(args[4] == "owner"){
+				var serverAddress = args[0];
+				var username = args[1];						
+				var mesh = "../"+args[2];			
+				var roomId = args[3];				
+				connect(serverAddress, mesh, username, roomId);
+			}
+			else{
+				var serverAddress = args[0];
+				var username = args[1];	
+				var mesh = "../"+args[2];				
+				connectVisitor(serverAddress, username, mesh);
+			}
 		]]></script>
 	</head>	
 	<body> 							

@@ -73,13 +73,20 @@ Kata.require([
 		}
 		
 		
-		Helper.rayIntersectsWalls = function(ray){
+		Helper.rayIntersectsWalls = function(ray, type){
 			var objs = document.getElementsByTagName("group");			
 			for (var i = 0; i<objs.length; i++){				
 				var obj = objs[i];				
-				if (obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling" || obj.getAttribute("type") == "floor"){
+				if(type){
+					if(obj.getAttribute("type") == type){
+						if(this.rayObjIntersection(obj,ray)){
+							return obj;
+						}
+					}
+				}
+				else if (obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling" || obj.getAttribute("type") == "floor"){
 					if(this.rayObjIntersection(obj,ray)){
-						return true;
+						return obj;
 					}
 				}
 			
@@ -159,6 +166,27 @@ Kata.require([
 			var ret = {x: x_h, y:y_h, z:z_h };
 			return ret;
 		}
+		
+		XML3DRotation.fromBasis = function(x, y, z) {
+		    var normX = x.length();
+		    var normY = y.length();
+		    var normZ = z.length();
+
+		    this.xml3d = document.getElementsByTagName("xml3d")[0];
+		    
+		    var m = this.xml3d.createXML3DMatrix();
+		    m.m11 = x.x / normX;
+		    m.m12 = y.x / normY;
+		    m.m13 = z.x / normZ;
+		    m.m21 = x.y / normX;
+		    m.m22 = y.y / normY;
+		    m.m23 = z.y / normZ;
+		    m.m31 = x.z / normX;
+		    m.m32 = y.z / normY;
+		    m.m33 = z.z / normZ;
+
+		    return XML3DRotation.fromMatrix(m);
+		};
 	
 		
 	

@@ -77,6 +77,52 @@ function loadGFX(){
 	Kata.GraphicsSimulation.initializeDriver(driver,null, graphicsReady);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
 }
 
+function connectVisitor(address, name, esh){
+	this.address = address;
+	this.username = name;
+	this.world = mesh;
+	
+	$("#loginButton").attr("disabled", true);
+	
+  	Kata.require([
+  		   		'katajs/oh/MainThread.js',	//need that to create MainThread object
+  		   		'katajs/oh/plugins/sirikata/SirikataSpaceConnection.js',	//to use the sirikata://... protocol
+  		   		'katajs/oh/GraphicsSimulation.js',	//the first hosted object always communicates with graphics
+  		   		'katajs/gfx/xml3dgfx.js'
+    ], function(){
+  		loadGFXVisitor();
+  		}
+  	);
+}
+
+function graphicsReadyVisitor() {
+	var scriptArgs ={
+			space: this.address,
+			username: this.username,
+			world: this.world,
+			visual: {mesh:avatarURL},					
+			loc:{scale: "1.0"},	//just to match the code..
+			
+	}	
+	
+	try{     
+   	
+   		window.kata = new Kata.MainThread(
+   			kata_base_offset + "scripts/VisitorScript.js", 
+   			"Visitor", scriptArgs
+   		);			   			
+			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));                         		   		 	
+   }
+   catch(err){
+   	alert(err);
+   	$("#loginButton").attr("disabled", false)
+   }   
+}
+
+function loadGFXVisitor(){
+	Kata.GraphicsSimulation.initializeDriver(driver,null, graphicsReadyVisitor);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
+}
+
 
 
 
