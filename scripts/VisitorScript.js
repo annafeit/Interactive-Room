@@ -2,7 +2,8 @@ var Visitor={};
 
 Kata.require([
 	'katajs/oh/GraphicsScript.js',
-	kata_base_offset + 'scripts/Utils.js'
+	kata_base_offset + 'scripts/Utils.js',
+	kata_base_offset + 'scripts/behavior/visit/Visit.js'
 ], function() {
 	/**
 	* Simulate inheritance from GraphicsScript by defining a super variable
@@ -27,7 +28,7 @@ Kata.require([
 		this.furniture = new Array();
 		this.activeFurniture;
 		
-		/**
+		/*
 		 * "camera" mode: moving camera by drag 
 		 * "furniture" mode: moving furniture by drag and drop
 		 */		
@@ -47,6 +48,13 @@ Kata.require([
 						
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
+		
+		
+		//for sending messages
+		this.visitBehavior = 
+			new Kata.Behavior.Visit(
+				this, "visitor"	
+		);
 		
 		//connect to the spaceServer with method 'connect' of parent's parent class
 		//last argument must always be a callback (->Kata.bind), a method that's invoked upon completion
@@ -110,10 +118,13 @@ Kata.require([
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
 		$(".furniture").live("click",function(){thus.createFurniture(this, false)});
-		
+						
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
-        this.syncCamera();       
+        this.syncCamera();      
+        
+        //send a introduction message to every user
+        
 	};
 
 	Visitor.prototype.parseScene = function(){
@@ -275,10 +286,10 @@ Kata.require([
 			
 		}
 		if(msg.msg=="click"){	
-			/*if (msg.event.timeStamp -200 < lastClick ){
+			if (msg.event.timeStamp -200 < lastClick ){
 				msg.msg = "doubleclick";
 			}
-			else{
+			else{/*
 				var furn = null;
 				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
 				if(mesh){
@@ -288,12 +299,12 @@ Kata.require([
 				
 				if (furn ||this.mode=="furniture"){	
 					this.changeMode(furn);
-				}
+				}*/
 			}
-			lastClick = msg.event.timeStamp;*/ //TODO send message to owner 			
+			lastClick = msg.event.timeStamp; //TODO send message to owner 			
 		}
 		if(msg.msg == "doubleclick"){
-			/*//move and rotate camera such that it looks at the center of the object that was clicked on.			
+			//move and rotate camera such that it looks at the center of the object that was clicked on.			
 			var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
 			var furn = this.furnitureFromXML3D(obj);
 			if (furn){	
@@ -304,7 +315,7 @@ Kata.require([
 				point.z = pos.z;
 				var cam = this.setCamUpToY(this.camera);
 				cam = this.lookAt(point, cam);
-				this.updatePresence(cam.position, cam.orientation);*/ //TODO find object and get position of remote object
+				this.updatePresence(cam.position, cam.orientation); //TODO find object and get position of remote object
 			}
 		}
 		if(msg.msg =="mousemove"){
@@ -466,10 +477,12 @@ Kata.require([
 		if (obj){
 			if (obj.getAttribute("type").substr(0,2) == "on"){ 
 				//if it's a furniture object (types "onwall", "onfloor" or "onceiling")										
-				for (var i = 0; i<this.furniture.length;i++) {
-		            var furn = this.furniture[i];
-		            if (furn.presence.mID == obj.parentElement.id ){
-		            	return furn;		            	
+				for (i in this.mRemotePresences) {
+					var furn = this.mRemotePresences[i];
+		            if (furn){
+		            	if (furn.mID == obj.parentElement.id ){
+		            		return furn;
+		            	}
 		            }		                
 		        }
 			}
@@ -858,8 +871,11 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);
 	}
-	
-	
+
+    
+    
+    
+
 
 
 

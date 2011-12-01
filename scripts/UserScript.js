@@ -2,7 +2,8 @@ var User={};
 
 Kata.require([
 	'katajs/oh/GraphicsScript.js',
-	kata_base_offset + 'scripts/Utils.js'
+	kata_base_offset + 'scripts/Utils.js',
+	kata_base_offset + 'scripts/behavior/visit/Visit.js'
 ], function() {
 	/**
 	* Simulate inheritance from GraphicsScript by defining a super variable
@@ -32,6 +33,7 @@ Kata.require([
 		//to store all furniture of the room
 		this.furniture = new Array();
 		this.activeFurniture;
+		this.loadedFurnitures = new Array();
 		
 		//to save which key is pressed
 		this.keyIsDown = {};
@@ -48,6 +50,12 @@ Kata.require([
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
 		
+		//for sending messages
+		this.visitBehavior = 
+			new Kata.Behavior.Visit(
+				this, "owner", this.cb	
+			);
+		
 		//connect to the spaceServer with method 'connect' of parent's parent class
 		//last argument must always be a callback (->Kata.bind), a method that's invoked upon completion
 		this.connect(args, null, Kata.bind(this.connected, this));
@@ -57,6 +65,10 @@ Kata.require([
 	*/
 	Kata.extend(User, SUPER);
 	
+	User.prototype.cb = function(){
+		
+		alert("visitor added");
+	}
 	
 	/**
 	* I think: This registers the "near" objects in this.mRemotePresences (with it's presence).
@@ -365,10 +377,11 @@ Kata.require([
 	var turnSpeed = 15;	
 	var zoomSpeed = 10;
 	var moveSpeed = 10;
+	
+	
 		
 	//Handle messages from GUI
 	User.prototype._handleGUIMessage = function (channel, msg) {
-		//TODO does this script only gets this message from objects hosted by this oh?
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
 				this.setCamToDoor();
@@ -379,8 +392,13 @@ Kata.require([
 			else{
 				for(var i = 0; i<this.furniture.length; i++){
 					var furn = this.furniture[i];
-					if(furn.presence.mID == msg.id){
-						furn.meshLoaded();
+					if(furn.presence){
+						if(furn.presence.mID == msg.id){
+							furn.meshLoaded();							
+						}
+					}						
+					else {
+						this.loadedFurnitures.push(msg.id);
 					}
 				}
 			}
@@ -972,8 +990,6 @@ Kata.require([
         this.updatePresence(cam.position, cam.orientation);
 	}
 	
-	
-
 
 
 }, kata_base_offset + "scripts/UserScript.js");

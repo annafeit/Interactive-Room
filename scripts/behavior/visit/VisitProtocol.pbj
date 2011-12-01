@@ -1,0 +1,53 @@
+"pbj-0.0.3"
+
+package Visit.Protocol;
+
+//The Visit Protocol is for the communication between visitor and owner
+
+//indicates if the script that sends the intro message a visitor or the owner of the room
+message Intro {
+  required bool visitor = 1;    
+}
+
+message Create {
+  required vector3d center = 1;		//see also UserScript.createFurniture();
+  required int32 id = 2;		
+  required string mesh = 3;
+  required bool inDB = 4;
+  required string type = 5;
+  required string name = 6;
+}
+
+//to delete an object
+message Delete {
+  required string presenceId = 1;
+}
+
+//to tell that the mode has changed or to ask for changing the mode
+message ChangeMode {
+  required string mode = 1;	//the new mode
+  optional string mesh = 2;	//the mesh of the new active object, only if changing to furniture mode
+}
+
+message Move {
+  required string move = 1;	//"x y" the mouse position where the active furniture should move to
+}
+
+message Rotate {
+  required string rotate = 1;	//"dx dy" the mouse coordinates for rotating the object
+}
+
+message Shader{
+  required string color = 1;	//this message is only sent by furnitures. It tells the visitors it's new color.
+}
+
+
+message Container {
+    optional Intro intro = 1;
+    optional Create create = 2;
+    optional Delete delete = 3;
+    optional ChangeMode changeMode = 4;
+    optional Move move = 5;
+    optional Rotate rotate = 6; 
+    optional Shader shader = 7;
+}

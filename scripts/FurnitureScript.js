@@ -36,9 +36,13 @@ Kata.require([
 		
 		this.xml3d = document.getElementsByTagName("xml3d")[0];
 		
+		//save furniture in userscript
+    	document.userScript.furniture.push(this);    	
+		
 		SUPER.constructor.call(this, channel, args, function(){});
-
-		this.connect(args, null, Kata.bind(this.connected, this));		
+			
+		this.connect(args, null, Kata.bind(this.connected, this));	
+		
 	};
 
 	Kata.extend(Furniture, SUPER);
@@ -70,64 +74,78 @@ Kata.require([
         this.presence.setQuery(0);
 		
         this.setInitialPos();
-		
-		if(this.position){
-			var now = new Date();
-		    var loc = this.presence.predictedLocationAtTime(now);		         	
-		    loc.pos = this.position;	    
-		    this.presence.setLocation(loc);
+        
+        var loads = document.userScript.loadedFurnitures;
+		var loaded;
+		for (var i = 0; i<loads.length;i++){
+			if(loads[i] == this.presence.mID){
+				loaded = true;
+			}
 		}
-		if(this.orientation){
-			var now = new Date();
-		    var loc = this.presence.predictedLocationAtTime(now);		    
-		    loc.orient = this.orientation; 	    
-		    this.presence.setLocation(loc);
-		}	    				
-		
-		//save furniture
-    	document.userScript.furniture.push(this);
-		
+		if(loaded){
+			this.meshLoaded();
+		}
 	}
 	
 	Furniture.prototype.setInitialPos = function(){
 		var now = new Date();
-		if(this.initialPos){
-			//set furniture to the current center
-		    var loc = this.presence.predictedLocationAtTime(now);		   
-		    var p = this.initialPos;		  
+		var loc = this.presence.predictedLocationAtTime(now);	
+		if(this.position){
+		    loc.pos = this.position;	    
+		    this.presence.setLocation(loc);
 		    
-		    var walls = Helper.getWalls(this.type);
-		    
-			switch (this.type){
-				case "floor":						
-				    var box = org.xml3d.util.getWorldBBox(walls[0]);
-					p.y = box.min.y;
-					loc.pos = [p.x, p.y, p.z];	    
-					this.presence.setLocation(loc);
-				case "wall": 
-					//TODO look for wall that's in camera view
-				case "ceiling":
-					var box = org.xml3d.util.getWorldBBox(walls[0]);
-					p.y = box.min.y;
-					loc.pos = [p.x, p.y, p.z];	    
-					this.presence.setLocation(loc);				
-				default: console.log("furniture " + this.name + this.presence.mID +": wrong type")
+		    if(this.orientation){		    
+			    loc.orient = this.orientation; 	    
+			    this.presence.setLocation(loc);
+			}
+		}
+		else{
+			if(this.initialPos){
+				//set furniture to the current center		   
+			    var p = this.initialPos;		  
+			    
+			    var walls = Helper.getWalls(this.type);
+			    
+				switch (this.type){
+					case "floor":						
+					    var box = org.xml3d.util.getWorldBBox(walls[0]);
+						p.y = box.min.y;
+						loc.pos = [p.x, p.y, p.z];	    
+						this.presence.setLocation(loc);
+					case "wall": 
+						//TODO look for wall that's in camera view
+					case "ceiling":
+						var box = org.xml3d.util.getWorldBBox(walls[0]);
+						p.y = box.min.y;
+						loc.pos = [p.x, p.y, p.z];	    
+						this.presence.setLocation(loc);				
+					default: console.log("furniture " + this.name + this.presence.mID +": wrong type")
+				}
 			}
 		}
 		this.lastValidPosition = this.presence.predictedLocationAtTime(now);
-		
 	}
+	
+	/*
+	 * TODO have to send a message when it's loaded.
+	 */
 	
 	Furniture.prototype.meshLoaded = function(){
 		//save corresponding group in xml3d-scene
 		this.group = document.getElementById(this.name + this.presence.mID);
+		this.parentGroup = document.getElementById(this.presence.mID);
 		this.centerMesh();
+
+        
 		//check for intersections in initial position
-		if(this.checkForIntersections()){			
-			this.active = true;			
-		}
-		else{
-			this.changeShader("normal");
+		//TODO mesh isnt rendered in the initalPos on this point. -> intersection with wall1 why?
+		if(!(this.inDB)){
+			if(this.checkForIntersections()){			
+				this.active = true;			
+			}
+			else{
+				this.changeShader("normal");
+			}
 		}
 		document.userScript.furnitureCreated(this, this.inDB);
 	}
@@ -140,7 +158,7 @@ Kata.require([
 	 * The z-coordinate is -0.1 for wall furnitures  
 	 */
 	Furniture.prototype.centerMesh = function(){
-		var transform = document.getElementById(this.group.transform);
+		var transform = document.getElementById(this.parentGroup.transform);
 		if(!transform){
 			//TODO create new transformation and assign it
 		}
@@ -148,8 +166,8 @@ Kata.require([
 		switch (this.type){
 			case "floor":
 				transform.translation.x = -center.x;
-				transform.translation.y = -1
-				transform.translation.z = -center.z;
+				transform.translation.y = -50;
+				transform.translation.z = center.z;
 			case "wall":
 				transform.translation.x = -center.x;
 				transform.translation.y = -center.y
@@ -157,7 +175,7 @@ Kata.require([
 			case "ceiling":
 				transform.translation.x = -center.x;
 				transform.translation.y = -1
-				transform.translation.z = -center.z;
+				transform.translation.z = center.z;
 		
 		}
 	}
@@ -287,8 +305,17 @@ Kata.require([
 		var pos = this.getPosition();
 		var or = this.getOrientation();
 		var dbID = this.dbID;
-		$.post('scripts/updateFurniture.php', {dbID: dbID, position: pos, orientation: or}, 
-			function(data, jqxhr){});
+		if(dbID){
+			$.post('scripts/updateFurniture.php', {dbID: dbID, position: pos, orientation: or}, 
+					function(data, jqxhr){});
+		}
+		else{
+			var thus = this;
+			$.post('scripts/createFurniture.php', {furnitureId: this.furnitureId, roomId: document.userScript.roomId, position: pos, orientation: or}, 
+					function(data, jqxhr){
+						thus.dbID = data[0];
+					},'json');
+		}
 	}
 	
 	/**
