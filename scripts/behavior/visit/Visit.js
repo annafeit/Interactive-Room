@@ -15,17 +15,14 @@ Kata.require([
      *  @param parent {Kata.Script} the parent Script for this behavior
      *  @param type 	visitor or owner
      */
-    Kata.Behavior.Visit = function(parent, type, cb) {
+    Kata.Behavior.Visit = function(parent, type) {
         this.parent = parent;
         this.parent.addBehavior(this);
 
         this.ports = {};
 
-        //TODO add some callbacks  here
-
         this.visitors = {};
         this.owner = {};
-        this.cb = cb;
         
         this.type = type;
 
@@ -55,25 +52,26 @@ Kata.require([
     /**
      * handles an intro message: initializes the owner attribute with the presence of the owner
      */
-    Kata.Behavior.Visit.prototype._handleIntroOwner = function(presence, remoteID, introMsg) {
-    	if (this.visitors[remoteID]) {
-            Kata.warn("Overwriting existing visitor info due to duplicate intro.");
-        }
-        this.visitors[remoteID] = {
-            presence : presence,
-            dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
-        };
-        this.cb();
+    Kata.Behavior.Visit.prototype._handleIntroVisitor = function(presence, remoteID) {
+	    if(this.type == "owner"){
+	    	if (this.visitors[remoteID]) {
+	            Kata.warn("Overwriting existing visitor info due to duplicate intro.");
+	        }
+	        this.visitors[remoteID] = {
+	            presence : presence,
+	            dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
+	        };
+	    }
         // Always send an initial update TODO update for shaders, mode and activeFurniture
         //this._sendUpdate();
     };
 
     
     
-    Kata.Behavior.Visit.prototype._handleIntroVistor = function(presence, remoteID, introMsg) {
-    	if (!(this.owner)){	//don't want to overwrite the owner presence
-        	if(!(introMsg.visitor))
+    Kata.Behavior.Visit.prototype._handleIntroOwner = function(presence, remoteID) {
+    	if (!(this.owner.id)){	//don't want to overwrite the owner presence        	
             this.owner = {
+            	id: remoteID.mObject,
                 presence : presence,
                 dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
             };
@@ -84,11 +82,9 @@ Kata.require([
      * if a visitor disappears, delete him from the list
      */
     Kata.Behavior.Visit.prototype._handleExit = function(remoteID, msg) {
-    	if(this.owner.presence){
+    	if(this.owner.id == remoteID){
     		//If the owner disappears, the visitors can't stay in the room
-    	    Visitor.prototype._handleExit = function(remoteID, msg) {
-    	    	document.location.href="mainMenu.xhtml";
-    	    };
+    	    document.location.href="mainMenu.xhtml";    	    
     	}
 	    else{
 	        if (this.visitors[remoteID]) {
@@ -135,20 +131,7 @@ Kata.require([
         }
     };
 
-//    Kata.Behavior.Visit.prototype._sendUpdate = function(state) {
-//        // Simply iterate over everyone we know about and try to get the message to them.
-//        for(var remote_key in this.mTrackedObjects) {
-//            var animate_msg = new Visit.Protocol.SetState();
-//            animate_msg.idle = state.idle;
-//            animate_msg.forward = state.forward;
-//            var container_msg = new Visit.Protocol.Container();
-//            container_msg.state = animate_msg;
-//
-//            var objdata = this.mTrackedObjects[remote_key];
-//            var odp_port = this._getPort(objdata.presence);
-//            odp_port.send(objdata.dest, this._serializeMessage(container_msg));
-//        }
-//    };
+
 
     /**
      * Passes the incoming messages to the right handler
@@ -158,20 +141,113 @@ Kata.require([
         container_msg.ParseFromStream(new PROTO.ByteArrayStream(payload));
 
         if (container_msg.HasField("intro")) {
-        	if(this.type == "owner"){
-        		this._handleIntroOwner(presence, src.presenceID(), container_msg.intro);
+        	if(container_msg.intro.visitor){
+        		this._handleIntroVisitor(presence, src.presenceID());
         	}
         	else{
-        		this._handleIntroVisitor(presence, src.presenceID(), container_msg.intro);
+        		this._handleIntroOwner(presence, src.presenceID());
         	}
             
         }
 
         if (container_msg.HasField("create")) {
-            //TODO
+            
         }
-        //TODO ...
+        if (container_msg.HasField("create")) {
+            
+        }
+        if (container_msg.HasField("create")) {
+            
+        }
+        if (container_msg.HasField("create")) {
+            
+        }
+        if (container_msg.HasField("create")) {
+            
+        }
+        
+        
     };
+    
+    /**
+     * sends a message to all visitors / to the owner (depending on this.type)
+     * @param: type 	the type of the message. 
+     * 					the owner of the room can only send two different type of messages:
+     * 						"mode": to tell the visitors that the mode changed
+     * 						"shader": to tell the visitors that the shader of an object changed
+     * 					a visitor can send the following type of request messages:
+     * 						"mode": to change the mode
+     *  					"move": to move an object
+     *  					"rotate": to rotate an object
+     *  					"create": to create an object
+     *  					"destroy": to delete an object
+     * @param args		the arguments that are required for the type of message
+     */
+    Kata.Behavior.Visit.prototype.sendMessage = function(type, args){
+    	if (this.type == "owner"){
+    		//create message
+    		var msg;
+    		var container_msg = new Visit.Protocol.Container();
+    		switch (type){
+    			case "mode":
+    				msg = new Visit.Protocol.Mode();
+    	            msg.mode = args.mode;
+    	            if(args.mesh)
+    	            	msg.mesh = args.mesh;    	            
+    	            container_msg.mode = msg;
+    			case "shader":
+    				msg = new Visit.Protocol.Shader();
+    				msg.groupId = args.groupId;
+    				msg.color = args.color;    				
+    				container_msg.shader = msg;
+    		}
+    		//send message to all visitors
+    		for(var remote_key in this.visitors) {
+              var visitor = this.visitors[remote_key];
+              var odp_port = this._getPort(visitor.presence);
+              odp_port.send(objdata.dest, this._serializeMessage(container_msg));
+          }
+    	}
+    	else{
+    		//create message
+    		var msg;
+    		var container_msg = new Visit.Protocol.Container();
+    		switch (type){
+				case "mode":
+					msg = new Visit.Protocol.Mode();
+					msg.mode = args.mode;
+					if(args.mesh)
+						msg.mesh = args.mesh;    	            
+	    	        container_msg.mode = msg;
+				case "move":
+					msg = new Visit.Protocol.Move();
+					msg.move = args.move;				//of form "x y"
+					container_msg.move = msg;
+				case "rotate":
+					msg = new Visit.Protocol.Rotate();
+					msg.rotate = args.rotate;			//of form "dx dy"
+					container_msg.rotate = msg;
+				case "create":
+					msg = new Visit.Protocol.Create();
+					msg.center = args.center;
+					msg.id = args.id;
+					msg.mesh = args.mesh;
+					msg.inDB = false;
+					msg.type = args.type;
+					msg.name = args.name;
+					container_msg.create = msg;
+				case "destroy":
+					msg = new Visit.Protocol.Destroy();
+					msg.groupId = args.groupId; 
+					container_msg.destroy = msg;
+    		}
+    		//send message to owner
+    		var owner = this.owner;
+            var odp_port = this._getPort(owner.presence);
+            odp_port.send(objdata.dest, this._serializeMessage(container_msg));
+    	}
+    		
+    }
 
 }, '../../scripts/behavior/visit/Visit.js');
  

@@ -77,7 +77,14 @@ Kata.require([
 	        this.mOther = remote;
         }
         else{
-        	Kata.warn("Camera wiped object");
+        	if (remote.mID == this.visitBehavior.owner.id){
+        		Kata.warn("Owner left room");
+        		alert("owner left the room");
+        		document.location.href="mainMenu.xhtml";
+        	}
+        	else{
+        		Kata.warn("Camera wiped object");
+        	}
         }
     };
 

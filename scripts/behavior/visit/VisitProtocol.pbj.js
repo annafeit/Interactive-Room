@@ -46,8 +46,8 @@ Visit.Protocol.Create = PROTO.Message("Visit.Protocol.Create",{
 		type: function(){return PROTO.string;},
 		id: 6
 	}});
-Visit.Protocol.Delete = PROTO.Message("Visit.Protocol.Delete",{
-	presenceId: {
+Visit.Protocol.Destroy = PROTO.Message("Visit.Protocol.Destroy",{
+	groupId: {
 		options: {},
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
@@ -60,7 +60,7 @@ Visit.Protocol.ChangeMode = PROTO.Message("Visit.Protocol.ChangeMode",{
 		type: function(){return PROTO.string;},
 		id: 1
 	},
-	mesh: {
+	groupId: {
 		options: {},
 		multiplicity: PROTO.optional,
 		type: function(){return PROTO.string;},
@@ -81,11 +81,17 @@ Visit.Protocol.Rotate = PROTO.Message("Visit.Protocol.Rotate",{
 		id: 1
 	}});
 Visit.Protocol.Shader = PROTO.Message("Visit.Protocol.Shader",{
-	color: {
+	groupId: {
 		options: {},
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
 		id: 1
+	},
+	color: {
+		options: {},
+		multiplicity: PROTO.required,
+		type: function(){return PROTO.string;},
+		id: 2
 	}});
 Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 	intro: {
@@ -100,10 +106,10 @@ Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 		type: function(){return Visit.Protocol.Create;},
 		id: 2
 	},
-	delete: {
+	destroy: {
 		options: {},
 		multiplicity: PROTO.optional,
-		type: function(){return Visit.Protocol.Delete;},
+		type: function(){return Visit.Protocol.Destroy;},
 		id: 3
 	},
 	changeMode: {

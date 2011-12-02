@@ -13,20 +13,20 @@ message Create {
   required vector3d center = 1;		//see also UserScript.createFurniture();
   required int32 id = 2;		
   required string mesh = 3;
-  required bool inDB = 4;
+  required bool inDB = 4 ;
   required string type = 5;
   required string name = 6;
 }
 
-//to delete an object
-message Delete {
-  required string presenceId = 1;
+//to destroy an object
+message Destroy {
+  required string groupId = 1;	//the groupId of the object to be destroyed (active Furniture)
 }
 
 //to tell that the mode has changed or to ask for changing the mode
 message ChangeMode {
   required string mode = 1;	//the new mode
-  optional string mesh = 2;	//the mesh of the new active object, only if changing to furniture mode
+  optional string groupId = 2;	//the mesh of the new active object, only if changing to furniture mode
 }
 
 message Move {
@@ -38,14 +38,15 @@ message Rotate {
 }
 
 message Shader{
-  required string color = 1;	//this message is only sent by furnitures. It tells the visitors it's new color.
+  required string groupId = 1;
+  required string color = 2;	//this message is only sent by furnitures. It tells the visitors it's new color.
 }
 
 
 message Container {
     optional Intro intro = 1;
     optional Create create = 2;
-    optional Delete delete = 3;
+    optional Destroy destroy = 3;
     optional ChangeMode changeMode = 4;
     optional Move move = 5;
     optional Rotate rotate = 6; 
