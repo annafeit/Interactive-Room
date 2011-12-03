@@ -34,6 +34,8 @@ Kata.require([
 		this.furniture = new Array();
 		this.activeFurniture;
 		this.loadedFurnitures = new Array();
+		//the initiator of the current (furniture) mode
+		this.initiator = null;
 		
 		//to save which key is pressed
 		this.keyIsDown = {};
@@ -153,8 +155,7 @@ Kata.require([
 	    if(!obj.inDB){
 	    	//if object was not placed correctly from beginning, it's active and the application is in furniture-mode
 	    	if(obj.active){
-	    		this.activeFurniture = obj;
-	    		this.mode = "furniture";
+	    		this.changeMode(obj);
 	    	}
 	    	//if it was placed correctly, it's not active and we can write it in the DB
 	    	else{
@@ -193,6 +194,10 @@ Kata.require([
     		    			});    		    	
     			},'json');
     } 
+    
+    User.prototype.destroyFurniture = function(){
+    	//TODO
+    }
     
     /**
      * checks the database for furniture that are already in that room
@@ -234,7 +239,6 @@ Kata.require([
         		    			  loc:{scale: "1.0"} //just to match the code..
         		    			});
     				}
-    		
     			},'json');    	
     }
 
@@ -418,6 +422,7 @@ Kata.require([
 				}
 				
 				if (furn ||this.mode=="furniture"){	
+					this.initiator == this.presence.mID;
 					this.changeMode(furn);
 				}
 			}
@@ -439,11 +444,11 @@ Kata.require([
 			}
 		}
 		if(msg.msg =="mousemove"){
-			if(this.mode == "furniture")
+			if(this.mode == "furniture" && (this.initiator == this.presence.mID))
 				this.activeFurniture.moveFurnitureToMouse(msg.x, msg.y);			
 		}		
 		if(msg.msg == "drag" && this.mode == "furniture"){
-			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2){
+			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2 && (this.initiator == this.presence.mID)){
 				this.activeFurniture.rotate(msg.dx, msg.dy);
 			}
 		}
@@ -640,9 +645,70 @@ Kata.require([
 					}
 					this.activeFurniture = furn;
 				}
-				
+		}	
+		if (this.mode == "furniture"){
+			var args = {
+				initiator: this.initiator,
+				mode: this.mode,
+				groupId: this.activeFurniture.group;
+				};
 		}
+		else{
+			var args = {
+					mode: this.mode				
+				};
+		}
+		this.visitBehavior.sendMessage("mode", args);
 	}
+	
+	/**
+	 * sends a message to all visitors, that the shader of a furniture has changed
+	 * is only called by FurnitureScript
+	 */
+	User.prototype.shaderChanged = function(group, color){
+		var args = {
+			groupId: group,
+			color: color
+			};
+		this.visitBehavior.sendMessage("shader", args);
+	}
+	
+	
+	/*
+	 * Methods to handle incoming messages from visitors:
+	 * changeMode:	changes the mode depending on msg.groupId (the object that was clicked on)
+	 * 			  	furniture -> camera: checks if the initiator is also this.initiator (initiator of furniture mode)
+	 * 			  	camera -> furniture: set this.initiator to initiator.
+	 * 			  	the method "changeMode" sends the message to all visitors that the mode has changed.
+	 * 
+	 * move:		moves the activeFurniture to the given position
+	 * rotate: 		rotates the activeFurniture by the given coordinates
+	 * create:		creates a new object with the given parameters.
+	 * destroy: 	destroys the given object 
+	 * 	
+	 */	
+	User.prototype.handleChangeMode = function(msg){
+		
+	} 
+	
+	User.prototype.handleMove = function(msg){
+		
+	}
+	
+	User.prototype.handleRotate = function(msg){
+		
+	}
+	
+	User.prototype.handleCreate = function(msg){
+		
+	}
+	
+	User.prototype.handleDestroy = function(msg){
+		//TODO
+	}
+	
+		
+	
 
 	
 	

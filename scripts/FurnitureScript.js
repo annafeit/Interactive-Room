@@ -37,7 +37,8 @@ Kata.require([
 		this.xml3d = document.getElementsByTagName("xml3d")[0];
 		
 		//save furniture in userscript
-    	document.userScript.furniture.push(this);    	
+		this.owner = document.userScript;
+    	this.owner.furniture.push(this);    	
 		
 		SUPER.constructor.call(this, channel, args, function(){});
 			
@@ -75,7 +76,7 @@ Kata.require([
 		
         this.setInitialPos();
         
-        var loads = document.userScript.loadedFurnitures;
+        var loads = this.owner.loadedFurnitures;
 		var loaded;
 		for (var i = 0; i<loads.length;i++){
 			if(loads[i] == this.presence.mID){
@@ -147,7 +148,7 @@ Kata.require([
 				this.changeShader("normal");
 			}
 		}
-		document.userScript.furnitureCreated(this, this.inDB);
+		this.owner.furnitureCreated(this, this.inDB);
 	}
 	
 	/**
@@ -223,6 +224,7 @@ Kata.require([
 		
 		this.shader = color;		
 		this.xml3d.update();		
+		this.owner.shaderChanged(this.group, this.shader);
 	}
 		
 	/**
@@ -311,7 +313,7 @@ Kata.require([
 		}
 		else{
 			var thus = this;
-			$.post('scripts/createFurniture.php', {furnitureId: this.furnitureId, roomId: document.userScript.roomId, position: pos, orientation: or}, 
+			$.post('scripts/createFurniture.php', {furnitureId: this.furnitureId, roomId: this.owner.roomId, position: pos, orientation: or}, 
 					function(data, jqxhr){
 						thus.dbID = data[0];
 					},'json');
@@ -405,7 +407,7 @@ Kata.require([
 	 * computes the wall this furniture is actually placed on
 	 */
 	Furniture.prototype.getWall = function(){
-		var camPos = document.userScript.camera.position;		
+		var camPos = this.owner.camera.position;		
 		var now = new Date();
 		var meshPos = this.presence.predictedPosition(now);
 		

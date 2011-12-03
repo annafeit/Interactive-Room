@@ -25,7 +25,6 @@ Kata.require([
         this.owner = {};
         
         this.type = type;
-
     };
 
     Kata.Behavior.Visit.prototype.ProtocolPort = 12;
@@ -149,24 +148,30 @@ Kata.require([
         	}
             
         }
-
         if (container_msg.HasField("create")) {
-            
+        	if(this.parent.handleCreate)
+        		this.parent.handleCreate(container_msg.create);
         }
-        if (container_msg.HasField("create")) {
-            
+        if (container_msg.HasField("destroy")) {
+        	if(this.parent.handleDestroy)
+        		this.parent.handleDestroy(container_msg.destroy);
         }
-        if (container_msg.HasField("create")) {
-            
+        if (container_msg.HasField("mode")) {
+        	if(this.parent.handleChangeMode)
+        		this.parent.handleChangeMode(container_msg.mode);
         }
-        if (container_msg.HasField("create")) {
-            
+        if (container_msg.HasField("move")) {
+        	if(this.parent.handleMove)
+        		this.parent.handleMove(container_msg.move);
         }
-        if (container_msg.HasField("create")) {
-            
+        if (container_msg.HasField("rotate")) {
+        	if(this.parent.handleRotate)
+        		this.parent.handleRotate(container_msg.rotate);
         }
-        
-        
+        if (container_msg.HasField("shader")) {
+        	if(this.parent.handleChangeShader)
+        		this.parent.handleChangeShader(container_msg.shader);
+        }
     };
     
     /**
@@ -191,9 +196,12 @@ Kata.require([
     		switch (type){
     			case "mode":
     				msg = new Visit.Protocol.Mode();
-    	            msg.mode = args.mode;
-    	            if(args.mesh)
-    	            	msg.mesh = args.mesh;    	            
+    				if(msg.mode)
+						msg.mode = args.mode;
+					if(args.mesh)
+						msg.mesh = args.mesh;
+					if(msg.initiator)
+						msg.initiator = args.initiator;  	            
     	            container_msg.mode = msg;
     			case "shader":
     				msg = new Visit.Protocol.Shader();
@@ -215,9 +223,12 @@ Kata.require([
     		switch (type){
 				case "mode":
 					msg = new Visit.Protocol.Mode();
-					msg.mode = args.mode;
+					if(msg.mode)
+						msg.mode = args.mode;
 					if(args.mesh)
-						msg.mesh = args.mesh;    	            
+						msg.mesh = args.mesh;
+					if(msg.initiator)
+						msg.initiator = args.initiator;
 	    	        container_msg.mode = msg;
 				case "move":
 					msg = new Visit.Protocol.Move();
@@ -235,6 +246,7 @@ Kata.require([
 					msg.inDB = false;
 					msg.type = args.type;
 					msg.name = args.name;
+					msg.initiator = args.initiator;
 					container_msg.create = msg;
 				case "destroy":
 					msg = new Visit.Protocol.Destroy();

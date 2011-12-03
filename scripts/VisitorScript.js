@@ -24,15 +24,13 @@ Kata.require([
 		this.space=args.space;	
 		this.roomMesh = args.world;	
 		
-		//to store all furniture of the room
-		this.furniture = new Array();
-		this.activeFurniture;
-		
 		/*
 		 * "camera" mode: moving camera by drag 
 		 * "furniture" mode: moving furniture by drag and drop
 		 */		
-		this.mode="camera";	 
+		this.mode="camera";
+		this.activeFurniture;
+		this.initiator = false;
 				
 		//to save which key is pressed
 		this.keyIsDown = {};
@@ -124,7 +122,7 @@ Kata.require([
 		
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
-		$(".furniture").live("click",function(){thus.createFurniture(this, false)});
+		$(".furniture").live("click",function(){thus.createFurniture(this)});
 						
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
@@ -133,6 +131,37 @@ Kata.require([
         //send a introduction message to every user
         
 	};
+	
+	Visitor.prototype.createFurniture = function(obj){
+    	var prev = obj.getAttribute("preview");
+    	var id = obj.getAttribute("id");  
+    	var type = obj.getAttribute("type");   
+    	var name = obj.getAttribute("name");  
+    	var thus = this;
+    	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
+    			function(data, jqxhr){     				
+    				var url = kata_base_offset + data[0];
+    				//create new object in world      				
+    				var args = {    		    			    		    	
+    		    			center: thus.center,
+    		    			id:id,
+    		    			mesh: url,    		    			
+    		    			type:type,
+    		    			name:name, 
+    		    			initiator: this.presence.mID
+    		    			};
+    				thus.visitBehavior.sendMessage("create", args);
+    			},'json');
+    } 
+	
+	Visitor.prototype.destroyFurniture = function (groupId){
+		if(this.initiator){
+			var args = {
+					groupId: groupId
+				};
+			this.visitBehavior.sendMessage("destroy", args);
+		}
+	}
 
 	Visitor.prototype.parseScene = function(){
 		//camera
@@ -280,35 +309,26 @@ Kata.require([
 			if (msg.mesh==this.roomMesh){
 				this.setCamToDoor();
 				this.parseScene();
-			}
-			else{
-				for(var i = 0; i<this.furniture.length; i++){
-					var furn = this.furniture[i];
-					if(furn.presence.mID == msg.id){
-						furn.meshLoaded();
-					}
-				}
-			}
-			
-			
+			}			
 		}
 		if(msg.msg=="click"){	
 			if (msg.event.timeStamp -200 < lastClick ){
 				msg.msg = "doubleclick";
 			}
-			else{/*
+			else{
+				//send a mode-message to the owner
 				var furn = null;
 				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
 				if(mesh){
 					var obj = mesh.parentElement;
-					furn = this.furnitureFromXML3D(obj);
+					var args = {
+						initiator: this.presence.mID
+						groupId: obj.id
+						};				
+					this.visitBehavior.sendMessage("mode", args);
 				}
-				
-				if (furn ||this.mode=="furniture"){	
-					this.changeMode(furn);
-				}*/
 			}
-			lastClick = msg.event.timeStamp; //TODO send message to owner 			
+			lastClick = msg.event.timeStamp;			
 		}
 		if(msg.msg == "doubleclick"){
 			//move and rotate camera such that it looks at the center of the object that was clicked on.			
@@ -322,17 +342,28 @@ Kata.require([
 				point.z = pos.z;
 				var cam = this.setCamUpToY(this.camera);
 				cam = this.lookAt(point, cam);
-				this.updatePresence(cam.position, cam.orientation); //TODO find object and get position of remote object
+				this.updatePresence(cam.position, cam.orientation);
 			}
 		}
 		if(msg.msg =="mousemove"){
-			if(this.mode == "furniture")
-				this.activeFurniture.moveFurnitureToMouse(msg.x, msg.y);			
+			//send a move message to the owner
+			if(this.mode == "furniture" && this.initiator){
+				var coord = msg.x + " " + msg.y;
+				var args = {
+					move: coord
+					};
+				this.visitBehavior.sendMessage("move", args);
+			}
+							
 		}		
 		if(msg.msg == "drag" && this.mode == "furniture"){
-			/*if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2){
-				this.activeFurniture.rotate(msg.dx, msg.dy);
-			}*///TODO send message to owner
+			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2 && this.initiator){
+				var coord = msg.dx + " " + msg.dy;
+				var args = {
+					rotate: coord
+					};
+				this.visitBehavior.sendMessage("rotate", args);
+			}
 		}
 		/** camera Navigation **/
 		if(msg.msg == "drag" && this.mode == "camera"){
@@ -495,42 +526,18 @@ Kata.require([
 			}
 		}
 	}
-	
-	/**
-	 * changes mode and activeFurniture in Visitorscript, changes active state and shader of furniture
-	 * furn: the furniture that was clicked on
-	 * mode: the new mode
+		
+	/*
+	 * Methods to handle incoming messages from owner:
+	 * handleChangeMode: sets this.mode to msg.mode and this.activeFurniture to msg.activeFurniture.
+	 * handleChangeShader: changes the shader of the given group (furniture) to msg.color.
 	 */
-	Visitor.prototype.changeMode = function (furn){					
-		//from 'camera' to 'furniture'
-		if (this.mode == "camera"){
-			this.mode = "furniture";
-			this.activeFurniture = furn;
-			this.activeFurniture.setActive(true);
-			//change shader
-			if (this.activeFurniture.shader == "normal"){				
-				this.activeFurniture.changeShader("green");
-			} 
-			   
-		}
-		else if(!(this.activeFurniture.shader == "red")){
-				if (this.activeFurniture == furn || !(furn)){
-					this.mode = "camera";
-					this.activeFurniture.setActive(false);											
-					this.activeFurniture.changeShader("normal");				
-					this.activeFurniture = null;
-				}
-				else{
-					this.activeFurniture.setActive(false);								
-					this.activeFurniture.changeShader("normal");
-					furn.setActive(true);
-					if (furn.shader == "normal"){				
-						furn.changeShader("green");
-					}
-					this.activeFurniture = furn;
-				}
-				
-		}
+	Visitor.prototype.handleChangeMode = function(msg){
+		
+	} 
+	
+	Visitor.prototype.handleChangeShader = function(msg){
+		
 	}
 
 	
