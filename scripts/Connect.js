@@ -74,7 +74,7 @@ function graphicsReady() {
 }
 
 function loadGFX(){
-	Kata.GraphicsSimulation.initializeDriver(driver,null, graphicsReady);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
+	Kata.GraphicsSimulation.initializeDriver(driver,"static/meshes/scene.xml3d", graphicsReady);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
 }
 
 function connectVisitor(address, name, esh){
@@ -120,7 +120,7 @@ function graphicsReadyVisitor() {
 }
 
 function loadGFXVisitor(){
-	Kata.GraphicsSimulation.initializeDriver(driver,null, graphicsReadyVisitor);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
+	Kata.GraphicsSimulation.initializeDriver(driver, "static/meshes/scene.xml3d", graphicsReadyVisitor);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
 }
 
 

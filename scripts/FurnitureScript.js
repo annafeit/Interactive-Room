@@ -13,6 +13,7 @@ Kata.require([
 	 * 
 	 * id of the corresponding group in the xml3d scene
 	 * this.name + this.presence.mID
+	 * 
 	 */
 	Furniture = function(channel, args){
 		this.mesh = args.visual.mesh;
@@ -53,12 +54,12 @@ Kata.require([
 	*/
     User.prototype.proxEvent = function(remote, added) {
         if (added){
-        	Kata.warn("Camera Discover object.");
+        	Kata.warn("Furniture Discovered object.");
 	        this.presence.subscribe(remote.id());
 	        this.mOther = remote;
         }
         else{
-        	Kata.warn("Camera wiped object");
+        	Kata.warn("Furniture wiped object");
         }
     };
 	
@@ -73,9 +74,8 @@ Kata.require([
 		
 		this.presence.setQueryHandler(Kata.bind(this.proxEvent, this));
         this.presence.setQuery(0);
-		
-        this.setInitialPos();
-        
+ 
+        //checks if the has already been loaded
         var loads = this.owner.loadedFurnitures;
 		var loaded;
 		for (var i = 0; i<loads.length;i++){
@@ -113,33 +113,36 @@ Kata.require([
 						p.y = box.min.y;
 						loc.pos = [p.x, p.y, p.z];	    
 						this.presence.setLocation(loc);
+						break;
 					case "wall": 
 						//TODO look for wall that's in camera view
+						break;
 					case "ceiling":
 						var box = org.xml3d.util.getWorldBBox(walls[0]);
 						p.y = box.min.y;
 						loc.pos = [p.x, p.y, p.z];	    
 						this.presence.setLocation(loc);				
+						break;
 					default: console.log("furniture " + this.name + this.presence.mID +": wrong type")
 				}
 			}
 		}
-		this.lastValidPosition = this.presence.predictedLocationAtTime(now);
+		if(this.shader = "normal"){
+			this.lastValidPosition = this.presence.predictedLocationAtTime(now);
+		}
 	}
 	
 	/*
-	 * TODO have to send a message when it's loaded.
-	 */
-	
+	 * If the mesh is loaded in initially parses the xml3d file for it's group, all children of it's group
+	 * and the green and red shaders.
+	 */	
 	Furniture.prototype.meshLoaded = function(){
 		//save corresponding group in xml3d-scene
 		this.group = document.getElementById(this.name + this.presence.mID);
-		this.parentGroup = document.getElementById(this.presence.mID);
+		this.parseScene();
 		this.centerMesh();
-
-        
-		//check for intersections in initial position
-		//TODO mesh isnt rendered in the initalPos on this point. -> intersection with wall1 why?
+		this.setInitialPos();
+		
 		if(!(this.inDB)){
 			if(this.checkForIntersections()){			
 				this.active = true;			
@@ -159,24 +162,28 @@ Kata.require([
 	 * The z-coordinate is -0.1 for wall furnitures  
 	 */
 	Furniture.prototype.centerMesh = function(){
-		var transform = document.getElementById(this.parentGroup.transform);
+		var transform = document.getElementById(this.group.transform);
 		if(!transform){
 			//TODO create new transformation and assign it
 		}
+		//TODO doesnt work
 		var center = Helper.objLocalCenter(this.group);
 		switch (this.type){
 			case "floor":
 				transform.translation.x = -center.x;
-				transform.translation.y = -50;
-				transform.translation.z = center.z;
+				transform.translation.y = ((-1)*this.group.getBoundingBox().min.y);
+				transform.translation.z = -center.z;
+				break;
 			case "wall":
 				transform.translation.x = -center.x;
 				transform.translation.y = -center.y
 				transform.translation.z = -1;
+				break;
 			case "ceiling":
 				transform.translation.x = -center.x;
-				transform.translation.y = -1
+				transform.translation.y = ((-1)*this.group.getBoundingBox().max.y)
 				transform.translation.z = center.z;
+				break;
 		
 		}
 	}
@@ -195,7 +202,6 @@ Kata.require([
 		else{
 			this.changeShader("green");
 		}
-		console.log(intersectionGroup);
 		return intersectionGroup;
 	}
 	
@@ -215,36 +221,48 @@ Kata.require([
 	}
 	
 	Furniture.prototype.changeShader = function(color){
-		// if scene wasn't parsed yet
-		if (this.materials.red == null){
-			this.parseScene();
+		if(color == "normal"){
+			var parent = this.group.parentElement;
+			$(this.group).remove();
+			$(parent).append(this.normalGroup);
 		}
-		var obj = document.getElementById(this.name+this.presence.mID);
-		obj.setAttribute("shader", "#"+this.materials[color] );
-		
+		else{
+			// if scene wasn't parsed yet		
+			if (this.materials.red == null){
+				this.parseScene();
+			}		
+			var children = this.group.getElementsByTagName("group");
+			for(var i=0; i < children.length; i++){
+				var child = children[i];
+				if (child.hasAttribute("shader")){
+					child.setAttribute("shader", "#"+this.materials[color] );
+				}
+			}
+		}
 		this.shader = color;		
 		this.xml3d.update();		
 		this.owner.shaderChanged(this.group, this.shader);
 	}
 		
 	/**
-	 * parses the xml3d file and saves the different shaders in the material array. 
+	 * parses the xml3d file:
+	 * saves the red and green shaders in the material array.
+	 * saves all child nodes of this.group 
 	 */
 	Furniture.prototype.parseScene = function(){	
         var materials = document.getElementsByTagName("shader");	    
 	    //finds id of red, green and normal shader
 	    for (var i = 0; i<materials.length; i++){
 		    var material = materials[i].id;
-		    if (material.substr(0,3) == "red"){
+		    if (material.substr(0,11) =="redMaterial"){
 		    	this.materials.red = material;
 		    }
-		    if (material.substr(0,5) == "green"){
+		    if (material.substr(0,13) =="greenMaterial"){
 		    	this.materials.green = material;
 		    }
-		    if (material.substr(0,6) == "normal"){
-		    	this.materials.normal = material;
-		    }
 	    }
+	    
+	    this.normalGroup = $(this.group).clone();
 	}
 	
 	Furniture.prototype.setActive = function(b){
@@ -278,23 +296,26 @@ Kata.require([
 			switch (this.type){		
 				case "floor": 
 					this.movePresence(hitPoint);
+					break;
 				case "wall":
 					//TODO change orientation
 					this.movePresence(hitPoint);
+					break;
 				case "ceiling":
 					this.movePresence(hitPoint);
+					break;
 			}
 		}
 		//check for intersections
 		var group = this.checkForIntersections();
 		if(group){
-			var type = group.getAttribute("type");
-			if(type == "wall" || type == "ceiling" || type == "floor"){
+			//TODO wieso dauert es so lange bis er sich wieder bewegt, wenn ich das mache?
+			/*var type = group.getAttribute("type");
+			if((type == "wall" || type == "ceiling" || type == "floor") && this.lastValidPosition){
 				//object intersects with a wall -> move back to last valid position
-				//TODO doesnt work
-				this.presence.setLocation(this.lastValidPosition);
-				var b = this.checkForIntersections();
-			}
+				this.movePresenceToLastValid();
+				this.changeShader("green");
+			}*/
 		}
 		else{
 			var now = new Date();
@@ -342,6 +363,20 @@ Kata.require([
 	}
 	
 	/**
+	 * helper function to update the presence's position and orientation to 
+	 * the last valid position
+	 *
+	 */
+	Furniture.prototype.movePresenceToLastValid = function (){
+		 var now = new Date();
+	     var loc = this.presence.predictedLocationAtTime(now);		     
+	     //create location	    
+	     loc.pos = this.lastValidPosition.pos;
+	     loc.orient = this.lastValidPosition.orient;	     
+	     this.presence.setLocation(loc);	    
+	}
+	
+	/**
 	 * rotates the Furniture by doing the following:
 	 * for type floor:
 	 * (1) take the center of the obj projected on the floor 
@@ -380,6 +415,7 @@ Kata.require([
                 mousePos.y = 0;
                 
                 up.x = 0; up.y = 1; up.z = 0;
+                break;
         	case "ceiling":
         		var box = org.xml3d.util.getWorldBBox(this.getWall());
         		centerVec.x = center.x;
@@ -389,17 +425,20 @@ Kata.require([
                 mousePos.x = center.x + dx;
                 mousePos.z = center.z + dy;
                 mousePos.y = box.min.y;
+                break;
         		
         }        
         
         var dir = mousePos.subtract(centerVec);
-        dir = dir.negate().normalize();
+        dir = dir.normalize();
         
         var right = up.cross(dir).normalize();
         up = dir.cross(right).normalize();
         
-        var orientation = XML3DRotation.fromBasis(right, up, dir);       
+        var orientation = XML3DRotation.fromBasis(right, up, dir);  
+        orientation.setAxisAngle(orientation.axis, orientation.angle*(-1));
         this.movePresence(null, orientation);
+        this.checkForIntersections();
 	}	
 	
 	
@@ -419,8 +458,7 @@ Kata.require([
 		ray.origin = camPos;
 		ray.direction = direction;
 		
-		var group = Helper.rayIntersectsWalls(ray, this.type);
-		console.log(group)
+		var group = Helper.rayIntersectsWalls(ray, this.type);		
 		return 	group;	
 	}
 	

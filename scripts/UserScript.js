@@ -171,28 +171,31 @@ Kata.require([
     	
     }
         
-    User.prototype.createFurniture = function(obj, inDB){
-    	var prev = obj.getAttribute("preview");
-    	var id = obj.getAttribute("id");  
-    	var type = obj.getAttribute("type");   
-    	var name = obj.getAttribute("name");  
-    	var thus = this;
-    	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
-    			function(data, jqxhr){     				
-    				var url = kata_base_offset + data[0];
-    				//create new object in world      				
-    		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
-    		    			"Furniture",
-    		    			{ space:thus.space,    		    		
-    		    			  center: thus.center,
-    		    			  id:id,
-    		    			  visual:{mesh: url},
-    		    			  inDB:inDB,
-    		    			  type:type,
-    		    			  name:name,
-    		    			  loc:{scale: "1.0"} //just to match the code..
-    		    			});    		    	
-    			},'json');
+    User.prototype.createFurniture = function(obj, inDB){ 
+	    if(this.mode == "camera"){
+	    	var prev = obj.getAttribute("preview");
+	    	var id = obj.getAttribute("id");  
+	    	var type = obj.getAttribute("type");   
+	    	var name = obj.getAttribute("name");  
+	    	var thus = this;
+	    	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
+	    			function(data, jqxhr){     				
+	    				var url = kata_base_offset + data[0];
+	    				//create new object in world   
+	    				thus.initiator = thus.presence.mID;
+	    		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
+	    		    			"Furniture",
+	    		    			{ space:thus.space,    		    		
+	    		    			  center: thus.center,
+	    		    			  id:id,
+	    		    			  visual:{mesh: url},
+	    		    			  inDB:inDB,
+	    		    			  type:type,
+	    		    			  name:name,
+	    		    			  loc:{scale: "1.0"} //just to match the code..
+	    		    			});    		    	
+	    			},'json');
+	    }
     } 
     
     User.prototype.destroyFurniture = function(){
@@ -220,10 +223,11 @@ Kata.require([
     					pos[1] = parseInt(pos[1]);
     					pos[2] = parseInt(pos[2]);
     					var or = obj.orientation.split(" ");
-    					or[0] = parseInt(or[0]);
-    					or[1] = parseInt(or[1]);
-    					or[2] = parseInt(or[2]);
-    					or[3] = parseInt(or[3]);
+    					var orient = new Array();
+    					orient[0] = parseInt(or[0]);
+    					orient[1] = parseInt(or[1]);
+    					orient[2] = parseInt(or[2]);
+    					orient[3] = parseInt(or[3]);
     					
     					thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
         		    			"Furniture",
@@ -417,12 +421,16 @@ Kata.require([
 				var furn = null;
 				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
 				if(mesh){
-					var obj = mesh.parentElement;
+					var obj = mesh;
+					//take parent element as long as there is no parent element or the parent elementis the furnituregroup (has type "on...")
+					while(!(obj) || !(obj.hasAttribute("type")) || !(obj.getAttribute("type").substr(0,2) == "on")){
+						obj = obj.parentElement;
+					}
 					furn = this.furnitureFromXML3D(obj);
 				}
 				
 				if (furn ||this.mode=="furniture"){	
-					this.initiator == this.presence.mID;
+					this.initiator = this.presence.mID;
 					this.changeMode(furn);
 				}
 			}
@@ -650,7 +658,7 @@ Kata.require([
 			var args = {
 				initiator: this.initiator,
 				mode: this.mode,
-				groupId: this.activeFurniture.group;
+				groupId: this.activeFurniture.group.id
 				};
 		}
 		else{
@@ -667,7 +675,7 @@ Kata.require([
 	 */
 	User.prototype.shaderChanged = function(group, color){
 		var args = {
-			groupId: group,
+			groupId: group.id,
 			color: color
 			};
 		this.visitBehavior.sendMessage("shader", args);
@@ -684,27 +692,74 @@ Kata.require([
 	 * move:		moves the activeFurniture to the given position
 	 * rotate: 		rotates the activeFurniture by the given coordinates
 	 * create:		creates a new object with the given parameters.
+	 * 				Does also save the initiator in case the object isn't placed initially right and has to be moved.
 	 * destroy: 	destroys the given object 
 	 * 	
 	 */	
 	User.prototype.handleChangeMode = function(msg){
-		
+		var obj = document.getElementById(msg.groupId);
+		var furn = this.furnitureFromXML3D(obj);
+
+		if (furn ||this.mode=="furniture"){	
+			this.initiator = msg.initiator;
+			this.changeMode(furn);
+		}
 	} 
 	
-	User.prototype.handleMove = function(msg){
-		
+	User.prototype.handleMove = function(msg){		
+		var coord = msg.move.split(" ");
+		this.activeFurniture.moveFurnitureToMouse(coord[0], coord[1]);	
 	}
 	
 	User.prototype.handleRotate = function(msg){
-		
+		var coord = msg.rotate.split(" ");
+		this.activeFurniture.rotate(coord[0], coord[1]);
 	}
 	
 	User.prototype.handleCreate = function(msg){
-		
+		this.initiator = msg.initiator;
+		this.createObject(kata_base_offset + "scripts/FurnitureScript.js",
+    			"Furniture",
+    			{ space:this.space,    		    		
+    			  center: msg.center,
+    			  id:msg.id,
+    			  visual:{mesh: msg.mesh},
+    			  inDB:msg.inDB,
+    			  type:msg.type,
+    			  name:msg.name,
+    			  loc:{scale: "1.0"} //just to match the code..
+    			});   
 	}
 	
 	User.prototype.handleDestroy = function(msg){
 		//TODO
+	}
+	
+	/**
+	 * send mode, activeFurniture and color of activeFurniture
+	 */
+	User.prototype.sendRoomConfiguration = function(dest){
+		if (this.mode == "furniture"){
+			var args = {
+				initiator: this.initiator,
+				mode: this.mode,
+				groupId: this.activeFurniture.group.id
+				};
+			
+			var args2 = {
+				groupId: this.activeFurniture.group.id,
+				color: this.activeFurniture.shader
+				};
+			
+			this.visitBehavior.sendMessageTo("shader", args2, dest);				
+		}
+		else{
+			var args = {
+					mode: this.mode				
+				};
+		}
+		
+		this.visitBehavior.sendMessageTo("mode", args, dest);		
 	}
 	
 		

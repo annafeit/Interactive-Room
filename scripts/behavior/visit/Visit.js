@@ -60,21 +60,22 @@ Kata.require([
 	            presence : presence,
 	            dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
 	        };
-	    }
-        // Always send an initial update TODO update for shaders, mode and activeFurniture
-        //this._sendUpdate();
+	        this.parent.sendRoomConfiguration(this.visitors[remoteID]);
+	    }  
     };
 
     
     
     Kata.Behavior.Visit.prototype._handleIntroOwner = function(presence, remoteID) {
-    	if (!(this.owner.id)){	//don't want to overwrite the owner presence        	
-            this.owner = {
-            	id: remoteID.mObject,
-                presence : presence,
-                dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
-            };
-        }
+    	if(this.type == "visitor"){
+	    	if (!(this.owner.id)){	//don't want to overwrite the owner presence        	
+	            this.owner = {
+	            	id: remoteID.mObject,
+	                presence : presence,
+	                dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
+	            };
+	        }
+    	}
     }
     
     /**
@@ -86,8 +87,7 @@ Kata.require([
     	    document.location.href="mainMenu.xhtml";    	    
     	}
 	    else{
-	        if (this.visitors[remoteID]) {
-	            var objdata = this.visitors[remoteID];
+	        if (this.visitors[remoteID]) {	            
 	            delete this.visitors[remoteID];
 	        }
 	    }
@@ -118,7 +118,7 @@ Kata.require([
             if(this.type == "owner")
             	intro_msg.visitor = false;	//this is the owner of the room
             else
-            	intro_msg.visitor = false;	//this is a visitor of the room
+            	intro_msg.visitor = true;	//this is a visitor of the room
             var container_msg = new Visit.Protocol.Container();
             container_msg.intro = intro_msg;
 
@@ -196,13 +196,11 @@ Kata.require([
     		switch (type){
     			case "mode":
     				msg = new Visit.Protocol.Mode();
-    				if(msg.mode)
-						msg.mode = args.mode;
-					if(args.mesh)
-						msg.mesh = args.mesh;
-					if(msg.initiator)
-						msg.initiator = args.initiator;  	            
+					msg.mode = args.mode;
+					msg.mesh = args.mesh;
+					msg.initiator = args.initiator;  	            
     	            container_msg.mode = msg;
+    	            break;
     			case "shader":
     				msg = new Visit.Protocol.Shader();
     				msg.groupId = args.groupId;
@@ -213,7 +211,7 @@ Kata.require([
     		for(var remote_key in this.visitors) {
               var visitor = this.visitors[remote_key];
               var odp_port = this._getPort(visitor.presence);
-              odp_port.send(objdata.dest, this._serializeMessage(container_msg));
+              odp_port.send(visitor.dest, this._serializeMessage(container_msg));
           }
     	}
     	else{
@@ -223,21 +221,21 @@ Kata.require([
     		switch (type){
 				case "mode":
 					msg = new Visit.Protocol.Mode();
-					if(msg.mode)
-						msg.mode = args.mode;
-					if(args.mesh)
-						msg.mesh = args.mesh;
-					if(msg.initiator)
-						msg.initiator = args.initiator;
+					msg.mode = args.mode;
+					msg.groupId = args.groupId;
+					msg.initiator = args.initiator;
 	    	        container_msg.mode = msg;
+	    	        break;
 				case "move":
 					msg = new Visit.Protocol.Move();
 					msg.move = args.move;				//of form "x y"
 					container_msg.move = msg;
+					break;
 				case "rotate":
 					msg = new Visit.Protocol.Rotate();
 					msg.rotate = args.rotate;			//of form "dx dy"
 					container_msg.rotate = msg;
+					break;
 				case "create":
 					msg = new Visit.Protocol.Create();
 					msg.center = args.center;
@@ -248,6 +246,7 @@ Kata.require([
 					msg.name = args.name;
 					msg.initiator = args.initiator;
 					container_msg.create = msg;
+					break;
 				case "destroy":
 					msg = new Visit.Protocol.Destroy();
 					msg.groupId = args.groupId; 
@@ -256,9 +255,36 @@ Kata.require([
     		//send message to owner
     		var owner = this.owner;
             var odp_port = this._getPort(owner.presence);
-            odp_port.send(objdata.dest, this._serializeMessage(container_msg));
+            odp_port.send(owner.dest, this._serializeMessage(container_msg));
     	}
     		
+    }
+    
+    //currently only used by owner
+    Kata.Behavior.Visit.prototype.sendMessageTo = function(type, args, visitor){
+    	//create message
+		var msg;
+		var container_msg = new Visit.Protocol.Container();
+		switch (type){
+			case "mode":
+				msg = new Visit.Protocol.Mode();
+				if(msg.mode)
+					msg.mode = args.mode;
+				if(args.mesh)
+					msg.mesh = args.mesh;
+				if(msg.initiator)
+					msg.initiator = args.initiator;  	            
+	            container_msg.mode = msg;
+	            break;
+			case "shader":
+				msg = new Visit.Protocol.Shader();
+				msg.groupId = args.groupId;
+				msg.color = args.color;    				
+				container_msg.shader = msg;
+		}
+		//send message to all visitors
+		var odp_port = this._getPort(visitor.presence);
+		odp_port.send(visitor.dest, this._serializeMessage(container_msg));     
     }
 
 }, '../../scripts/behavior/visit/Visit.js');

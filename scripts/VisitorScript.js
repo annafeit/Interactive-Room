@@ -43,9 +43,12 @@ Kata.require([
 		this.keyIsDown[this.Keys.A] = false;
 		this.keyIsDown[this.Keys.S] = false;
 		this.keyIsDown[this.Keys.D] = false;
-						
+		
+		this.material = {red: null, green: null, normal: null};
+		
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
+		
 		
 		
 		//for sending messages
@@ -133,25 +136,27 @@ Kata.require([
 	};
 	
 	Visitor.prototype.createFurniture = function(obj){
-    	var prev = obj.getAttribute("preview");
-    	var id = obj.getAttribute("id");  
-    	var type = obj.getAttribute("type");   
-    	var name = obj.getAttribute("name");  
-    	var thus = this;
-    	$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
-    			function(data, jqxhr){     				
-    				var url = kata_base_offset + data[0];
-    				//create new object in world      				
-    				var args = {    		    			    		    	
-    		    			center: thus.center,
-    		    			id:id,
-    		    			mesh: url,    		    			
-    		    			type:type,
-    		    			name:name, 
-    		    			initiator: this.presence.mID
-    		    			};
-    				thus.visitBehavior.sendMessage("create", args);
-    			},'json');
+		if(this.mode=="camera"){
+			var prev = obj.getAttribute("preview");
+			var id = obj.getAttribute("id");  
+			var type = obj.getAttribute("type");   
+			var name = obj.getAttribute("name");  
+			var thus = this;
+			$.post('scripts/getMeshFromFurniturePreview.php', {preview: prev}, 
+					function(data, jqxhr){     				
+						var url = kata_base_offset + data[0];
+						//create new object in world      				
+						var args = {    		    			    		    	
+				    			center: thus.center,
+				    			id:id,
+				    			mesh: url,    		    			
+				    			type:type,
+				    			name:name, 
+				    			initiator: this.presence.mID
+				    			};
+						thus.visitBehavior.sendMessage("create", args);
+					},'json');
+		}
     } 
 	
 	Visitor.prototype.destroyFurniture = function (groupId){
@@ -168,25 +173,25 @@ Kata.require([
         var activeViewId = this.xml3d.activeView;
         this.camera = document.getElementById(activeViewId);
         
-        var materials = document.getElementsByTagName("shader");
-	    var material;
-	    var transparent;
+        var materials = document.getElementsByTagName("shader");	    
 	     
 	     //finds id of material-shader and transparent-shader
 	     for (var i = 0; i<materials.length; i++){
-	    	 material = materials[i].id;
+	    	 var material = materials[i].id;
 	    	 if (material.substr(0,8) == "material" && material.substr(0,14) != "materialCenter"){
-	    		 break;
+	    		 this.material = material;
+	    	 }	    	 	 		   
+ 		     if (material.substr(0,11) =="redMaterial"){
+ 		    	this.material["red"] = material;
+ 		     }
+ 		     if (material.substr(0,13) =="greenMaterial"){
+ 		    	this.material["green] = material;
+ 		     }
+ 		     if (material.substr(0,19) == "transparentMaterial"){
+ 		    	this.transparentMaterial = material;
 	    	 }
+	 	    
 	     }
-	     for (var i = 0; i<materials.length; i++){
-	    	 transparent = materials[i].id;
-	    	 if (transparent.substr(0,19) == "transparentMaterial"){
-	    		 break;
-	    	 }
-	     }
-	     this.material = material;
-	     this.transparentMaterial = transparent;
 	}
 	
 	  /**
@@ -280,6 +285,31 @@ Kata.require([
 		}
 		this.xml3d.update();
 	}
+	
+	Visitor.prototype.centerMesh = function(mesh){
+		var transform = document.getElementById(mesh.transform);
+		if(!transform){
+			//TODO create new transformation and assign it
+		}
+		var center = Helper.objLocalCenter(mesh);
+		switch (this.type){
+			case "floor":
+				transform.translation.x = -center.x;
+				transform.translation.y = ((-1)*mesh.getBoundingBox().min.y);
+				transform.translation.z = -center.z;
+				break;
+			case "wall":
+				transform.translation.x = -center.x;
+				transform.translation.y = -center.y
+				transform.translation.z = -1;
+				break;
+			case "ceiling":
+				transform.translation.x = -center.x;
+				transform.translation.y = ((-1)*mesh.getBoundingBox().max.y)
+				transform.translation.z = center.z;
+				break;		
+		}
+	}
 
 	
 	//Enum for Keycode
@@ -304,11 +334,16 @@ Kata.require([
 		
 	//Handle messages from GUI
 	Visitor.prototype._handleGUIMessage = function (channel, msg) {
-		//TODO does this script only gets this message from objects hosted by this oh?
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
 				this.setCamToDoor();
 				this.parseScene();
+			}			
+			if(this.activeFurnitureUpdate){
+				var obj = document.getElementById(this.activeFurnitureUpdate.groupId);
+				if(obj){
+					this.handleChangeShader(this.activeFurnitureUpdate);
+				}
 			}			
 		}
 		if(msg.msg=="click"){	
@@ -316,13 +351,12 @@ Kata.require([
 				msg.msg = "doubleclick";
 			}
 			else{
-				//send a mode-message to the owner
-				var furn = null;
+				//send a mode-message to the owner				
 				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
 				if(mesh){
 					var obj = mesh.parentElement;
 					var args = {
-						initiator: this.presence.mID
+						initiator: this.presence.mID,
 						groupId: obj.id
 						};				
 					this.visitBehavior.sendMessage("mode", args);
@@ -529,15 +563,52 @@ Kata.require([
 		
 	/*
 	 * Methods to handle incoming messages from owner:
-	 * handleChangeMode: sets this.mode to msg.mode and this.activeFurniture to msg.activeFurniture.
+	 * handleChangeMode: updates the mode and activeFurniture and checks if it was the initiator of the furniture mode
 	 * handleChangeShader: changes the shader of the given group (furniture) to msg.color.
 	 */
 	Visitor.prototype.handleChangeMode = function(msg){
-		
+		this.mode = msg.mode
+		if (msg.activeFurniture){
+			this.activeFurniture = msg.activeFurniture
+		}
+		else{
+			this.activeFurniture = null
+		}
+		if (this.mode == "furniture" && msg.initiator == this.presence.mID){
+			this.initiator = true;
+		}	
+		else{
+			this.initiator = false;
+		}
 	} 
 	
 	Visitor.prototype.handleChangeShader = function(msg){
+		var group = document.getElementById(msg.groupId);
+		var color = msg.color;
 		
+		if(group){
+			if(color = "normal"){
+				var parent = group.parentElement;
+				$(group).remove();
+				$(parent).append(this.activeFurnitureNormal);
+			}
+			else{
+				this.activeFurnitureNormal = $(group).clone();
+				//change Material of all child-groups of the furniture group
+				var children = group.getElementsByTagName("group");
+				for(var i=0; i < children.length; i++){
+					var child = children[i];
+					if (child.hasAttribute("shader")){
+						child.setAttribute("shader", "#"+this.materials[color] );
+					}
+				}
+			}
+			
+			this.xml3d.update();
+		}
+		else{			
+			this.activeFurnitureUpdate = msg;
+		}
 	}
 
 	

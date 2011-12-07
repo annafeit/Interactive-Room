@@ -72,7 +72,7 @@ Visit.Protocol.Mode = PROTO.Message("Visit.Protocol.Mode",{
 		type: function(){return PROTO.string;},
 		id: 2
 	},
-	mode: {
+	initiator: {
 		options: {},
 		multiplicity: PROTO.optional,
 		type: function(){return PROTO.string;},
@@ -124,7 +124,7 @@ Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 		type: function(){return Visit.Protocol.Destroy;},
 		id: 3
 	},
-	Mode: {
+	mode: {
 		options: {},
 		multiplicity: PROTO.optional,
 		type: function(){return Visit.Protocol.Mode;},
