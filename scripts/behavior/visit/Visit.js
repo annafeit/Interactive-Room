@@ -172,6 +172,10 @@ Kata.require([
         	if(this.parent.handleChangeShader)
         		this.parent.handleChangeShader(container_msg.shader);
         }
+        if (container_msg.HasField("furnitureInfo")) {
+        	if(this.parent.handleFurnitureInfo)
+        		this.parent.handleFurnitureInfo(container_msg.furnitureInfo, this.visitors[src.presenceID()]);
+        }
     };
     
     /**
@@ -197,7 +201,7 @@ Kata.require([
     			case "mode":
     				msg = new Visit.Protocol.Mode();
 					msg.mode = args.mode;
-					msg.mesh = args.mesh;
+					msg.groupId = args.groupId;
 					msg.initiator = args.initiator;  	            
     	            container_msg.mode = msg;
     	            break;
@@ -206,6 +210,7 @@ Kata.require([
     				msg.groupId = args.groupId;
     				msg.color = args.color;    				
     				container_msg.shader = msg;
+    				break;    			
     		}
     		//send message to all visitors
     		for(var remote_key in this.visitors) {
@@ -228,7 +233,7 @@ Kata.require([
 	    	        break;
 				case "move":
 					msg = new Visit.Protocol.Move();
-					msg.move = args.move;				//of form "x y"
+					msg.hitPoint = args.hitPoint;				//of form "x y z"
 					container_msg.move = msg;
 					break;
 				case "rotate":
@@ -251,6 +256,7 @@ Kata.require([
 					msg = new Visit.Protocol.Destroy();
 					msg.groupId = args.groupId; 
 					container_msg.destroy = msg;
+					break;				
     		}
     		//send message to owner
     		var owner = this.owner;
@@ -268,12 +274,9 @@ Kata.require([
 		switch (type){
 			case "mode":
 				msg = new Visit.Protocol.Mode();
-				if(msg.mode)
-					msg.mode = args.mode;
-				if(args.mesh)
-					msg.mesh = args.mesh;
-				if(msg.initiator)
-					msg.initiator = args.initiator;  	            
+				msg.mode = args.mode;
+				msg.mesh = args.mesh;
+				msg.initiator = args.initiator;  	            
 	            container_msg.mode = msg;
 	            break;
 			case "shader":
@@ -281,6 +284,11 @@ Kata.require([
 				msg.groupId = args.groupId;
 				msg.color = args.color;    				
 				container_msg.shader = msg;
+				break;
+			case "furnitureInfo":
+				msg = new Visit.Protocol.FurnitureInfo();
+				msg.groupId = args.groupId;   				
+				container_msg.furnitureInfo = msg;
 		}
 		//send message to all visitors
 		var odp_port = this._getPort(visitor.presence);

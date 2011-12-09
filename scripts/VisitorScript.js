@@ -44,7 +44,8 @@ Kata.require([
 		this.keyIsDown[this.Keys.S] = false;
 		this.keyIsDown[this.Keys.D] = false;
 		
-		this.material = {red: null, green: null, normal: null};
+		this.furnitureShaders = {red: null, green: null, normal: null};
+		this.centerFurniture = new Array();
 		
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
@@ -182,10 +183,10 @@ Kata.require([
 	    		 this.material = material;
 	    	 }	    	 	 		   
  		     if (material.substr(0,11) =="redMaterial"){
- 		    	this.material["red"] = material;
+ 		    	this.furnitureShaders["red"] = material;
  		     }
  		     if (material.substr(0,13) =="greenMaterial"){
- 		    	this.material["green] = material;
+ 		    	this.furnitureShaders["green"] = material;
  		     }
  		     if (material.substr(0,19) == "transparentMaterial"){
  		    	this.transparentMaterial = material;
@@ -286,31 +287,7 @@ Kata.require([
 		this.xml3d.update();
 	}
 	
-	Visitor.prototype.centerMesh = function(mesh){
-		var transform = document.getElementById(mesh.transform);
-		if(!transform){
-			//TODO create new transformation and assign it
-		}
-		var center = Helper.objLocalCenter(mesh);
-		switch (this.type){
-			case "floor":
-				transform.translation.x = -center.x;
-				transform.translation.y = ((-1)*mesh.getBoundingBox().min.y);
-				transform.translation.z = -center.z;
-				break;
-			case "wall":
-				transform.translation.x = -center.x;
-				transform.translation.y = -center.y
-				transform.translation.z = -1;
-				break;
-			case "ceiling":
-				transform.translation.x = -center.x;
-				transform.translation.y = ((-1)*mesh.getBoundingBox().max.y)
-				transform.translation.z = center.z;
-				break;		
-		}
-	}
-
+	
 	
 	//Enum for Keycode
 	Visitor.prototype.Keys = {
@@ -344,7 +321,15 @@ Kata.require([
 				if(obj){
 					this.handleChangeShader(this.activeFurnitureUpdate);
 				}
-			}			
+			}
+			for (var i = 0; i<this.centerFurniture.length;i++){
+				var furn = this.centerFurniture[i];
+				if (furn.indexOf(msg.id) != -1){
+					this.centerFurniture.splice(i, 1);
+					var obj = document.getElementById(furn);
+					this.centerMesh(obj);
+				}
+			}
 		}
 		if(msg.msg=="click"){	
 			if (msg.event.timeStamp -200 < lastClick ){
@@ -353,14 +338,23 @@ Kata.require([
 			else{
 				//send a mode-message to the owner				
 				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
-				if(mesh){
-					var obj = mesh.parentElement;
-					var args = {
-						initiator: this.presence.mID,
-						groupId: obj.id
-						};				
-					this.visitBehavior.sendMessage("mode", args);
+				if(mesh){	
+					var obj = Helper.getFurnitureGroup(mesh);
+					if(obj){
+						var args = {
+								initiator: this.presence.mID,
+								groupId: obj.id
+							};
+						this.visitBehavior.sendMessage("mode", args);
+						return;
+					}
 				}
+				//else for both ifs
+				var args = {
+					initiator: this.presence.mID,						
+					};
+				
+				this.visitBehavior.sendMessage("mode", args);
 			}
 			lastClick = msg.event.timeStamp;			
 		}
@@ -382,11 +376,16 @@ Kata.require([
 		if(msg.msg =="mousemove"){
 			//send a move message to the owner
 			if(this.mode == "furniture" && this.initiator){
-				var coord = msg.x + " " + msg.y;
-				var args = {
-					move: coord
-					};
-				this.visitBehavior.sendMessage("move", args);
+				var furn = document.getElementById(this.activeFurniture);
+				var type = furn.getAttribute("type");
+				var p = Helper.getHitPoint(msg.x,msg.y,type);
+				if (p){
+					var coord = p.x + " " + p.y + " " + p.z;
+					var args = {
+						hitPoint: coord
+						};
+					this.visitBehavior.sendMessage("move", args);
+				}
 			}
 							
 		}		
@@ -568,8 +567,8 @@ Kata.require([
 	 */
 	Visitor.prototype.handleChangeMode = function(msg){
 		this.mode = msg.mode
-		if (msg.activeFurniture){
-			this.activeFurniture = msg.activeFurniture
+		if (msg.groupId){
+			this.activeFurniture = msg.groupId;
 		}
 		else{
 			this.activeFurniture = null
@@ -587,19 +586,25 @@ Kata.require([
 		var color = msg.color;
 		
 		if(group){
-			if(color = "normal"){
+			if(color == "normal"){
 				var parent = group.parentElement;
 				$(group).remove();
 				$(parent).append(this.activeFurnitureNormal);
+				this.activeFurnitureNormal = null;
 			}
 			else{
-				this.activeFurnitureNormal = $(group).clone();
+				if(!this.activeFurnitureNormal){
+					this.activeFurnitureNormal = $(group).clone();
+				}
+				if (group.hasAttribute("shader")){
+					group.setAttribute("shader", "#"+this.furnitureShaders[color] );
+				}
 				//change Material of all child-groups of the furniture group
 				var children = group.getElementsByTagName("group");
 				for(var i=0; i < children.length; i++){
 					var child = children[i];
 					if (child.hasAttribute("shader")){
-						child.setAttribute("shader", "#"+this.materials[color] );
+						child.setAttribute("shader", "#"+this.furnitureShaders[color] );
 					}
 				}
 			}
@@ -610,6 +615,45 @@ Kata.require([
 			this.activeFurnitureUpdate = msg;
 		}
 	}
+	
+	Visitor.prototype.handleFurnitureInfo = function(msg){
+		var mesh = document.getElementById(msg.groupId);
+		if (mesh){
+			this.centerMesh(mesh);
+		}
+		else{
+			this.centerFurniture.push(msg.groupId);
+		}
+	}
+	
+	Visitor.prototype.centerMesh = function(mesh){
+		var transform = document.getElementById(mesh.transform);
+		if(!transform){
+			//TODO create new transformation and assign it
+		}
+		//TODO doesnt work
+		var center = Helper.centerDistance(mesh);
+		switch (mesh.getAttribute("type")){
+			case "onfloor":
+				transform.translation.x = center.x;
+				//such that the min coordinate is at (x,0,z)
+				transform.translation.y = (1+ (-1)*mesh.getBoundingBox().min.y);
+				transform.translation.z = center.z;
+				break;
+			case "onwall":
+				transform.translation.x = -center.x;
+				transform.translation.y = -center.y
+				transform.translation.z = -1;
+				break;
+			case "onceiling":
+				transform.translation.x = center.x;
+				transform.translation.y = ((-1)*mesh.getBoundingBox().max.y)
+				transform.translation.z = center.z;
+				break;
+		
+		}
+	}
+
 
 	
 	

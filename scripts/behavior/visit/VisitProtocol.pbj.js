@@ -79,7 +79,7 @@ Visit.Protocol.Mode = PROTO.Message("Visit.Protocol.Mode",{
 		id: 3
 	}});
 Visit.Protocol.Move = PROTO.Message("Visit.Protocol.Move",{
-	move: {
+	hitPoint: {
 		options: {},
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
@@ -104,6 +104,13 @@ Visit.Protocol.Shader = PROTO.Message("Visit.Protocol.Shader",{
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
 		id: 2
+	}});
+Visit.Protocol.FurnitureInfo = PROTO.Message("Visit.Protocol.FurnitureInfo",{
+	groupId: {
+		options: {},
+		multiplicity: PROTO.required,
+		type: function(){return PROTO.string;},
+		id: 1
 	}});
 Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 	intro: {
@@ -147,4 +154,10 @@ Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 		multiplicity: PROTO.optional,
 		type: function(){return Visit.Protocol.Shader;},
 		id: 7
+	},
+	furnitureInfo: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return Visit.Protocol.FurnitureInfo;},
+		id: 8
 	}});

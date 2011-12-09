@@ -100,6 +100,11 @@ Kata.require([
 		 */
 		Helper.getWalls = function(wall){
 			if(wall){
+				switch (wall){
+					case "onFloor": wall = "floor"; break;
+					case "onWall": wall = "wall"; break;
+					case "onCeiling": wall = "ceiling"; break;
+				}
 				var groups = document.getElementsByTagName("group");
 				var res = new Array();
 				for(var i = 0; i<groups.length;i++){
@@ -156,13 +161,13 @@ Kata.require([
 			return ret;
 		}
 		
-		Helper.objLocalCenter = function(obj){
+		Helper.centerDistance = function(obj){
 			var box = obj.getBoundingBox();
 			var max = box.max;
 			var min = box.min;
-			var x_h = min.x + ((box.max.x - box.min.x)/2);
-			var y_h = min.y + ((box.max.y - box.min.y)/2);
-			var z_h = min.z + ((box.max.z - box.min.z)/2);
+			var x_h = (Math.abs(box.max.x - box.min.x)/2);
+			var y_h = (Math.abs(box.max.y - box.min.y)/2);
+			var z_h = (Math.abs(box.max.z - box.min.z)/2);
 			var ret = {x: x_h, y:y_h, z:z_h };
 			return ret;
 		}
@@ -187,6 +192,38 @@ Kata.require([
 
 		    return XML3DRotation.fromMatrix(m);
 		};
+		
+		Helper.getFurnitureGroup = function(obj){
+			while(obj && (!(obj.hasAttribute("type")) || !(obj.getAttribute("type").substr(0,2) == "on"))){
+				obj = obj.parentElement;
+			}
+			return obj;
+		}
+		
+		/**
+		 * @param 
+		 * x y: where the mouse clicked on the screen
+		 * type: the type of the walls that should be checked 
+		 * 
+		 */
+		Helper.getHitPoint = function(x, y, type){
+			this.xml3d = document.getElementsByTagName("xml3d")[0];
+			
+			var ray = this.xml3d.generateRay(x,y);
+			var walls = this.getWalls(type);
+			var hitPoint = new Array();
+			for(var i = 0; i<walls.length;i++){
+				var wall = walls[i];
+				var tnear = this.rayObjIntersection(wall,ray);
+				if(tnear){
+					hitPoint.x = ray.origin.x + ray.direction.x*tnear;
+					hitPoint.y = ray.origin.y + ray.direction.y*tnear;
+					hitPoint.z = ray.origin.z + ray.direction.z*tnear;
+					break;
+				}
+			}
+			return hitPoint;
+		}
 	
 		
 	

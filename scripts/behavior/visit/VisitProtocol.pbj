@@ -32,16 +32,20 @@ message Mode {
 }
 
 message Move {
-  required string move = 1;	//"x y" the mouse position where the active furniture should move to
+  required string hitPoint = 1;	//"x y z" the point where the mouse hits the wall
 }
 
 message Rotate {
-  required string rotate = 1;	//"dx dy" the mouse coordinates for rotating the object
+  required string rotate = 1;	//"dx dy"
 }
 
 message Shader{
   required string groupId = 1;
   required string color = 2;	//this message is only sent by furnitures. It tells the visitors it's new color.
+}
+
+message FurnitureInfo{
+  required string groupId = 1;	//this message is from the visitor to the owner to ask him if a detected object is a furniture, then it's sent back with the answer  
 }
 
 
@@ -53,4 +57,5 @@ message Container {
     optional Move move = 5;
     optional Rotate rotate = 6; 
     optional Shader shader = 7;
+    optional FurnitureInfo furnitureInfo = 8;
 }

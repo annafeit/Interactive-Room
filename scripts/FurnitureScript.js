@@ -144,12 +144,8 @@ Kata.require([
 		this.setInitialPos();
 		
 		if(!(this.inDB)){
-			if(this.checkForIntersections()){			
-				this.active = true;			
-			}
-			else{
-				this.changeShader("normal");
-			}
+			this.checkForIntersections()			
+			this.active = true;						
 		}
 		this.owner.furnitureCreated(this, this.inDB);
 	}
@@ -167,12 +163,13 @@ Kata.require([
 			//TODO create new transformation and assign it
 		}
 		//TODO doesnt work
-		var center = Helper.objLocalCenter(this.group);
+		var center = Helper.centerDistance(this.group);
 		switch (this.type){
 			case "floor":
-				transform.translation.x = -center.x;
-				transform.translation.y = ((-1)*this.group.getBoundingBox().min.y);
-				transform.translation.z = -center.z;
+				transform.translation.x = center.x;
+				//such that the min coordinate is at (x,0,z)
+				transform.translation.y = (1+ (-1)*this.group.getBoundingBox().min.y);
+				transform.translation.z = center.z;
 				break;
 			case "wall":
 				transform.translation.x = -center.x;
@@ -180,7 +177,7 @@ Kata.require([
 				transform.translation.z = -1;
 				break;
 			case "ceiling":
-				transform.translation.x = -center.x;
+				transform.translation.x = center.x;
 				transform.translation.y = ((-1)*this.group.getBoundingBox().max.y)
 				transform.translation.z = center.z;
 				break;
@@ -221,27 +218,35 @@ Kata.require([
 	}
 	
 	Furniture.prototype.changeShader = function(color){
-		if(color == "normal"){
-			var parent = this.group.parentElement;
-			$(this.group).remove();
-			$(parent).append(this.normalGroup);
-		}
-		else{
-			// if scene wasn't parsed yet		
-			if (this.materials.red == null){
-				this.parseScene();
-			}		
-			var children = this.group.getElementsByTagName("group");
-			for(var i=0; i < children.length; i++){
-				var child = children[i];
-				if (child.hasAttribute("shader")){
-					child.setAttribute("shader", "#"+this.materials[color] );
+		if(color != this.shader){
+			if(color == "normal"){
+				var parent = this.group.parentElement;
+				$(this.group).remove();
+				$(parent).append($(this.normalGroup).clone());
+				this.group = document.getElementById(this.name + this.presence.mID);
+			}
+			else{
+				// if scene wasn't parsed yet		
+				if (this.materials.red == null){
+					this.parseScene();
+				}
+				
+				//set shader attribute for this group and all it's children
+				if (this.group.hasAttribute("shader")){
+					this.group.setAttribute("shader", "#"+this.materials[color] );
+				}
+				var children = this.group.getElementsByTagName("group");
+				for(var i=0; i < children.length; i++){
+					var child = children[i];
+					if (child.hasAttribute("shader")){
+						child.setAttribute("shader", "#"+this.materials[color] );
+					}
 				}
 			}
+			this.shader = color;		
+			this.xml3d.update();		
+			this.owner.shaderChanged(this.group, this.shader);
 		}
-		this.shader = color;		
-		this.xml3d.update();		
-		this.owner.shaderChanged(this.group, this.shader);
 	}
 		
 	/**
@@ -276,20 +281,11 @@ Kata.require([
 		}
 	}	
 	
-	Furniture.prototype.moveFurnitureToMouse = function(x, y){		
-		//look if the a ray from the current mouse position hits a wall of the right type.
-		var ray = this.xml3d.generateRay(x,y);
-		var walls = Helper.getWalls(this.type);
-		var hitPoint = new Array();
-		for(var i = 0; i<walls.length;i++){
-			var wall = walls[i];
-			var tnear = Helper.rayObjIntersection(wall,ray);
-			if(tnear){
-				hitPoint.x = ray.origin.x + ray.direction.x*tnear;
-				hitPoint.y = ray.origin.y + ray.direction.y*tnear;
-				hitPoint.z = ray.origin.z + ray.direction.z*tnear;
-				break;
-			}
+	Furniture.prototype.moveFurnitureToMouse = function(x, y, hitpoint){		
+		//look if a ray from the current mouse position hits a wall of the right type.
+		var hitPoint = hitpoint;
+		if(!hitpoint){
+			hitPoint = Helper.getHitPoint(x,y,this.type);
 		}
 		//move furniture to the hitpoint (if there is one)
 		if(hitPoint.x){

@@ -420,16 +420,12 @@ Kata.require([
 			else{
 				var furn = null;
 				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
-				if(mesh){
-					var obj = mesh;
-					//take parent element as long as there is no parent element or the parent elementis the furnituregroup (has type "on...")
-					while(!(obj) || !(obj.hasAttribute("type")) || !(obj.getAttribute("type").substr(0,2) == "on")){
-						obj = obj.parentElement;
-					}
+				if(mesh){										
+					var obj = Helper.getFurnitureGroup(mesh);
 					furn = this.furnitureFromXML3D(obj);
 				}
 				
-				if (furn ||this.mode=="furniture"){	
+				if (furn ||(this.mode=="furniture")){	
 					this.initiator = this.presence.mID;
 					this.changeMode(furn);
 				}
@@ -696,24 +692,30 @@ Kata.require([
 	 * destroy: 	destroys the given object 
 	 * 	
 	 */	
-	User.prototype.handleChangeMode = function(msg){
-		var obj = document.getElementById(msg.groupId);
+	User.prototype.handleChangeMode = function(msg){		
+		var obj = document.getElementById(msg.groupId);		
 		var furn = this.furnitureFromXML3D(obj);
-
-		if (furn ||this.mode=="furniture"){	
+		if (furn ||(this.mode=="furniture")){	
 			this.initiator = msg.initiator;
 			this.changeMode(furn);
-		}
+		}		
 	} 
 	
-	User.prototype.handleMove = function(msg){		
-		var coord = msg.move.split(" ");
-		this.activeFurniture.moveFurnitureToMouse(coord[0], coord[1]);	
+	User.prototype.handleMove = function(msg){
+		if(this.activeFurniture){
+			var coord = msg.hitPoint.split(" ");
+			var x = parseInt(coord[0]);
+			var y = parseInt(coord[1]);
+			var z = parseInt(coord[2]);
+			this.activeFurniture.moveFurnitureToMouse(null, null, {x:x, y:y, z:z} );
+		}
 	}
 	
 	User.prototype.handleRotate = function(msg){
 		var coord = msg.rotate.split(" ");
-		this.activeFurniture.rotate(coord[0], coord[1]);
+		var x = parseInt(coord[0]);
+		var y = parseInt(coord[1]);
+		this.activeFurniture.rotate(x, y);
 	}
 	
 	User.prototype.handleCreate = function(msg){
@@ -734,11 +736,11 @@ Kata.require([
 	User.prototype.handleDestroy = function(msg){
 		//TODO
 	}
-	
+		
 	/**
 	 * send mode, activeFurniture and color of activeFurniture
 	 */
-	User.prototype.sendRoomConfiguration = function(dest){
+	User.prototype.sendRoomConfiguration = function(dest){		
 		if (this.mode == "furniture"){
 			var args = {
 				initiator: this.initiator,
@@ -758,7 +760,13 @@ Kata.require([
 					mode: this.mode				
 				};
 		}
-		
+		for (var i = 0;i<this.furniture.length;i++){
+			var furn = this.furniture[i];
+			var args3 = {
+				groupId:furn.group.id
+			};				
+			this.visitBehavior.sendMessageTo("furnitureInfo", args3, dest);
+		}
 		this.visitBehavior.sendMessageTo("mode", args, dest);		
 	}
 	
