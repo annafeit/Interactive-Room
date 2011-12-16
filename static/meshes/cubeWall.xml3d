@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
+	<defs>	
+	    <transform id="cubeTransform" scale="50 50 50" />
+	    
+	    <shader id="normalMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    0.1 0.4 0.9
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
+	    </shader>	
+	    <shader id="redMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    1.0 0.0 0.0
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
+	    </shader>
+	    <shader id="greenMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    0.0 1.0 0.0
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
+	    </shader>			        
+	
+	    <data id="cubeData" >
+		<int name="index">
+		    0 1 2 
+		    2 3 0
+		    0 4 5
+		    5 3 0
+		    0 1 6
+		    6 4 0
+		    4 6 7
+		    7 5 4
+		    3 2 7
+		    7 5 3
+		    1 6 7
+		    7 2 1
+		</int>
+		
+		<float3 name="position">
+		    0 0 0
+		    0 -1 0 
+		    -1 -1 0
+		    -1 0 0
+		    0 0 -1
+		    -1 0 -1
+		    0 -1 -1
+		    -1 -1 -1
+		</float3>
+		
+		<float3 name="normal">
+		    0 0 -1
+		    0 0 -1		    
+		    0 1 0
+		    0 1 0
+		    1 0 0
+		    1 0 0
+		    0 0 1
+		    0 0 1
+		    -1 0 0
+		    -1 0 0
+		    0 -1 0
+		    0 -1 0
+		</float3>
+	    </data>
+	
+    </defs>
+     		  
+    <group transform = "#cubeTransform" id="lamp" type="onCeiling" shader = "#normalMaterial">
+      <mesh src="#cubeData" type="triangles"/>
+    </group>
+</xml3d>

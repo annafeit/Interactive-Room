@@ -73,7 +73,7 @@
 	
     </defs>
      		  
-    <group transform = "#cubeTransform" id="bed" type="onFloor" shader = "#normalMaterial">
+    <group transform = "#cubeTransform" id="sofa" type="onFloor" shader = "#normalMaterial">
       <mesh src="#cubeData" type="triangles"/>
     </group>
 </xml3d>

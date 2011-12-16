@@ -115,7 +115,14 @@ Kata.require([
 						this.presence.setLocation(loc);
 						break;
 					case "wall": 
-						//TODO look for wall that's in camera view
+						var wall = Helper.checkCameraRayWallIntersection(this.owner.camera);
+						if(wall){
+							var c = Helper.getConstantCoordinate(wall);
+							p[c.coord] = c.value;
+						}
+						loc.pos = [p.x, p.y, p.z];	    
+						this.presence.setLocation(loc);
+						this.rotateToNormal();
 						break;
 					case "ceiling":
 						var box = org.xml3d.util.getWorldBBox(walls[0]);
@@ -139,12 +146,14 @@ Kata.require([
 	Furniture.prototype.meshLoaded = function(){
 		//save corresponding group in xml3d-scene
 		this.group = document.getElementById(this.name + this.presence.mID);
-		this.parseScene();
-		this.centerMesh();
+		var box = this.group.getBoundingBox();
+		this.bbox = {min: box.min, max: box.max};
+		this.parseScene();		
 		this.setInitialPos();
+		this.centerMesh();
 		
 		if(!(this.inDB)){
-			this.checkForIntersections()			
+			this.checkForIntersections();			
 			this.active = true;						
 		}
 		this.owner.furnitureCreated(this, this.inDB);
@@ -154,15 +163,15 @@ Kata.require([
 	 * changes the transformation attributre of the corresponding mesh in such a way,
 	 * that it's centered around (0,0) on the x-z plane for ceiling and floor furnitures
 	 * and on the x-y plane for furnitures with type wall.
-	 * The y-coordinate is 0.1 for floor furnitures and -0.1 for ceiling furnitures.
-	 * The z-coordinate is -0.1 for wall furnitures  
+	 * The y-coordinate is 1 for floor furnitures and -1 for ceiling furnitures.
+	 * The z/x-coordinate is 1 for wall furnitures  
 	 */
 	Furniture.prototype.centerMesh = function(){
+		console.log("max: " + this.bbox.max + ", " + "min: " + this.bbox.min);
 		var transform = document.getElementById(this.group.transform);
 		if(!transform){
 			//TODO create new transformation and assign it
 		}
-		//TODO doesnt work
 		var center = Helper.centerDistance(this.group);
 		switch (this.type){
 			case "floor":
@@ -172,9 +181,36 @@ Kata.require([
 				transform.translation.z = center.z;
 				break;
 			case "wall":
-				transform.translation.x = -center.x;
-				transform.translation.y = -center.y
-				transform.translation.z = -1;
+				var c = Helper.getConstantCoordinate(this.getWall());
+				var str = Helper.getWallNormal(this.getWall()).split(" ");
+				var normal = {x: str[0], y:str[1], z:str[2]};				
+				
+				transform.translation.x = 0;
+				transform.translation.y = 0;
+				transform.translation.z = 0;	
+				switch(c.coord){
+					case "x":
+						if (normal[c.coord] == "-1"){
+							var g = Helper.smallerNumber(this.bbox.max["z"], this.bbox.min["z"])
+							transform.translation["z"] = 1-g;
+						}
+						else{
+							var k = Helper.smallerNumber(this.bbox.max["z"], this.bbox.min["z"])
+							transform.translation["z"] = 1-k;
+						}
+						break;
+					case "z":
+						if (normal[c.coord] == "-1"){
+							var g = Helper.greaterNumber(this.bbox.max[c.coord], this.bbox.min[c.coord])
+							transform.translation[c.coord] = 1+g;
+						}
+						else{
+							var k = Helper.greaterNumber(this.bbox.max[c.coord], this.bbox.min[c.coord])
+							transform.translation[c.coord] = 1+k;
+						}
+						break;
+				}
+				
 				break;
 			case "ceiling":
 				transform.translation.x = center.x;
@@ -184,6 +220,7 @@ Kata.require([
 		
 		}
 	}
+	
 	
 	
 	/**
@@ -294,8 +331,8 @@ Kata.require([
 					this.movePresence(hitPoint);
 					break;
 				case "wall":
-					//TODO change orientation
 					this.movePresence(hitPoint);
+					this.rotateToNormal();					
 					break;
 				case "ceiling":
 					this.movePresence(hitPoint);
@@ -317,6 +354,7 @@ Kata.require([
 			var now = new Date();
 			this.lastValidPosition = this.presence.predictedLocationAtTime(now);
 		}
+		this.centerMesh();
 		
 	}
 	
@@ -410,7 +448,9 @@ Kata.require([
                 mousePos.z = center.z + dy;
                 mousePos.y = 0;
                 
-                up.x = 0; up.y = 1; up.z = 0;
+                up.x = 0; 
+                up.y = 1; 
+                up.z = 0;
                 break;
         	case "ceiling":
         		var box = org.xml3d.util.getWorldBBox(this.getWall());
@@ -421,7 +461,13 @@ Kata.require([
                 mousePos.x = center.x + dx;
                 mousePos.z = center.z + dy;
                 mousePos.y = box.min.y;
+                
+                up.x = 0; 
+                up.y = 1; 
+                up.z = 0;
                 break;
+        	case "wall":
+        		
         		
         }        
         
@@ -456,6 +502,31 @@ Kata.require([
 		
 		var group = Helper.rayIntersectsWalls(ray, this.type);		
 		return 	group;	
+	}
+	
+	Furniture.prototype.rotateToNormal = function(){
+		var normal = Helper.getWallNormal(this.getWall()).split(" ");
+		
+		var transform = document.getElementById(this.group.transform);
+        var rotation = transform.rotation;
+        
+        var up = this.xml3d.createXML3DVec3();
+        up.x = 0; 
+        up.y = 1; 
+        up.z = 0;
+        
+        var dir = this.xml3d.createXML3DVec3();
+        dir.x = normal[0];
+        dir.y = normal[1];
+        dir.z = normal[2];
+        
+        var right = up.cross(dir).normalize();
+        up = dir.cross(right).normalize();
+        
+        var orientation = XML3DRotation.fromBasis(right, up, dir);  
+        orientation.setAxisAngle(orientation.axis, orientation.angle*(-1));
+        this.movePresence(null, orientation);
+        this.checkForIntersections();
 	}
 	
 	

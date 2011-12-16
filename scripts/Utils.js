@@ -95,8 +95,9 @@ Kata.require([
 		}
 		
 		/**
-		 * parses the xml3d object for groups that's id begins with the argument.
-		 * returns an array of xml3d group elements.
+		 * returns an array of group objects
+		 * @param
+		 *   wall: the type of the group. if it is specified only those groups are returned that have this type
 		 */
 		Helper.getWalls = function(wall){
 			if(wall){
@@ -224,6 +225,97 @@ Kata.require([
 			}
 			return hitPoint;
 		}
+		
+		/**
+		 * 
+		 * Checks if a ray with origin in camera position and direction in camera direction intersects with a wall
+		 * Test in five direction: original direction of camera, and directions with modified x y z coordinates 
+		 * 
+		 */
+		Helper.checkCameraRayWallIntersection = function(cam){
+			this.xml3d = document.getElementsByTagName("xml3d")[0];
+			this.camera = cam;
+			
+			var walls = Helper.getWalls("wall");						
+
+			var ray = this.xml3d.createXML3DRay();
+			ray.origin = this.camera.position;
+			ray.direction = this.camera.direction;
+			
+			var dist= Number.MAX_VALUE;
+			var wall = null;
+			for (var i = 0; i<walls.length; i++){				
+				var inter = this.rayObjIntersection(walls[i], ray);
+				if(inter){
+					if (inter<dist){
+						dist = inter;
+						wall = walls[i];
+					}
+				}
+			}
+			return wall;			
+		}
+		
+		/**
+		 * @param
+		 * wall: a group element of the xml3d scene of type "wall"
+		 * @return
+		 * the coordinate thats constant in this wall, e.g. x if the wall is parallel to the y-z plane
+		 * and the value of this component
+		 */
+		Helper.getConstantCoordinate = function(wall){
+			var bb = org.xml3d.util.getWorldBBox(wall);
+			if(bb.max.x == bb.min.x){
+				return {coord: "x", value: bb.min.x};
+			}else{
+				if(bb.max.z == bb.min.z){
+					return {coord: "z", value: bb.min.z};
+				}	
+			}			
+		}
+		
+		/**
+		 * computes the normal of the given wall
+		 * @return
+		 * the normal in form "x y z"
+		 */
+		Helper.getWallNormal = function(wall){
+			var src = $(wall).children("mesh")[0].src;
+			var data = document.getElementById(src);
+			var children = $(data).children();
+			var child;
+			for (var i = 0; i<children.length;i++){
+				if(children[i].getAttribute("name") == "normal"){
+					child = children[i];
+					break;
+				}
+			}
+			var str = child.textContent.replace(/\s/g, "").split("");
+			var normal="";
+			var l = 0;
+			for (var i = 0;l<3;i++){
+				var z = str[i];			
+				if(z == "-"){
+					normal = normal + z;
+				}
+				else{
+					normal = normal + z + " ";
+					l++;
+				}			
+			}
+			return normal;
+		}
+		
+		Helper.greaterNumber = function(x,y){
+			if (x>y) return x;
+			else return y;
+		}
+		
+		Helper.smallerNumber = function(x,y){
+			if (x<y) return x;
+			else return y;
+		}
+		
 	
 		
 	

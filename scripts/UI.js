@@ -341,7 +341,7 @@ function searchRoomTableRowClicked(obj){
 	div.style.backgroundImage = url;
 	
 	var name = window.name.split(" ");
-	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id");		
+	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id") + ' '+'owner';		
 }
 
 function roomTableRowClicked(obj){
@@ -360,7 +360,7 @@ function roomTableRowClicked(obj){
 	div.style.backgroundImage = url;
 	
 	var name = window.name.split(" ");
-	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id");
+	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id") + ' '+'owner';
 	
 	if(obj.hasAttribute("permission")){
 		if(obj.getAttribute("permission") == "0"){
@@ -529,7 +529,7 @@ function createNewRoom(title){
 			function(data, jqxhr){
 				console.log("room creation: "+ data);
 				var roomId = data[0];
-				window.name = space + " " + username + " " + mesh + " " + roomId;
+				window.name = space + " " + username + " " + mesh + " " + roomId + ' '+'owner';
 				document.location.href='room.xhtml';
 			},'json');		
 }
