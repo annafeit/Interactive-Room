@@ -166,8 +166,7 @@ Kata.require([
 	 * The y-coordinate is 1 for floor furnitures and -1 for ceiling furnitures.
 	 * The z/x-coordinate is 1 for wall furnitures  
 	 */
-	Furniture.prototype.centerMesh = function(){
-		console.log("max: " + this.bbox.max + ", " + "min: " + this.bbox.min);
+	Furniture.prototype.centerMesh = function(){		
 		var transform = document.getElementById(this.group.transform);
 		if(!transform){
 			//TODO create new transformation and assign it
@@ -177,7 +176,7 @@ Kata.require([
 			case "floor":
 				transform.translation.x = center.x;
 				//such that the min coordinate is at (x,0,z)
-				transform.translation.y = (1+ (-1)*this.group.getBoundingBox().min.y);
+				transform.translation.y = (1+ (-1)*this.bbox.min["y"]);
 				transform.translation.z = center.z;
 				break;
 			case "wall":
@@ -210,15 +209,15 @@ Kata.require([
 						}
 						break;
 				}
-				
 				break;
 			case "ceiling":
 				transform.translation.x = center.x;
-				transform.translation.y = ((-1)*this.group.getBoundingBox().max.y)
+				transform.translation.y = ((-1)*this.bbox.max["y"])
 				transform.translation.z = center.z;
 				break;
 		
 		}
+		this.owner.transformationChanged(this.group.id, transform.translation.x, transform.translation.y, transform.translation.z);
 	}
 	
 	
@@ -322,7 +321,7 @@ Kata.require([
 		//look if a ray from the current mouse position hits a wall of the right type.
 		var hitPoint = hitpoint;
 		if(!hitpoint){
-			hitPoint = Helper.getHitPoint(x,y,this.type);
+			hitPoint = Helper.getHitPoint(x,y,this.type, this.owner.hiddenWall);
 		}
 		//move furniture to the hitpoint (if there is one)
 		if(hitPoint.x){
@@ -459,16 +458,15 @@ Kata.require([
                 centerVec.z = center.z;
                 
                 mousePos.x = center.x + dx;
-                mousePos.z = center.z + dy;
                 mousePos.y = box.min.y;
+                mousePos.z = center.z + dy;
                 
                 up.x = 0; 
                 up.y = 1; 
                 up.z = 0;
                 break;
         	case "wall":
-        		
-        		
+        		return;
         }        
         
         var dir = mousePos.subtract(centerVec);
@@ -476,9 +474,12 @@ Kata.require([
         
         var right = up.cross(dir).normalize();
         up = dir.cross(right).normalize();
-        
-        var orientation = XML3DRotation.fromBasis(right, up, dir);  
+       
+        var orientation = XML3DRotation.fromBasis(right, up, dir);          
         orientation.setAxisAngle(orientation.axis, orientation.angle*(-1));
+        
+        
+        
         this.movePresence(null, orientation);
         this.checkForIntersections();
 	}	
@@ -500,7 +501,7 @@ Kata.require([
 		ray.origin = camPos;
 		ray.direction = direction;
 		
-		var group = Helper.rayIntersectsWalls(ray, this.type);		
+		var group = Helper.rayIntersectsWalls(ray, this.type, this.owner.hiddenWall);		
 		return 	group;	
 	}
 	

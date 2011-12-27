@@ -9,6 +9,11 @@ message Intro {
   required bool visitor = 1;    
 }
 
+message ConfirmAccess{
+  optional bool confirmation = 1;	//true if the owner gives the permission to acces the room  
+  optional string visitor = 2;
+}
+
 message Create {
   required vector3d center = 1;		//see also UserScript.createFurniture();
   required int32 id = 2;		
@@ -46,6 +51,9 @@ message Shader{
 
 message FurnitureInfo{
   required string groupId = 1;	//this message is from the visitor to the owner to ask him if a detected object is a furniture, then it's sent back with the answer  
+  optional int32 x = 2;
+  optional int32 y = 3;
+  optional int32 z = 4;
 }
 
 
@@ -58,4 +66,5 @@ message Container {
     optional Rotate rotate = 6; 
     optional Shader shader = 7;
     optional FurnitureInfo furnitureInfo = 8;
+    optional ConfirmAccess confirmAccess = 9;
 }

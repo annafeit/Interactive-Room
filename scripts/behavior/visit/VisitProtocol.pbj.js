@@ -9,6 +9,19 @@ Visit.Protocol.Intro = PROTO.Message("Visit.Protocol.Intro",{
 		type: function(){return PROTO.bool;},
 		id: 1
 	}});
+Visit.Protocol.ConfirmAccess = PROTO.Message("Visit.Protocol.ConfirmAccess",{
+	confirmation: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return PROTO.bool;},
+		id: 1
+	},
+	visitor: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return PROTO.string;},
+		id: 2
+	}});
 Visit.Protocol.Create = PROTO.Message("Visit.Protocol.Create",{
 	center: {
 		options: {packed:true},
@@ -111,6 +124,24 @@ Visit.Protocol.FurnitureInfo = PROTO.Message("Visit.Protocol.FurnitureInfo",{
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
 		id: 1
+	},
+	x: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return PROTO.int32;},
+		id: 2
+	},
+	y: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return PROTO.int32;},
+		id: 3
+	},
+	z: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return PROTO.int32;},
+		id: 4
 	}});
 Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 	intro: {
@@ -160,4 +191,10 @@ Visit.Protocol.Container = PROTO.Message("Visit.Protocol.Container",{
 		multiplicity: PROTO.optional,
 		type: function(){return Visit.Protocol.FurnitureInfo;},
 		id: 8
+	},
+	confirmAccess: {
+		options: {},
+		multiplicity: PROTO.optional,
+		type: function(){return Visit.Protocol.ConfirmAccess;},
+		id: 9
 	}});

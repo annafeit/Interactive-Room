@@ -109,17 +109,17 @@ Kata.require([
 		if (presence == null){
 		Kata.error('Failed to connect viewer to '+ space+'. Reason: ' + reason);
 		throw "error";
-		}
+		}		
 		
 		//save world presence
 		this.presence = presence;
 		
-		//display the object
-		this.enableGraphicsViewport(presence,0);
-		
 		this.presence.setQueryHandler(Kata.bind(this.proxEvent, this));
-        this.presence.setQuery(0);
-        
+        this.presence.setQuery(0);   
+	
+		//display the object
+		this.enableGraphicsViewport(this.presence,0);
+		
         //save the activeView
         var id = this.xml3d.activeView;
         this.camera = document.getElementById(id);		
@@ -130,11 +130,18 @@ Kata.require([
 						
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
-        this.syncCamera();      
-        
-        //send a introduction message to every user
-        
-	};
+        this.syncCamera(); 
+	}
+	
+	Visitor.prototype.accessConfirmationRequest = function(){
+		//send access confirmation request
+		var args = {visitor: this.username, mode: null};
+		this.visitBehavior.sendMessage("confirmAccess", args);
+		//block content until access is allowed
+		$("#modalDialogVisitor").append("<p>Please wait until the owner of the room authorizes your acces</p>");
+		$("#modalDialogVisitor").dialog("open");
+	}
+	
 	
 	Visitor.prototype.createFurniture = function(obj){
 		if(this.mode=="camera"){
@@ -153,7 +160,7 @@ Kata.require([
 				    			mesh: url,    		    			
 				    			type:type,
 				    			name:name, 
-				    			initiator: this.presence.mID
+				    			initiator: thus.presence.mID
 				    			};
 						thus.visitBehavior.sendMessage("create", args);
 					},'json');
@@ -253,8 +260,9 @@ Kata.require([
 		var rt1 = Helper.rayIntersectsWalls(ray);
 		var rt2 = Helper.rayIntersectsWalls(rayNeg);
 		if (!(rt1 && rt2)){
-			//outside of the room (not a wall on both sides of the camera)			
-			this.setShaderTransparent();							
+			//outside of the room (not a wall on both sides of the camera)
+			if(rt1)
+				this.setShaderTransparent(rt1.wall);							
 		}
 		else{
 			this.setShaderSolid();
@@ -262,17 +270,29 @@ Kata.require([
 	}
 	
 
-	Visitor.prototype.setShaderTransparent = function(){
-		var groups = document.getElementsByTagName("group");		
-		for (var i =0;i<groups.length;i++)
-		{
-			var obj = groups[i];
-			if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
-				obj.setAttribute("shader", "#"+this.transparentMaterial );				
+	Visitor.prototype.setShaderTransparent = function(wall){
+		if(this.hiddenWall && this.hiddenWall != wall){
+			this.setShaderSolid();			
+		}
+		if(wall){			
+			wall.setAttribute("shader", "#"+this.transparentMaterial );
+			this.hiddenWall = wall;
+		}
+		else{
+			//set shader of all walls transparent
+			var groups = document.getElementsByTagName("group");		
+			for (var i =0;i<groups.length;i++)
+			{
+				var obj = groups[i];
+				if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
+					obj.setAttribute("shader", "#"+this.transparentMaterial );				
+				}
 			}
 		}
 		this.xml3d.update();
 	}
+	
+
 	
 	Visitor.prototype.setShaderSolid = function(){	
 		var groups = document.getElementsByTagName("group");		
@@ -285,8 +305,9 @@ Kata.require([
 			
 		}
 		this.xml3d.update();
+		this.hiddenWall = null;
 	}
-	
+
 	
 	
 	//Enum for Keycode
@@ -323,44 +344,51 @@ Kata.require([
 				}
 			}
 			for (var i = 0; i<this.centerFurniture.length;i++){
-				var furn = this.centerFurniture[i];
+				var msg = this.centerFurniture[i]
+				var furn = msg.groupId;
 				if (furn.indexOf(msg.id) != -1){
 					this.centerFurniture.splice(i, 1);
 					var obj = document.getElementById(furn);
-					this.centerMesh(obj);
+					this.centerMesh(obj, msg.x, msg.y, msg.z);
 				}
 			}
 		}
 		if(msg.msg=="click"){	
 			if (msg.event.timeStamp -200 < lastClick ){
 				msg.msg = "doubleclick";
+				lastClick = msg.event.timeStamp;
 			}
 			else{
-				//send a mode-message to the owner				
-				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
-				if(mesh){	
-					var obj = Helper.getFurnitureGroup(mesh);
-					if(obj){
-						var args = {
-								initiator: this.presence.mID,
-								groupId: obj.id
-							};
-						this.visitBehavior.sendMessage("mode", args);
-						return;
+				lastClick = msg.event.timeStamp;
+				if(this.mode == "camera" || this.initiator){
+					//send a mode-message to the owner				
+					var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
+					if(mesh){	
+						var obj = Helper.getFurnitureGroup(mesh);
+						if(obj){
+							var args = {
+									initiator: this.presence.mID,
+									groupId: obj.id
+								};
+							this.visitBehavior.sendMessage("mode", args);
+							return;
+						}
 					}
-				}
-				//else for both ifs
-				var args = {
-					initiator: this.presence.mID,						
-					};
-				
-				this.visitBehavior.sendMessage("mode", args);
+					//else for both ifs
+					var args = {
+						initiator: this.presence.mID,						
+						};
+					
+					this.visitBehavior.sendMessage("mode", args);
+				}				
 			}
-			lastClick = msg.event.timeStamp;			
+						
 		}
 		if(msg.msg == "doubleclick"){
 			//move and rotate camera such that it looks at the center of the object that was clicked on.			
-			var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
+			var mesh  = this.xml3d.getElementByPoint(msg.x, msg.y);
+			var obj = Helper.getFurnitureGroup(mesh);
+			
 			var furn = this.furnitureFromXML3D(obj);
 			if (furn){	
 				var pos = Helper.objWorldCenter(obj);
@@ -378,13 +406,16 @@ Kata.require([
 			if(this.mode == "furniture" && this.initiator){
 				var furn = document.getElementById(this.activeFurniture);
 				var type = furn.getAttribute("type");
-				var p = Helper.getHitPoint(msg.x,msg.y,type);
+				var p = Helper.getHitPoint(msg.x,msg.y,type, this.hiddenWall);
 				if (p){
 					var coord = p.x + " " + p.y + " " + p.z;
 					var args = {
 						hitPoint: coord
 						};
 					this.visitBehavior.sendMessage("move", args);
+					if (furn.getAttribute("type")=="onWall"){
+						this.centerMesh(furn);
+					}
 				}
 			}
 							
@@ -399,7 +430,7 @@ Kata.require([
 			}
 		}
 		/** camera Navigation **/
-		if(msg.msg == "drag" && this.mode == "camera"){
+		if(msg.msg == "drag" && this.mode == "camera" || !(this.initiator)){
 			if (Math.abs(msg.dx) > Math.abs(msg.dy)){			
 				//mouse moved more horizontally
 				if(msg.dx > 0){					
@@ -619,44 +650,43 @@ Kata.require([
 	Visitor.prototype.handleFurnitureInfo = function(msg){
 		var mesh = document.getElementById(msg.groupId);
 		if (mesh){
-			this.centerMesh(mesh);
+			this.centerMesh(mesh, msg.x, msg.y, msg.z);
 		}
 		else{
-			this.centerFurniture.push(msg.groupId);
+			this.centerFurniture.push(msg);
 		}
 	}
 	
-	Visitor.prototype.centerMesh = function(mesh){
+	
+	Visitor.prototype.centerMesh = function(mesh, x, y, z){
 		var transform = document.getElementById(mesh.transform);
 		if(!transform){
 			//TODO create new transformation and assign it
 		}
-		//TODO doesnt work
-		var center = Helper.centerDistance(mesh);
-		switch (mesh.getAttribute("type")){
-			case "onfloor":
-				transform.translation.x = center.x;
-				//such that the min coordinate is at (x,0,z)
-				transform.translation.y = (1+ (-1)*mesh.getBoundingBox().min.y);
-				transform.translation.z = center.z;
-				break;
-			case "onwall":
-				transform.translation.x = -center.x;
-				transform.translation.y = -center.y
-				transform.translation.z = -1;
-				break;
-			case "onceiling":
-				transform.translation.x = center.x;
-				transform.translation.y = ((-1)*mesh.getBoundingBox().max.y)
-				transform.translation.z = center.z;
-				break;
+		transform.translation.x = x;
+		transform.translation.y = y;
+		transform.translation.z = z;
+	}
 		
+	
+	Visitor.prototype.handleAccessConfirmation = function(msg){
+		if(msg.confirmation){
+			$("#modalDialogVisitor").dialog("close");
+			
+		}
+		else{
+			$("#modalDialogVisitor").empty();
+			$( "#modalDialogVisitor" ).append("<p> The owner didn't allow you to access the room</p>" )
+			$( "#modalDialogVisitor" ).dialog( "option", "buttons", [
+                                   {
+                                	   text: "Ok",
+                                	   click: function() { document.location.href='mainMenu.xhtml'; }                                	 
+                                   }
+                                   ] );
 		}
 	}
-
-
 	
-	
+		
 	/*
 	 * Functions to control the camera.
 	 * 
@@ -718,26 +748,9 @@ Kata.require([
 	 */
 	Visitor.prototype.moveCenter = function(x, z){
 		this.center.x = this.center.x + x;		
-		this.center.z = this.center.z + z;
-		this.moveCenterCube(x, z);		
+		this.center.z = this.center.z + z;		
 	}
 	
-	/**
-	 * Helper function to move the center cube
-	 */
-	Visitor.prototype.moveCenterCube = function(x, z){
-		//finds the transformation of the cube
-		var transformations = document.getElementsByTagName("transform");
-		var trans;
-	    for (var i = 0; i<transformations.length; i++){
-		    trans = transformations[i];
-		    if (trans.id.substr(0,6) == "center"){
-		    	break;
-		    }
-	    }
-	    trans.translation.x = trans.translation.x + x;
-	    trans.translation.z = trans.translation.z + z;
-	}
 	
 	/**
 	 * Helper function to correct the Distance from the cam to the center

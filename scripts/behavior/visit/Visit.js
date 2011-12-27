@@ -60,7 +60,6 @@ Kata.require([
 	            presence : presence,
 	            dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
 	        };
-	        this.parent.sendRoomConfiguration(this.visitors[remoteID]);
 	    }  
     };
 
@@ -74,6 +73,8 @@ Kata.require([
 	                presence : presence,
 	                dest : new Kata.ODP.Endpoint(remoteID, this.ProtocolPort)
 	            };
+	            
+	            this.parent.accessConfirmationRequest();
 	        }
     	}
     }
@@ -98,7 +99,7 @@ Kata.require([
      * messages. The rest is triggered by prox events.
      */
     Kata.Behavior.Visit.prototype.newPresence = function(pres) {        
-        var odp_port = this._getPort(pres);
+        var odp_port = this._getPort(pres);        
     };
 
     Kata.Behavior.Visit.prototype.presenceInvalidated = function(pres) {
@@ -124,6 +125,7 @@ Kata.require([
 
             var odp_port = this._getPort(presence);
             odp_port.send(remote.endpoint(this.ProtocolPort), this._serializeMessage(container_msg));
+            
         }
         else {            
             this._handleExit(remote.presenceID());
@@ -136,6 +138,14 @@ Kata.require([
      * Passes the incoming messages to the right handler
      */
     Kata.Behavior.Visit.prototype._handleMessage = function(presence, src, dest, payload) {
+    	if(this.visitors[src.presenceID()] == null){
+    		if(this.type=="owner"){
+        		this._handleIntroVisitor(presence, src.presenceID());
+        	}
+        	else{
+        		this._handleIntroOwner(presence, src.presenceID());
+        	}
+    	}
         var container_msg = new Visit.Protocol.Container();
         container_msg.ParseFromStream(new PROTO.ByteArrayStream(payload));
 
@@ -176,6 +186,10 @@ Kata.require([
         	if(this.parent.handleFurnitureInfo)
         		this.parent.handleFurnitureInfo(container_msg.furnitureInfo, this.visitors[src.presenceID()]);
         }
+        if(container_msg.HasField("confirmAccess")){
+        	if(this.parent.handleAccessConfirmation)
+        		this.parent.handleAccessConfirmation(container_msg.confirmAccess, this.visitors[src.presenceID()]);
+        }
     };
     
     /**
@@ -210,7 +224,15 @@ Kata.require([
     				msg.groupId = args.groupId;
     				msg.color = args.color;    				
     				container_msg.shader = msg;
-    				break;    			
+    				break;       			
+    			case "furnitureInfo":
+					msg = new Visit.Protocol.FurnitureInfo();
+					msg.groupId = args.groupId;   	
+					msg.x = args.x;
+					msg.y = args.y;
+					msg.z = args.z;
+					container_msg.furnitureInfo = msg;
+					break;
     		}
     		//send message to all visitors
     		for(var remote_key in this.visitors) {
@@ -256,7 +278,13 @@ Kata.require([
 					msg = new Visit.Protocol.Destroy();
 					msg.groupId = args.groupId; 
 					container_msg.destroy = msg;
-					break;				
+					break;	
+				case "confirmAccess":
+					msg = new Visit.Protocol.ConfirmAccess();
+					msg.visitor = args.visitor;
+					container_msg.confirmAccess = msg;
+					break;
+				
     		}
     		//send message to owner
     		var owner = this.owner;
@@ -287,10 +315,18 @@ Kata.require([
 				break;
 			case "furnitureInfo":
 				msg = new Visit.Protocol.FurnitureInfo();
-				msg.groupId = args.groupId;   				
+				msg.groupId = args.groupId;   			
+				msg.x = args.x;
+				msg.y = args.y;
+				msg.z = args.z;
 				container_msg.furnitureInfo = msg;
+				break;
+			case "confirmAccess":
+				msg = new Visit.Protocol.ConfirmAccess();				
+				msg.confirmation = args.confirmation;
+				container_msg.confirmAccess = msg;
 		}
-		//send message to all visitors
+		//send message to the visitor
 		var odp_port = this._getPort(visitor.presence);
 		odp_port.send(visitor.dest, this._serializeMessage(container_msg));     
     }

@@ -73,23 +73,37 @@ Kata.require([
 		}
 		
 		
-		Helper.rayIntersectsWalls = function(ray, type){
-			var objs = document.getElementsByTagName("group");			
+		Helper.rayIntersectsWalls = function(ray, type, hiddenWall){
+			var objs = document.getElementsByTagName("group");
+			var tnear = Number.MAX_VALUE;
+			var wall;
 			for (var i = 0; i<objs.length; i++){				
 				var obj = objs[i];				
 				if(type){
 					if(obj.getAttribute("type") == type){
-						if(this.rayObjIntersection(obj,ray)){
-							return obj;
+						if (hiddenWall && (hiddenWall.id != obj.id)){
+							if(this.rayObjIntersection(obj,ray)){
+								return obj;
+							}
+						}
+						else if(!hiddenWall){
+							if(this.rayObjIntersection(obj,ray)){
+								return obj;
+							}
 						}
 					}
-				}
+				}				
 				else if (obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling" || obj.getAttribute("type") == "floor"){
-					if(this.rayObjIntersection(obj,ray)){
-						return obj;
+					var t = this.rayObjIntersection(obj,ray)
+					if(t && t<tnear){
+						tnear = t ; 
+						wall = obj;
 					}
 				}
 			
+			}
+			if(wall){
+				return {wall:wall, dist: tnear};
 			}
 			return false;
 		}
@@ -207,21 +221,25 @@ Kata.require([
 		 * type: the type of the walls that should be checked 
 		 * 
 		 */
-		Helper.getHitPoint = function(x, y, type){
+		Helper.getHitPoint = function(x, y, type, hiddenWall){			
 			this.xml3d = document.getElementsByTagName("xml3d")[0];
 			
 			var ray = this.xml3d.generateRay(x,y);
-			var walls = this.getWalls(type);
+			var walls = this.getWalls(type);			
 			var hitPoint = new Array();
+			
 			for(var i = 0; i<walls.length;i++){
-				var wall = walls[i];
-				var tnear = this.rayObjIntersection(wall,ray);
-				if(tnear){
-					hitPoint.x = ray.origin.x + ray.direction.x*tnear;
-					hitPoint.y = ray.origin.y + ray.direction.y*tnear;
-					hitPoint.z = ray.origin.z + ray.direction.z*tnear;
-					break;
+				var wall = walls[i];				
+				if((hiddenWall && (wall.id != hiddenWall.id)) || (!hiddenWall)){
+					var tnear = this.rayObjIntersection(wall,ray);				
+					if(tnear ){
+						hitPoint.x = ray.origin.x + ray.direction.x*tnear;
+						hitPoint.y = ray.origin.y + ray.direction.y*tnear;
+						hitPoint.z = ray.origin.z + ray.direction.z*tnear;
+						break;
+					}
 				}
+				
 			}
 			return hitPoint;
 		}

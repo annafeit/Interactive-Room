@@ -401,6 +401,23 @@ function initRoom(){
 					document.location.href='index.xhtml';					
 				});
 	});
+	
+	$("#modalDialogVisitor").dialog({
+		autoOpen: false,
+		show: "blind",
+		hide: "blind",
+		modal:true,
+		draggable:false,
+		closeText: ''
+	});
+	
+	$("#modalDialogOwner").dialog({
+		autoOpen: false,
+		show: "blind",
+		hide: "blind",
+		modal:true,
+		draggable:false
+	});
 }
 
 $(document).ready(		

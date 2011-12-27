@@ -48,6 +48,7 @@ Kata.require([
 		this.keyIsDown[this.Keys.A] = false;
 		this.keyIsDown[this.Keys.S] = false;
 		this.keyIsDown[this.Keys.D] = false;
+		this.keyIsDown[this.Keys.DEL] = false;
 		
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
@@ -67,10 +68,6 @@ Kata.require([
 	*/
 	Kata.extend(User, SUPER);
 	
-	User.prototype.cb = function(){
-		
-		alert("visitor added");
-	}
 	
 	/**
 	* I think: This registers the "near" objects in this.mRemotePresences (with it's presence).
@@ -331,8 +328,9 @@ Kata.require([
 		var rt1 = Helper.rayIntersectsWalls(ray);
 		var rt2 = Helper.rayIntersectsWalls(rayNeg);
 		if (!(rt1 && rt2)){
-			//outside of the room (not a wall on both sides of the camera)			
-			this.setShaderTransparent();							
+			//outside of the room (not a wall on both sides of the camera)
+			if(rt1)
+				this.setShaderTransparent(rt1.wall);							
 		}
 		else{
 			this.setShaderSolid();
@@ -340,17 +338,29 @@ Kata.require([
 	}
 	
 
-	User.prototype.setShaderTransparent = function(){
-		var groups = document.getElementsByTagName("group");		
-		for (var i =0;i<groups.length;i++)
-		{
-			var obj = groups[i];
-			if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
-				obj.setAttribute("shader", "#"+this.transparentMaterial );				
+	User.prototype.setShaderTransparent = function(wall){
+		if(this.hiddenWall && this.hiddenWall != wall){
+			this.setShaderSolid();			
+		}
+		if(wall){				
+			wall.setAttribute("shader", "#"+this.transparentMaterial );
+			this.hiddenWall = wall;
+		}
+		else{
+			//set shader of all walls transparent
+			var groups = document.getElementsByTagName("group");		
+			for (var i =0;i<groups.length;i++)
+			{
+				var obj = groups[i];
+				if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
+					obj.setAttribute("shader", "#"+this.transparentMaterial );				
+				}
 			}
 		}
 		this.xml3d.update();
 	}
+	
+
 	
 	User.prototype.setShaderSolid = function(){	
 		var groups = document.getElementsByTagName("group");		
@@ -363,6 +373,7 @@ Kata.require([
 			
 		}
 		this.xml3d.update();
+		this.hiddenWall = null;
 	}
 
 	
@@ -375,7 +386,8 @@ Kata.require([
 		W : 87,
 		A : 65,
 		S : 83,
-		D : 68
+		D : 68,
+		DEL:46
 	};
 
 	var lastClick = -Number.MAX_VALUE;
@@ -416,25 +428,29 @@ Kata.require([
 		if(msg.msg=="click"){	
 			if (msg.event.timeStamp -200 < lastClick ){
 				msg.msg = "doubleclick";
+				lastClick = msg.event.timeStamp;
 			}
 			else{
-				var furn = null;
-				var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
-				if(mesh){										
-					var obj = Helper.getFurnitureGroup(mesh);
-					furn = this.furnitureFromXML3D(obj);
+				lastClick = msg.event.timeStamp;
+				if(this.mode == "camera" || (this.mode=="furniture" && this.initiator == this.presence.mID)){
+					var furn = null;
+					var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
+					if(mesh){										
+						var obj = Helper.getFurnitureGroup(mesh);
+						furn = this.furnitureFromXML3D(obj);
+					}
+					
+					if (furn ||(this.mode=="furniture")){	
+						this.initiator = this.presence.mID;
+						this.changeMode(furn);
+					}
 				}
-				
-				if (furn ||(this.mode=="furniture")){	
-					this.initiator = this.presence.mID;
-					this.changeMode(furn);
-				}
-			}
-			lastClick = msg.event.timeStamp; 			
+			}			
 		}
 		if(msg.msg == "doubleclick"){
-			//move and rotate camera such that it looks at the center of the object that was clicked on.			
-			var obj = this.xml3d.getElementByPoint(msg.x, msg.y).parentElement;
+			//move and rotate camera such that it looks at the center of the object that was clicked on.
+			var mesh  = this.xml3d.getElementByPoint(msg.x, msg.y);
+			var obj = Helper.getFurnitureGroup(mesh);
 			var furn = this.furnitureFromXML3D(obj);
 			if (furn){	
 				var pos = Helper.objWorldCenter(obj);
@@ -457,7 +473,7 @@ Kata.require([
 			}
 		}
 		/** camera Navigation **/
-		if(msg.msg == "drag" && this.mode == "camera"){
+		if(msg.msg == "drag" && (this.mode == "camera" || this.initiator != this.presence.mID)){
 			if (Math.abs(msg.dx) > Math.abs(msg.dy)){			
 				//mouse moved more horizontally
 				if(msg.dx > 0){					
@@ -587,6 +603,12 @@ Kata.require([
             			i++;
             		}
 	            }
+            }
+            if (this.keyIsDown[this.Keys.DEL]){
+            	//delete the active Furniture
+            	if(this.activeFurniture){
+            		this.activeFurniture.presence.disconnect();
+            	}
             }
 		}
 	
@@ -760,17 +782,55 @@ Kata.require([
 					mode: this.mode				
 				};
 		}
-		for (var i = 0;i<this.furniture.length;i++){
+		for (var i = 0;i<this.furniture.length;i++){			
 			var furn = this.furniture[i];
+			var transform = document.getElementById(furn.group.transform);
+			
 			var args3 = {
-				groupId:furn.group.id
+				groupId:furn.group.id,
+				x:transform.translation.x,
+				y:transform.translation.y,
+				z:transform.translation.z,
 			};				
 			this.visitBehavior.sendMessageTo("furnitureInfo", args3, dest);
 		}
 		this.visitBehavior.sendMessageTo("mode", args, dest);		
 	}
 	
-		
+	User.prototype.transformationChanged = function(group, x,y,z){
+		var args3 = {
+				groupId:group,
+				x:x,
+				y:y,
+				z:z,
+			};				
+			this.visitBehavior.sendMessage("furnitureInfo", args3);
+	}
+	
+	User.prototype.handleAccessConfirmation = function(msg, dest){
+		$("#modalDialogOwner").empty();
+		$("#modalDialogOwner").append("<p> Is the user: " + msg.visitor + " allowed to access your room? </p>")
+		var thus = this;
+		$( "#modalDialogOwner" ).dialog( "option", "buttons", [
+                           {
+                        	   text: "Yes",
+                        	   click: function() { thus.accessConfirmation(true, dest); $(this).dialog("close");},                        	 
+                           },
+                           {
+                        	   text: "No",
+                        	   click: function() { thus.accessConfirmation(false, dest); $(this).dialog("close"); }
+                           }
+                           ] );
+		$("#modalDialogOwner").dialog("open");		
+	}
+	
+	User.prototype.accessConfirmation = function (confirm, dest){
+		var args = {confirmation: confirm};
+		this.visitBehavior.sendMessageTo("confirmAccess", args, dest);
+		if(confirm){
+	        this.sendRoomConfiguration(dest);
+		}
+	}
 	
 
 	
@@ -974,9 +1034,9 @@ Kata.require([
 	User.prototype.turnDown = function(){
 		var cam = this.camera;
 		
-		//angle of camDirection to y-Axis in the range of 90° - 180°
+		//angle of camDirection to y-Axis in the range of 0° - 180°
 		var angle = this.angleToY(cam.getDirection());
-		if(angle > 0){
+		if(angle > 0.98){
 			return;
 		}
 		

@@ -56,40 +56,41 @@
 			<button id="logoutButton" onclick = "document.location.href='index.xhtml';" class="squareButton roomButton"/>
 		</div>							
 	    <div id="menu-type" >	    	
-	    	<h3 class="category"><a href="#livingRoom" class="categoryColor">Living Room</a></h3>
-    			<div id="livingRoom">
-    				<a table="Sofas"  class="subcategory" onclick="categoryClicked(this);">Sofas and armchairs</a><br/>
-    				<a table="Media"  class="subcategory" onclick="categoryClicked(this);">TV stands and media solutions</a><br/>
-    				<a table="Storage"  class="subcategory" onclick="categoryClicked(this);">Living room storage</a><br/>
-    				<a table="Tables"  class="subcategory" onclick="categoryClicked(this);">Coffee and side tables</a><br/>	    					    							    					
+	    	<h3 class="category"><a href="#chairsSofas" class="categoryColor">Chairs and Sofas</a></h3>
+    			<div id="chairsSofas">
+    				<a table="Sofas"  class="subcategory" onclick="categoryClicked(this);">Sofas</a><br/>
+    				<a table="Armchairs"  class="subcategory" onclick="categoryClicked(this);">Armchairs</a><br/>
+    				<a table="Stools"  class="subcategory" onclick="categoryClicked(this);">Stools</a><br/>
+    				<a table="Footstools"  class="subcategory" onclick="categoryClicked(this);">Footstools</a><br/>	    					    							    					
 	    		</div>
-	    	<h3 class="category"><a href="#bedroom" class="category">Bedroom</a></h3>
-	    		<div id="bedroom">
-	    			<a table="Beds"  class="subcategory" onclick="categoryClicked(this);">Beds</a><br/>
-    				<a table="Mirrors"  class="subcategory" onclick="categoryClicked(this);">Mirrors</a><br/>
-    				<a table="Storage"  class="subcategory" onclick="categoryClicked(this);">Bedroom storage</a><br/>
-    				<a table="Rugs"  class="subcategory" onclick="categoryClicked(this);">Rugs</a><br/>
+	    	<h3 class="category"><a href="#tables" class="category">Tables</a></h3>
+	    		<div id="tables">
+	    			<a table="Dining"  class="subcategory" onclick="categoryClicked(this);">Dining Tables</a><br/>
+    				<a table="Couch"  class="subcategory" onclick="categoryClicked(this);">Couch Tables</a><br/>
+    				<a table="Side"  class="subcategory" onclick="categoryClicked(this);">Side Tables</a><br/>    				
     			</div>
-	    	<h3 class="category"><a href="kitchen" class="category">Kitchen</a></h3>
-		    	<div id="kitchen">
-    				<a table="Cabinets"  class="subcategory" onclick="categoryClicked(this);">Kitchen cabinets</a><br/>
-    				<a table="Fridges"  class="subcategory" onclick="categoryClicked(this);">Fridges and Freezers</a><br/>
-    				<a table="Ovens"  class="subcategory" onclick="categoryClicked(this);">Ovens</a><br/>
-    				<a table="Dishwashers"  class="subcategory" onclick="categoryClicked(this);">Dishwashers</a><br/>	    							    						    			
+	    	<h3 class="category"><a href="#storage" class="category">Storage</a></h3>
+		    	<div id="storage">
+    				<a table="Shelves"  class="subcategory" onclick="categoryClicked(this);">Shelves</a><br/>
+    				<a table="Sideboards"  class="subcategory" onclick="categoryClicked(this);">Sideboards</a><br/>    					    							    						    		
 	    		</div>
-	    	<h3 class="category"><a href="#bath" class="category">Bath</a></h3>
-	    		<div id="bath">
-	    			<a table="Washstands"  class="subcategory" onclick="categoryClicked(this);">Wash-stands</a><br/>
-    				<a table="Storage"  class="subcategory" onclick="categoryClicked(this);">Bathroom storage</a><br/>
-    				<a table="Mirrors"  class="subcategory" onclick="categoryClicked(this);">Mirrors</a><br/>
-    				<a table="Washbasins"  class="subcategory" onclick="categoryClicked(this);">Wash-basins</a><br/>
+	    	<h3 class="category"><a href="#lighting" class="category">Lighting</a></h3>
+	    		<div id="lighting">
+	    			<a table="Ceiling"  class="subcategory" onclick="categoryClicked(this);">Ceiling Lamps</a><br/>
+    				<a table="Wall"  class="subcategory" onclick="categoryClicked(this);">Wall Lamps</a><br/>
+    				<a table="Floor"  class="subcategory" onclick="categoryClicked(this);">Floor Lamps</a><br/>    				
     			</div>
-	    	<h3 class="category"><a href="#office" class="category">Office</a></h3>
-	    		<div id="office">
-	    			<a table="Desks"  class="subcategory" onclick="categoryClicked(this);"> Desks and tables</a><br/>		    			
-	    			<a table="Chairs"  class="subcategory" onclick="categoryClicked(this);"> Office Chairs</a><br/>
-	    			<a table="Storage"  class="subcategory" onclick="categoryClicked(this);"> Workspace Storage</a><br/>		    			
-	    		</div>
+   			<h3 class="category"><a href="#dekcoration" class="category">Decoration</a></h3>
+    		<div id="decoration">
+    			<a table="Carpets"  class="subcategory" onclick="categoryClicked(this);">Carpets</a><br/>
+   				<a table="Clocks"  class="subcategory" onclick="categoryClicked(this);">Clocks</a><br/>
+   				<a table="Pictures"  class="subcategory" onclick="categoryClicked(this);">Pictures</a><br/>
+   				<a table="Plants"  class="subcategory" onclick="categoryClicked(this);">Plants and Flowers</a><br/>
+   				<a table="Miscellaneous"  class="subcategory" onclick="categoryClicked(this);">Miscellaneous</a><br/>
+   			</div>
+	    	<h3 class="category"><a href="#miscellaneous" class="category">Miscellaneous</a></h3>
+	    		<!-- <div id="miscellaneous">-->	    					    		
+	    		<!-- </div> -->
 	    </div>		    
 
 		<div id="furnitureBrowser" class="menu">
@@ -101,5 +102,8 @@
 				<div id="prev" class="browserButton"/>
 				<div id="next" class="browserButton"/>
 		</div> 
+		
+		<div id="modalDialogVisitor"> </div>
+		<div id="modalDialogOwner"></div>
 	</body>
 </html> 

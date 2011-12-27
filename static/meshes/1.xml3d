@@ -54,7 +54,7 @@
        </float>
       </shader>
      </defs>    
-     <group id="stool" type = "onfloor" transform="#t_1_HOCKER_1">
+     <group id="stool" type = "onFloor" transform="#t_1_HOCKER_1">
       <group shader="#VAR_ZZ1">
        <mesh src="#1_HOCKER_1_data_VAR_ZZ1" type="triangles"/>
       </group>
