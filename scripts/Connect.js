@@ -31,7 +31,7 @@ var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I n
 function connect(address, mesh, name, roomId){          	            	
 		
 		
-		this.address= address;
+		this.address= SpaceURL;
 		this.username = name;
 		this.world = mesh;
 		this.roomId = roomId;
@@ -65,7 +65,9 @@ function graphicsReady() {
    			kata_base_offset + "scripts/UserScript.js", 
    			"User", scriptArgs
    		);			   			
-			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));                         		   		 	
+			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));
+			chats = new ChatUI(window.kata.getChannel(), this.username, 300);
+			chats.create("Chat");
    }
    catch(err){
    	alert(err);
@@ -88,7 +90,7 @@ function connectVisitor(address, name, esh){
   		   		'katajs/oh/MainThread.js',	//need that to create MainThread object
   		   		'katajs/oh/plugins/sirikata/SirikataSpaceConnection.js',	//to use the sirikata://... protocol
   		   		'katajs/oh/GraphicsSimulation.js',	//the first hosted object always communicates with graphics
-  		   		'katajs/gfx/xml3dgfx.js'
+  		   		'katajs/gfx/xml3dgfx.js'  		   		
     ], function(){
   		loadGFXVisitor();
   		}

@@ -322,7 +322,9 @@
 	    </data>
     </defs>
     
-    <view id="door" position="5 200 -200" orientation="0 1 0 -1.57" center="200 100 -200"/>
+    <view id="top" position="-70 250 -200" orientation="0 1 0 -1.57" center="200 100 -200"/>
+    <view id="firstPerson" position="200 100 -200" orientation="0 1 0 -1.57" center="210 100 -200"/>
+    
            
     <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />

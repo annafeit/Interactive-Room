@@ -3,6 +3,11 @@ var user;
 var imgURLs = new Array();
 var imgs = new Array();
 
+function debug(){	
+	$("#debug").show();
+	$("#debugVisitor").show();
+}
+
 function initIndex(){
 	/** register Form handling**/
 	$("#fregister").submit(function(event){
@@ -22,8 +27,7 @@ function initIndex(){
 			return;
 	    }
 		$.post('scripts/register.php', {newUsername: username, newPassword: password}, 
-				function(data, jqxhr){
-					alert(data);
+				function(data, jqxhr){					
 					$('#overlayRegister').hide();
 					//show newly registered user name in login window
 					$("#username").val(username);
@@ -48,9 +52,7 @@ function initIndex(){
 		$.post('scripts/login.php', {username: username, password: password}, 
 				function(data, jqxhr){	
 					if (data[0]){
-						$.post('scripts/updateOnlineStatus.php', {username: username, online: "1"}, 
-								function(){	
-								});
+						
 						//preserve username and server address
 						window.name= serverAddress  + " " + username;
 						document.location.href='mainMenu.xhtml';						
@@ -64,12 +66,9 @@ function initIndex(){
 }
 function initMainMenu(){
 	
-	$("#logoutButton").click(function(){
-		$.post('scripts/updateOnlineStatus.php', {username: username, online: "0"}, 
-				function(){
-					window.name="";
-					document.location.href='index.xhtml';					
-				});
+	$("#logoutButton2").click(function(){		
+		var name = window.name.split(" ");
+		logout(username, "0", name[3], 'index.xhtml');
 	});
 	
 	/*****	Room Navigation Menu	*****/
@@ -145,73 +144,24 @@ function initMainMenu(){
 		}
 	});
 	/**navigation Menu of "shared Rooms"**/	
-	$("#newOtherRoomsButton").click(function(){
-		$("#myRooms").hide(); 
+	$("#newOtherRoomsButton").click(function(){		
 		$("#otherRooms").hide();
 		$("#visitNewRoom").show();
 		$("#previewAndButton").hide();
 		$(this).addClass("sharedRoomsButtonActive");
-		$("#myRoomsButton").removeClass("sharedRoomsButtonActive ");
 		$("#otherRoomsButton").removeClass("sharedRoomsButtonActive");
 	});
 	
 
 	var username = window.name.split(" ")[1];
-	
-	
-	$("#myRoomsButton").click(function(){
-		$("#myRooms").show(); 
-		$("#otherRooms").hide();
-		$("#visitNewRoom").hide();
-		$("#previewAndButton").hide();
-		$(this).addClass("sharedRoomsButtonActive");
-		$("#otherRoomsButton").removeClass("sharedRoomsButtonActive");
-		$("#newOtherRoomsButton").removeClass("sharedRoomsButtonActive");		
-		
-		//fill my-visitors-room-table
-		$.post('scripts/fillMyVisitorsTable.php', {username:username}, 
-				function(data, jqxhr){	
-					//replace table body by empty body
-					var body = $("#myRoomListTable tbody")[0];
-					var newBody = $("<tbody> </tbody>")[0];
-					$(body).replaceWith(newBody);
-			
-					for (var i=0;i<data.length;i++){
-						var o = data[i];
-						var button="permissionButton"+i;
-						var a = $("<tr class='row' onclick='roomTableRowClicked(this)'>" +
-										"<td>"+o.title+"</td>" +
-										"<td>"+ o.visitor + "</td>" +
-										"<td> <button id='"+button+"' class='permissionButton' onclick='changePermission(this);'> </button> </td>" +
-									"</tr>")[0];
-						$("#myRoomListTable tbody").append(a);
-						a.setAttribute("preview", data[i].preview);
-						a.setAttribute("id", data[i].id);
-						a.setAttribute("mesh", data[i].mesh);
-						a.setAttribute("visitor", data[i].visitor);					
-						if(o.permission == 1){
-							
-							$("#"+button).addClass("permissionButtonTrue");
-							$("#"+button).text("permission");
-						}
-						else{
-							$("#"+button).addClass("permissionButtonFalse");
-							$("#"+button).text("no permission");
-						}
-					}				
-				},'json');
-	});
-	
-	
+
 	$("#otherRoomsButton").click(function(){
-		$("#myRooms").hide(); 
 		$("#otherRooms").show();
 		$("#visitNewRoom").hide();
 		$("#previewAndButton").hide();
 		$("#searchMessage").text("");
 		$("#userNotOnline").hide();
-		$(this).addClass("sharedRoomsButtonActive");
-		$("#myRoomsButton").removeClass("sharedRoomsButtonActive");
+		$(this).addClass("sharedRoomsButtonActive");		
 		$("#newOtherRoomsButton").removeClass("sharedRoomsButtonActive");		
 	
 		//fill rooms-I-visit-table
@@ -224,21 +174,17 @@ function initMainMenu(){
 					
 					for (var i=0;i<data.length;i++){
 						var o = data[i];
-						var perm;
-						if (o.permission == 1) perm = "YES";
-						else perm = "NO";
+						
 						var a = $("<tr class='row' onclick='roomTableRowClicked(this)'>" +
 										"<td>"+o.owner+"</td>" +
 										"<td>"+ o.title + "</td>" +
-										"<td>"+ o.lastUpdate + "</td>" +
-										"<td >"+ perm + "</td>" +
+										"<td>"+ o.lastUpdate + "</td>" +										
 									"</tr>")[0];
 						$("#otherRoomListTable tbody").append(a);
 						a.setAttribute("preview", data[i].preview);
 						a.setAttribute("id", data[i].id);
 						a.setAttribute("mesh", data[i].mesh);
-						a.setAttribute("owner", data[i].owner);
-						a.setAttribute("permission", data[i].permission);						
+						a.setAttribute("owner", data[i].owner);						
 					}				
 				},'json');
 	});
@@ -250,7 +196,7 @@ function initMainMenu(){
 	    event.preventDefault();
 	    
 		var owner = $("#usernameSearch").val();	    
-		if(this.username == "" ){
+		if(owner == "" ){
 			alert("Fill in a username");
 			return;
 		}
@@ -267,7 +213,7 @@ function initMainMenu(){
 					if (data[0]){
 						for (var i=0;i<data.length;i++){
 							var o = data[i];						
-							var a = $("<tr class='row' onclick='searchRoomTableRowClicked(this)'>" +
+							var a = $("<tr class='row' onclick='roomTableRowClicked(this)'>" +
 											"<td>"+ o.title + "</td>" +
 											"<td>"+ o.lastUpdate + "</td>" +
 										"</tr>")[0];
@@ -285,64 +231,9 @@ function initMainMenu(){
 				},'json');
 		
 	});
-	
-	$("#askPermissionButton").click(function(){				
-		var roomId = window.name.split(" ")[3]; 
-		$.post('scripts/askPermission.php', {visitor: username, roomId: roomId},
-				function(data){
-					console.log(data);
-					$("#usernameSearch").val("");  
-					$("#visitNewRoomListTable").hide();
-					$("#previewAndButtonSearch").hide();
-					$("#otherRoomsButton").trigger("click");
-				});
-	})
-	
-
 }
 
-function changePermission(obj){
-	var newValue;
-	if($(obj).hasClass("permissionButtonTrue")){
-		$(obj).removeClass("permissionButtonTrue");
-		$(obj).addClass("permissionButtonFalse");	
-		$(obj).text("no permission");
-		newValue = 0;
-	}
-	else{
-		$(obj).addClass("permissionButtonTrue");
-		$(obj).removeClass("permissionButtonFalse");
-		$(obj).text("permission");
-		newValue = 1;
-	}
-	var tr = $(obj).parent().parent();
-	var id=tr.attr("id");
-	var visitor=tr.attr("visitor");
-	$.post('scripts/changePermission.php', {roomId:id, visitor:visitor,permission: newValue},
-			function(data,jqxhr){
-				
-			});
-					
-}
 
-function searchRoomTableRowClicked(obj){
-	//change style
-	var rows = document.getElementsByTagName("tr");
-	for(var i=0;i<rows.length;i++){
-		$(rows[i]).removeClass("rowActive");
-	}
-	$(obj).addClass("rowActive");
-	
-	//load preview
-	$("#previewAndButtonSearch").show();
-	document.getElementById("editRoomButton").style.visibility="visible";
-	var url = "url(../"+obj.getAttribute("preview")+")";
-	var div = document.getElementById("askRoomPreview");
-	div.style.backgroundImage = url;
-	
-	var name = window.name.split(" ");
-	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id") + ' '+'owner';		
-}
 
 function roomTableRowClicked(obj){
 	//change style
@@ -361,46 +252,72 @@ function roomTableRowClicked(obj){
 	
 	var name = window.name.split(" ");
 	window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id") + ' '+'owner';
-	
-	if(obj.hasAttribute("permission")){
-		if(obj.getAttribute("permission") == "0"){
-			document.getElementById("editRoomButton").style.visibility="hidden";
-		}
+	if(obj.hasAttribute("owner")){		
+		var name = window.name.split(" ");
+		window.name = name[0] + " "+ name[1] +" "+ obj.getAttribute("mesh") + " " + obj.getAttribute("id") + ' '+'visitor';
 		var user = obj.getAttribute("owner");
-		$.post('scripts/checkOnlineStatus.php', {username:user},
+		$.post('scripts/checkOnlineStatus.php', {username:user, room: obj.getAttribute("id") },
 				function(data,jqxhr){
-					if (!(data[0]))
+					if (!(data[0])){
 						document.getElementById("editRoomButton").style.visibility="hidden";
 						$("#userNotOnline").show();
+					}
+					else{
+						$("#userNotOnline").hide();	
+						}
 				},'json');
 	}
 	
 	
 }
 
+function logout(name, online, id, loc){
+	$.post('scripts/updateOnlineStatus.php', {name: username, online: online, roomId:id},			
+			function(){				
+				window.name = "";
+				document.location.href=loc;
+			});
+}
 	
 function initRoom(){
 
 	$("#menu-type").accordion({
-		autoHeight: false,
-		navigation: true
+		autoHeight: true,
+		navigation: true		
 	});				
 	
 	
 	$("#furnitureBrowser").hide();
 	
 	$("#homeButton").click(function(){
-		document.location.href='mainMenu.xhtml';
-		
+		camMenu = 0;
+		var name = window.name.split(" "); 
+		$.post('scripts/updateOnlineStatus.php', {name: username, online: "0", roomId:name[3]},			
+				function(){									
+					document.location.href='mainMenu.xhtml';
+				});
 	});
 	
 	$("#logoutButton").click(function(){
-		$.post('scripts/updateOnlineStatus.php', {username: username, online: "0"}, 
-				function(){
-					window.name="";
-					document.location.href='index.xhtml';					
-				});
+		camMenu = 0;
+		var name = window.name.split(" ");		
+		logout(username, "0", name[3], 'index.xhtml' )
 	});
+	
+	var camMenu = 0;
+	
+	$("#camButton").click(function(){
+		if (camMenu == 0){
+			$("#cameraMenu").show();
+			camMenu = 1;
+		}
+		else{
+			$("#cameraMenu").hide();
+			camMenu = 0;
+		}
+	});
+	
+	
 	
 	$("#modalDialogVisitor").dialog({
 		autoOpen: false,
@@ -530,6 +447,15 @@ function chooseNewRoom(name){
 	$("#roomMesh").attr("name", name);  
 	$("#overlay").show();  
 }
+
+function logInRoom(){
+	var name = window.name.split(" ");	
+	$.post('scripts/updateOnlineStatus.php', {username: name[1], online: "1", roomId:name[3]}, 
+			function(){	
+				document.location.href='room.xhtml';
+			});
+}
+
 /**
  * string title: the title of the room
  */
@@ -547,7 +473,7 @@ function createNewRoom(title){
 				console.log("room creation: "+ data);
 				var roomId = data[0];
 				window.name = space + " " + username + " " + mesh + " " + roomId + ' '+'owner';
-				document.location.href='room.xhtml';
+				logInRoom();
 			},'json');		
 }
 

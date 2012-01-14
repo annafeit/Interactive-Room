@@ -127,6 +127,8 @@ Kata.require([
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
 		$(".furniture").live("click",function(){thus.createFurniture(this)});
+		$("#firstPersonView").click(function(){thus.setCamToView("top")});
+		$("#topView").click(function(){thus.setCamToView("top")});
 						
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
@@ -203,16 +205,16 @@ Kata.require([
 	}
 	
 	  /**
-	* Sets the camera to the "door-view"
+	* Sets the camera to the view with the given name
 	*/
-    Visitor.prototype.setCamToDoor = function(){
+    User.prototype.setCamToView = function(v){
 	     var views = document.getElementsByTagName("view");
 	     var view;
 	     
-	     //finds the viewpoint at the door
+	     //finds the viewpoint of the given view
 	     for (var i = 0; i<views.length; i++){
 	    	 view = views[i];
-	    	 if (view.id.substr(0,4) == "door"){
+	    	 if (view.id.substr(0,4) == v){
 	    		 break;
 	    	 }
 	     }
@@ -334,7 +336,7 @@ Kata.require([
 	Visitor.prototype._handleGUIMessage = function (channel, msg) {
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
-				this.setCamToDoor();
+				this.setCamToView("top");
 				this.parseScene();
 			}			
 			if(this.activeFurnitureUpdate){
@@ -373,8 +375,7 @@ Kata.require([
 							this.visitBehavior.sendMessage("mode", args);
 							return;
 						}
-					}
-					//else for both ifs
+					}					
 					var args = {
 						initiator: this.presence.mID,						
 						};

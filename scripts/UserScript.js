@@ -3,7 +3,8 @@ var User={};
 Kata.require([
 	'katajs/oh/GraphicsScript.js',
 	kata_base_offset + 'scripts/Utils.js',
-	kata_base_offset + 'scripts/behavior/visit/Visit.js'
+	kata_base_offset + 'scripts/behavior/visit/Visit.js',
+	kata_base_offset + 'scripts/behavior/chat/Chat.js'
 ], function() {
 	/**
 	* Simulate inheritance from GraphicsScript by defining a super variable
@@ -58,6 +59,14 @@ Kata.require([
 			new Kata.Behavior.Visit(
 				this, "owner", this.cb	
 			);
+		
+		this.mChatBehavior =
+            new Kata.Behavior.Chat(
+                args.name, this,
+                Kata.bind(this.chatEnterEvent, this),
+                Kata.bind(this.chatExitEvent, this),
+                Kata.bind(this.chatMessageEvent, this)
+            );
 		
 		//connect to the spaceServer with method 'connect' of parent's parent class
 		//last argument must always be a callback (->Kata.bind), a method that's invoked upon completion
@@ -124,6 +133,8 @@ Kata.require([
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
 		$(".furniture").live("click",function(){thus.createFurniture(this, false)});
+		$("#firstPersonView").click(function(){thus.setCamToView("firstPerson")});
+		$("#topView").click(function(){thus.setCamToView("top")});
 		
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
@@ -270,16 +281,16 @@ Kata.require([
 	}
 	
 	  /**
-	* Sets the camera to the "door-view"
+	* Sets the camera to the view with the given name
 	*/
-    User.prototype.setCamToDoor = function(){
+    User.prototype.setCamToView = function(v){
 	     var views = document.getElementsByTagName("view");
 	     var view;
-	     
-	     //finds the viewpoint at the door
+	     var l = v.length;
+	     //finds the viewpoint of the given view
 	     for (var i = 0; i<views.length; i++){
 	    	 view = views[i];
-	    	 if (view.id.substr(0,4) == "door"){
+	    	 if (view.id.substr(0,l) == v){
 	    		 break;
 	    	 }
 	     }
@@ -377,6 +388,33 @@ Kata.require([
 	}
 
 	
+	User.prototype.createChatEvent = function(action, name, msg) {
+        var evt = {
+            action : action,
+            name : name
+        };
+        if (msg)
+            evt.msg = msg;
+        return new Kata.ScriptProtocol.FromScript.GUIMessage("chat", evt);
+    };
+    User.prototype.chatEnterEvent = function(remote, name) {
+        this._sendHostedObjectMessage(this.createChatEvent('enter', name));
+        var remote_pres = this.getRemotePresence(remote);
+        if (remote_pres) this.updateGFX(remote_pres);
+    };
+    User.prototype.chatExitEvent = function(remote, name, msg) {
+        this._sendHostedObjectMessage(this.createChatEvent('exit', name, msg));
+    };
+    User.prototype.chatMessageEvent = function(remote, name, msg) {
+        this._sendHostedObjectMessage(this.createChatEvent('say', name, msg));
+    };
+    
+    User.prototype.handleChatGUIMessage = function(msg) {
+        var revt = msg.event;
+        this.mChatBehavior.chat(revt);
+    };
+
+	
 	//Enum for Keycode
 	User.prototype.Keys = {
 		UP : 38,
@@ -394,17 +432,20 @@ Kata.require([
 	var lastDragEvent;
 	//the smaller the speed the faster the turning/moving/zooming
 	//no mathematical foundation, just a  guess
-	var turnSpeed = 15;	
-	var zoomSpeed = 10;
-	var moveSpeed = 10;
+		
 	
 	
 		
 	//Handle messages from GUI
 	User.prototype._handleGUIMessage = function (channel, msg) {
+		var turnSpeed = 15;	
+		var zoomSpeed = 10;	
+		var moveSpeed = 10;
+		if (msg.msg == 'chat')
+	            this.handleChatGUIMessage(msg);
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
-				this.setCamToDoor();
+				this.setCamToView("top");
 				this.parseScene();
 				this.fillRoom();
 			
@@ -714,13 +755,15 @@ Kata.require([
 	 * destroy: 	destroys the given object 
 	 * 	
 	 */	
-	User.prototype.handleChangeMode = function(msg){		
-		var obj = document.getElementById(msg.groupId);		
-		var furn = this.furnitureFromXML3D(obj);
-		if (furn ||(this.mode=="furniture")){	
-			this.initiator = msg.initiator;
-			this.changeMode(furn);
-		}		
+	User.prototype.handleChangeMode = function(msg){
+		if (this.mode == "camera" || this.initiator == msg.initiator){
+			var obj = document.getElementById(msg.groupId);		
+			var furn = this.furnitureFromXML3D(obj);
+			if (furn ||(this.mode=="furniture")){	
+				this.initiator = msg.initiator;
+				this.changeMode(furn);			
+			}
+		}
 	} 
 	
 	User.prototype.handleMove = function(msg){

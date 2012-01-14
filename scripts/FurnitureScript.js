@@ -505,6 +505,9 @@ Kata.require([
 		return 	group;	
 	}
 	
+	/**
+	 * rotates the (wall)-object such that it has the same orientation as the normal of the wall it is placed on
+	 */
 	Furniture.prototype.rotateToNormal = function(){
 		var normal = Helper.getWallNormal(this.getWall()).split(" ");
 		

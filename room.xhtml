@@ -17,12 +17,18 @@
 		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.scrollTo-min.js"/>
 		<script type="text/javascript" src="externals/development-bundle/jquery/jquery.serialScroll-min.js"/>		
 		
+		<!-- jQuery Chat -->
+		<link type="text/css" href="externals/css/jquery.ui.chatbox.css" rel="stylesheet" />
+        <link type="text/css" href="externals/css/jquery.ui.ppmenu.css" rel="stylesheet" />
+        <script type="text/javascript" src="externals/lib/jquery.ui.chatbox.js"/>
+		
 		<!-- KataJS simplifies development of the Sirikata ObjectHost in the browser -->
 		<script type="text/javascript" src="externals/katajs/katajs/core/Core.js"/>
 		
 		<!-- Configuration and Login-->
 		<script type="text/javascript" src="scripts/Connect.js"/>
-		<script type="text/javascript" src="scripts/UI.js"/>					
+		<script type="text/javascript" src="scripts/UI.js"/>
+		<script type="text/javascript" src="scripts/chat.js"/>
 		
 		
 		<!--  CSS-Style of the User Interface -->		
@@ -53,8 +59,16 @@
 			<button id="camButton"  class="squareButton roomButton"/>											
 			<button id="listButton" class="squareButton roomButton"/>
 			<button id="homeButton" onclick = "document.location.href='mainMenu.xhtml';" class="squareButton roomButton"/>	
-			<button id="logoutButton" onclick = "document.location.href='index.xhtml';" class="squareButton roomButton"/>
-		</div>							
+			<button id="logoutButton" onclick = "document.location.href='index.xhtml';" class="squareButton roomButton"/>			
+		</div>
+		
+		<div id="cameraMenu" class="dialogue" >
+			<div id="predefinedViews">
+				<button id="topView" class="camButton" > Top </button>
+				<button id="firstPersonView" class="camButton"> First Person</button>
+			</div>
+		</div>
+									
 	    <div id="menu-type" >	    	
 	    	<h3 class="category"><a href="#chairsSofas" class="categoryColor">Chairs and Sofas</a></h3>
     			<div id="chairsSofas">

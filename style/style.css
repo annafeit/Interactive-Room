@@ -70,14 +70,15 @@ button:active{
 #flogin{
 	position:absolute;
 	left:15px;
-	top:20px;
-	height:180px;
+	top:30px;
+	height:165px;
 	width:580px;	
 }
 .loginInput{
 	position:absolute;	
-	left:250px;
-	height:18px;	
+	left:150px;
+	height:18px;
+	width:250px;		
 }
 #server-address{
 	position:absolute;
@@ -98,7 +99,8 @@ button:active{
 	float:left;
 	position:absolute;
 	width:100%;
-	top:75%;	
+	top:75%;
+		
 }
 #loginButton{
 	position:absolute;
@@ -284,12 +286,12 @@ button:active{
 }
 #roomMesh{	
 	background-repeat:no-repeat;
-	background-size:100px 100px;
+	background-size:120px 120px;
 	position:absolute;
 	top:10px;
 	left: 200px;
-	height:100px;
-	width:100px;
+	height:120px;
+	width:120px;
 }
 #createNewRoomInput{
 	position:absolute;
@@ -418,9 +420,9 @@ for all tables the same**/
 }
 .sharedRoomsButton{
 	position:relative;
-	width: 200px;
+	width: 300px;
 	height: 35px;
-	font-size:18px;		
+	font-size:22px;		
 	border-radius:3px;
 	background-color:#a32500;
 	box-shadow: 0px 0px 10px #a32500;		
@@ -441,11 +443,7 @@ for all tables the same**/
 	width:100%;
 	top:50px;
 }
-#descriptionMyRooms{
-	font-size:24px;
-	position:relative;
-	top:-15px;
-}
+
 .permissionButton{
 	font-size:14px;	
 	width:130px;
@@ -455,15 +453,6 @@ for all tables the same**/
 	margin-left:-65px;
 	box-shadow: 0px 0px 0px #680000 inset;
 }
-.permissionButtonTrue{
-	background-color:#98C828;	
-}
-.permissionButtonFalse{
-	background-color:#FF3A00;
-}
-.permissionButton:active{
-	box-shadow: 0px 0px 10px #680000 inset;
-}
 
 #descriptionOtherRooms{
 	position:relative;
@@ -471,11 +460,12 @@ for all tables the same**/
 	font-size:20px;
 }
 #userNotOnline{
+	
 	color:#ba340b;
 	position:absolute;
 	top:250px;
-	left:75%;
-	margin-left:-150px;	
+	left:25%;
+	margin-left:-50px;	
 	z-index:3;
 }
 
@@ -603,13 +593,52 @@ for all tables the same**/
 	#logoutButton:hover{
 		background-image:url(../static/icons/logoutActive.png);
 	}
+	
+#logoutButton2{
+	height:50px;
+	width:50px;
+	background-image:url(../static/icons/logout.png);
+	background-position:4px center;
+	background-size:40px 40px;
+}
+	#logoutButton2:hover{
+		background-image:url(../static/icons/logoutActive.png);
+	}
 
+/** camera menu **/
+.camButton{
+	position:relative;
+	font-size:16px;
+	margin: 0 5px;	
+}
+#cameraMenu{
+	position:absolute;
+	top:50px;
+	right:15px;
+	height:250px;
+	width:282px;
+	z-index:-1;
+}
+
+#predefinedViews{
+	position:relative; 
+	left: 10px; 
+	top: 30px;
+}
+#topView{
+	width:50px;
+}
+
+#firstPersonView{
+	
+	width:120px;
+}
 
 /** menu **/
 #menu-type{
 	position:absolute;
 	width:20%;
-	height:1500px;
+	height:500px;
 	top:20%;
 	left:0%;	
 	overflow:hidden;
