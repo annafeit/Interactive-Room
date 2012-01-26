@@ -28,13 +28,16 @@
 			window.onload=initIndex;			
 		]]></script>
 	</head>	
-	<body>
+	<body>	
+			
 		<div id = "debugDiv" style ="width:20px; height:20px; position:absolute; left:0px; top:0px; color:680000" onclick="debug();"></div>
-			<button id="debug" style = "display:none;" onclick="window.name = 'sirikata://' + window.location.hostname + ':7777' + ' ' + '0' + ' ' + 'static/meshes/room1.xml3d'  + ' ' + '-1' + ' '+'owner'; document.location.href='room.xhtml';"> DEBUG </button>
-			<button id="debugVisitor" style = "display:none; width:200px;" onclick="window.name = 'sirikata://' + window.location.hostname + ':7777' + ' ' + 'visitor' + ' ' + 'static/meshes/room1.xml3d'  + ' '+ 'visitor'; document.location.href='room.xhtml';"> DEBUG (Visitor)</button>-->
-		<div id="connection" class="dialogue">		
-			<a class ="loginFont" style="position:absolute; left: 15px; top:10px; font-size:28px; color:#460000">Please enter your username and password </a> <br/>		
-			<form id="flogin" action="scripts/login.php" method="post" class="loginFont">
+		<button id="debug" style = "display:none;" onclick="window.name = 'sirikata://' + window.location.hostname + ':7777' + ' ' + '0' + ' ' + 'static/meshes/room1.xml3d'  + ' ' + '-1' + ' '+'owner'; document.location.href='room.xhtml';"> DEBUG </button>
+		<button id="debugVisitor" style = "display:none; width:200px;" onclick="window.name = 'sirikata://' + window.location.hostname + ':7777' + ' ' + 'visitor' + ' ' + 'static/meshes/room1.xml3d'  + ' '+ 'visitor'; document.location.href='room.xhtml';"> DEBUG (Visitor)</button>
+		
+		
+		<div id="connection" class="">		
+					
+			<form id="flogin" action="scripts/login.php" method="post" class="textOrange">
 				<!-- form fields -->												
 				<br></br>
 				username:	<input id="username" class="loginInput" type="text" name="username" /><br/>
@@ -68,6 +71,6 @@
 				<button class="closeButton" onclick="$('#overlayRegister').hide();">x</button>
 			</div>
 		</div>
-	
+		<div id="bg"/>
 	</body>	
 </html>

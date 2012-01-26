@@ -65,6 +65,7 @@ function initIndex(){
 			
 }
 function initMainMenu(){
+	$("body").css("background-image", "url(../static/bgChoose.jpeg)");  	
 	
 	$("#logoutButton2").click(function(){		
 		var name = window.name.split(" ");
@@ -245,6 +246,7 @@ function roomTableRowClicked(obj){
 	
 	//load preview
 	$("#previewAndButton").show();
+	$("#userNotOnline").hide();
 	document.getElementById("editRoomButton").style.visibility="visible";
 	var url = "url(../"+obj.getAttribute("preview")+")";
 	var div = document.getElementById("roomPreview");
@@ -317,7 +319,42 @@ function initRoom(){
 		}
 	});
 	
+	$("#camUpDownSlider").slider({
+		orientation: "vertical",
+		range: "min",
+		min: -90,
+		max: 90,
+		value: 60,
+	});
 	
+	$(".furniture").live("mouseover",function(){
+		var posThis = $(this).offset();	
+		var l = posThis.left + "px"
+		document.getElementById("furnitureDetail").style.left = l;
+		
+		//preview picture
+		var pic = this.getAttribute("preview");
+		var url = "url(../"+pic+")";
+		document.getElementById("furniturePreview").style.backgroundImage = url;
+		
+		//name
+		var name = this.getAttribute("name");
+		document.getElementById("furnitureName").innerHTML = name;
+		
+		//description text
+		var description = this.getAttribute("description");
+		document.getElementById("furnitureDescription").innerHTML = description;  
+		
+		//price
+		var price = this.getAttribute("price");
+		document.getElementById("furniturePrice").innerHTML =  price+ " €";
+		
+		$("#furnitureDetail").show();
+	});
+	
+	$(".furniture").live("mouseout",function(){
+		$("#furnitureDetail").hide();
+	});
 	
 	$("#modalDialogVisitor").dialog({
 		autoOpen: false,
@@ -407,6 +444,8 @@ function categoryClicked(element){
 					furniture[i].setAttribute("id", data[i].id);
 					furniture[i].setAttribute("name", data[i].name);
 					furniture[i].setAttribute("type", data[i].type);
+					furniture[i].setAttribute("description", data[i].description);
+					furniture[i].setAttribute("price", data[i].price);
 				}
 				//initialize browser				
 				$('#furnitureContent').serialScroll({

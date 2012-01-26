@@ -65,7 +65,7 @@
 	  	</div>
 	  	
 	  	<div id="editRoom" class="editRoom" style="display:none">
-	  	<label id="descriptionEditRoom" class="loginFont">Choose a room that you want to edit</label>
+	  	<label id="descriptionEditRoom" class="textRed">Choose a room that you want to edit</label>
 	  		<div id="roomList" class="roomList" style="z-index:2">	  			
 	  			<table id="roomTable" cellspacing="3px;" class="roomTable">
 					<thead>
@@ -87,7 +87,7 @@
 	  		</div>
 	  			  		
 	  		<div id="otherRooms" style="display:none; z-index:2;" class="sharedRoomsList">
-	  			<label id="descriptionOtherRooms" class="loginFont">You can only enter the room of an other user if the owner is online</label>
+	  			<label id="descriptionOtherRooms" class="textRed">You can only enter the room of an other user if the owner is online</label>
 	  			<div id="otherRoomList" class="roomList">		  			
 		  			<table id="otherRoomListTable" cellspacing="3px;" class="roomTable">
 						<thead>
@@ -105,7 +105,7 @@
 	  		
 	  		<div id="visitNewRoom" style="display:none; z-index:2;" class="sharedRoomsList">
 	  			
-	  			<form id="fsearchRoom"  method="post" class="loginFont">
+	  			<form id="fsearchRoom"  method="post" class="textRed">
 					<!-- form fields -->				
 					<label id="usernameSearchLabel" for="#usernameSearch"> Username:</label>	
 					<input id="usernameSearch" class="loginInput" name="username" />
@@ -133,7 +133,7 @@
 	  	<div id="previewAndButton" style="z-index:0; display:none;">
 		  	<div id="roomPreview" class="roomPreview" />	  		
 			<button id="editRoomButton"  onclick="logInRoom();"> Edit room</button>
-			<label id="userNotOnline" class="loginFont" style="display:none;">The owner is not online</label>
+			<label id="userNotOnline" class="textRed" style="display:none;">The owner is not online</label>
 		</div>
 	  	
 	  	<div id="chooseNewRoom" style="display:none">

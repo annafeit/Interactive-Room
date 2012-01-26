@@ -3,13 +3,38 @@ COLORS:
 red: rgb(163,37,0), #A32500, lighter: #BA340B
 darkbrown (background): rgb(20,13,10), #680000, text: #460000  
 light yellow(font): #f2cb9b
+orange: #F6B03F
 **/
 
-body{
-	background-color:rgb(20,13,10); 
+.textRed{
+	font-family:sans-serif;
+	color:#460000;
+	font-size:28px;
+}
+.textOrange{
+	font-family:sans-serif;
+	color:#FDCB5A;
+	font-size:50px;	
+	 text-shadow: 0px -2px 0px #E19932,
+                  0px 2px 5px #FFFFFF;
+}
+body{	
+	background-color:#feea79;	
 	overflow:hidden;
 }
-
+#bg{
+	position:absolute;
+	right:0px;
+	bottom:0px;
+	width:110%;
+	height:110%;
+	background-image: url(../static/bg.jpeg) ;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position:right top;
+	z-index:-5;
+	;
+}
 xml3d{
 	background-color: #009CFC;
 }
@@ -25,18 +50,20 @@ button{
 	letter-spacing:1px;
 	color:#460000;
 	/*color and border*/
-	background-color:#f2cb9b;
+	background-color:#FFECA6;
 	border:none;
 	border-radius:5px;
 	height:35px;
 	width:100px;
-	box-shadow:0px 0px 10px #680000;	
+	box-shadow:0px 0px 10px #F4AB3A;	
 }
 button:hover{
 	box-shadow:0px 0px 15px #FFBC45;
+	background-color: #AC0200;
 }
 button:active{
-	box-shadow: 0px 0px 10px #680000 inset;
+	box-shadow: 0px 0px 15px #FFBC45 inset;
+	background-color: #AC0200;
 	}
 .overlay{
 	display:none;
@@ -50,6 +77,9 @@ button:active{
 	margin-left:-7px;
 	z-index:5;
 }
+input{
+	border-color: #FDCB5A #FEFFE1 #FEFFE1 #FDCB5A;
+}
 .dialogue{
 	background-color:rgb(163,37,0);
 	border-radius:10px;	
@@ -62,10 +92,8 @@ button:active{
 	position:absolute;
 	height:200px;
 	width:600px;
-	left:50%;
-	top:50%;
-	margin-left:-300px;
-	margin-top:-150px;		
+	left:50px;
+	top:70%;
 }
 #flogin{
 	position:absolute;
@@ -78,7 +106,10 @@ button:active{
 	position:absolute;	
 	left:150px;
 	height:18px;
-	width:250px;		
+	width:250px;	
+	color:#AC0200;
+	font-size:24px;	
+	
 }
 #server-address{
 	position:absolute;
@@ -87,28 +118,30 @@ button:active{
 }
 #username{
 	position:absolute;
-	top:39px;
-	height:18px;	
+	top:75px;
+	height:30px;
+	left:300px;	
 }
 #password{
 	position:absolute;
-	top:74px;
-	height:18px;
+	top:130px;
+	height:30px;
+	left:300px;
 }
 #buttons{
 	float:left;
-	position:absolute;
+	position:absolute;	
 	width:100%;
-	top:75%;
+	top:180px;
 		
 }
 #loginButton{
 	position:absolute;
-	right:10px;
+	right:25px;
 }
 #registerButton{
 	position:absolute;
-	right:120px;
+	right:140px;
 }
 
 
@@ -171,11 +204,6 @@ button:active{
 
 
 /**choosing room**/
-#choose{
-	position:absolute;
-	width:100%;
-	height:100%;
-}
 .squareButton{
 	position:absolute;
 	background-color:rgb(163,37,0);
@@ -183,7 +211,7 @@ button:active{
 	box-shadow:  0px 0px 20px #A32500;
 	height:200px;
 	width:200px;
-	top:100px;	
+	top:150px;	
 	left:50%;
 
 }
@@ -327,7 +355,7 @@ button:active{
 /** choose existing room to edit **/
 .editRoom{
 	position:absolute;
-	top:400px;
+	top:450px;
 	width:900px;		
 	left:50%;		
 	margin-left:-450px;
@@ -381,7 +409,7 @@ button:active{
 for all tables the same**/
 #previewAndButton{
 	position:absolute;
-	top:420px;
+	top:470px;
 	height:50%;
 	left:50%;
 	width:450px;
@@ -407,7 +435,7 @@ for all tables the same**/
 /** choose shared rooms**/
 #editSharedRooms{
 	position:absolute;
-	top:350px;
+	top:400px;
 	z-index:-1;
 }
 #editSharedRoomsButtons{
@@ -507,21 +535,7 @@ for all tables the same**/
 	width:50%;
 	top:40px;
 }
-#previewAndButtonSearch{
-	position:absolute;
-	width:50%;
-	height:100%;
-	left:50%;
-	top:60px;
-}
-#askPermissionButton{
-	position:absolute;
-	width: 200px;
-	top: 250px;
-	left:50%;
-	font-size:20px; 
-	margin-left:-100px;	
-}
+
 
 /** room **/
 #room{
@@ -614,9 +628,9 @@ for all tables the same**/
 #cameraMenu{
 	position:absolute;
 	top:50px;
-	right:15px;
+	right:60px;
 	height:250px;
-	width:282px;
+	width:215px;
 	z-index:-1;
 }
 
@@ -629,10 +643,132 @@ for all tables the same**/
 	width:50px;
 }
 
-#firstPersonView{
-	
+#firstPersonView{	
 	width:120px;
 }
+/** camera navigation buttons **/
+#cameraButtons{
+	position:absolute;
+	top:70px;
+	left:8px;	
+	height:150px;
+	width:200px;
+}
+
+#navButtonsMove{
+	position:absolute;
+	left:50 px;
+	width:130px;
+	height:150px;	
+	top:30px;
+}
+.camButton1{
+	position: absolute;	
+	left:120px;
+}
+#camLeft{
+	top:40px;
+	margin-left:-60px;
+	background-size:30px 40px;
+	height:40px;
+	width:30px;	
+	background-image:url(../static/icons/left.png);
+}
+	#camLeft:hover{
+		background-image:url(../static/icons/leftActive.png);
+	}
+#camRight{
+	margin-left:20px;
+	top:40px;
+	height:40px;
+	width:30px;	
+	background-size:30px 40px;
+	background-image:url(../static/icons/right.png);
+}
+	#camRight:hover{
+		background-image:url(../static/icons/rightActive.png);
+	}
+#camDown{
+	margin-left: -25px;
+	top:82px;
+	height:30px;
+	width:40px;	
+	background-size:40px 30px;
+	background-image:url(../static/icons/down.png);
+}
+	#camDown:hover{
+		background-image:url(../static/icons/downActive.png);
+	}
+#camUp{
+	margin-left: -25px;
+	background-size:40px 30px;
+	height:30px;
+	width:40px;
+	top:8px;
+	background-image:url(../static/icons/up.png);
+}
+	#camUp:hover{
+		background-image:url(../static/icons/upActive.png);
+	}
+.camButton2{
+	position: absolute;	
+	background-repeat:no-repeat;
+	background-size:100% 100%;
+	height:50px;
+	width:25px;
+	top:35px;
+	left:120px;
+}	
+#camTurnLeft{
+	margin-left:-5px;	
+	background-image:url(../static/icons/turnLeft1.png);
+}
+	#camTurnLeft:hover{
+		background-image:url(../static/icons/turnLeftActive1.png);
+	}
+#camTurnRight{
+	margin-left:-30px;
+	background-image:url(../static/icons/turnRight1.png);
+}
+	#camTurnRight:hover{
+		background-image:url(../static/icons/turnRightActive1.png);
+	}
+	
+#navButtonsTurn{
+	position:absolute;
+	left:10 px;
+	width:50px;
+	height:150px;
+	top:10px;	
+}	
+#camUpDownSlider{
+	position:absolute;
+	right:10px;
+	top:30px;
+	width:8px;
+	height:95px;
+	background-color:#f2cb9b;
+}
+#camTurnDown{
+	position:absolute;
+	top:130px;
+	right: 5px;
+	height:30px;
+	width:30px;
+	background-color:green;
+	background-size:30px 30px;
+	background-image:url(../static/icons/camUp.png);
+}
+#camTurnUp{
+	position:absolute;
+	top:0px;
+	right: 5px;
+	height:30px;
+	width:30px;
+	background-size:30px 30px;
+	background-image:url(../static/icons/camDown.png);
+}
+
 
 /** menu **/
 #menu-type{
@@ -736,6 +872,54 @@ for all tables the same**/
 		background-image:url(../static/icons/next.png);
 	}
 
-
-
+#furnitureDetail{
+	position:absolute;
+	left:0px;	
+	bottom:140px;
+	width:350px;	
+	margin-left:-100px;
+	/*border: 1px solid rgba(0,0,0,0.5);*/
+   	border-radius: 5px 5px 5px 5px;
+   	background-color: #FFF0D6;/*rgba(200,200,200, 0.5);*/
+    box-shadow: 
+        0 2px 8px rgba(0,0,0,0.5), /* Exterior Shadow */
+        inset 0 10px rgba(255,255,255,0.2), /* Top Light Shadow */
+        inset 0 1px rgba(255,255,255,0.3), /* Top light Line */
+        inset 0 10px 20px rgba(255,255,255,0.25), /* Sides Light Shadow */
+        inset 0 -15px 20px rgba(0,0,0,0.2); /* Dark Background */
+        
+}
+#furnitureText{
+	position:relative;
+	left:10px;
+	top:10px;	
+	width:320px;
+	color:#460000;
+}
+#furnitureName{	
+	font-size:24px;	
+	font-weight: bold;
+}
+#furniturePrice{
+	font-size:28px;
+	font-weight: bold;	
+}
+#furniturePreview{
+	position:absolute;
+	margin-top:-100px;	
+	left:260px;
+	width:130px;
+	height:130px;
+	background-repeat:no-repeat;
+	background-size:130px 130px;
+}
+.furnitureText{
+	font-family:sans-serif;
+	font-size:14px;	
+}
+#furnitureDescription{
+	position:relative;
+	left:15px;
+	
+}
 

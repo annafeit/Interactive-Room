@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" renderer="opengl" activeView="#defaultView" >
+<xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" renderer="rtpie" activeView="#defaultView" >
 	<defs>		
 	    <shader id="redMaterial" script="urn:xml3d:shader:phong">
 			<float3 name="diffuseColor">
