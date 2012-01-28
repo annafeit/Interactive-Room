@@ -225,6 +225,10 @@ function initMainMenu(){
 							a.setAttribute("mesh", data[i].mesh);														
 						}
 						$("#visitNewRoomListTable").show();
+						var h1 = $("#visitNewRoomListTable").height();
+						var h2 = 120;
+						var h = h1 + h2 + 50;
+						$("#visitNewRoom").css("height", h + "px");
 					}
 					else{
 						$("#searchMessage").text("This user has no rooms or you've already visited them all")

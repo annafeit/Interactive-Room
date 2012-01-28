@@ -15,7 +15,7 @@ orange: #F6B03F
 	font-family:sans-serif;
 	color:#FDCB5A;
 	font-size:50px;	
-	 text-shadow: 0px -2px 0px #E19932,
+	text-shadow: 0px -2px 0px #E19932,
                   0px 2px 5px #FFFFFF;
 }
 body{	
@@ -36,7 +36,7 @@ body{
 	;
 }
 xml3d{
-	background-color: #009CFC;
+	background-color:#feea79;
 }
 .loginFont{
 	font-family:sans-serif;
@@ -60,10 +60,12 @@ button{
 button:hover{
 	box-shadow:0px 0px 15px #FFBC45;
 	background-color: #AC0200;
+	color:#f2cb9b;
 }
 button:active{
 	box-shadow: 0px 0px 15px #FFBC45 inset;
 	background-color: #AC0200;
+	color:#f2cb9b;
 	}
 .overlay{
 	display:none;
@@ -265,12 +267,12 @@ input{
 		position:absolute;
 		height:50px;
 		width:600px;
-		top:-150px;
-		left:25%;
+		top:-300px;
+		left:240px;
 		/*font and color*/
 		font-family: sans-serif;
-		color:#f2cb9b;
-		font-size: 38px; 		
+		color:#AC0200;
+		font-size: 32px; 		
 	}
 .newRoomContent{	
 	float:left;
@@ -361,19 +363,31 @@ input{
 	margin-left:-450px;
 	height:50%;
 }
-
+#editRoom{
+	top:400px;
+	border:2px solid;
+	border-color:#FDCB5A #FFFFFF #FFFFFF #FDCB5A;
+	border-radius: 10px 10px;
+	height:380px;
+}
 
 .roomList{
 	float:left;
 	position:relative;
 	width:50%;
 	height:100%;
-	overflow-y:auto;
+	overflow-y:auto;	
+	left:30px;
+	top:100px;
+}
+#roomList{
+	margin-top:-30px;
 }
 
 #descriptionEditRoom{
 	position:relative;
-	top:-30px;
+	top:30px;
+	left:35px;
 }
 	.roomTable{
 		position:relative;
@@ -403,15 +417,16 @@ input{
 	}
 	.rowActive{
 		color:#a32500;
-		background-color:#f2cb9b;
+		background-color:#FAC230;
 	}
 /** preview of room and button to enter room 
 for all tables the same**/
 #previewAndButton{
 	position:absolute;
-	top:470px;
+	top:500px;
 	height:50%;
 	left:50%;
+	margin-left:50px;
 	width:450px;
 }
 .roomPreview{		
@@ -438,6 +453,7 @@ for all tables the same**/
 	top:400px;
 	z-index:-1;
 }
+
 #editSharedRoomsButtons{
 	position:absolute;
 	left:145px;
@@ -469,7 +485,7 @@ for all tables the same**/
 	position:absolute;
 	height:50%;
 	width:100%;
-	top:50px;
+	top:100px;
 }
 
 .permissionButton{
@@ -481,17 +497,25 @@ for all tables the same**/
 	margin-left:-65px;
 	box-shadow: 0px 0px 0px #680000 inset;
 }
+#otherRooms{
+	position:absolute;
+	top:0px;
+	border:2px solid;
+	border-color:#FDCB5A #FFFFFF #FFFFFF #FDCB5A;
+	border-radius: 10px 10px;
+	min-height:350px;
+}
 
 #descriptionOtherRooms{
 	position:relative;
-	top:-15px;
+	top:70px;
 	font-size:20px;
+	left:30px;
 }
-#userNotOnline{
-	
+#userNotOnline{	
 	color:#ba340b;
 	position:absolute;
-	top:250px;
+	top:200px;
 	left:25%;
 	margin-left:-50px;	
 	z-index:3;
@@ -499,21 +523,35 @@ for all tables the same**/
 
 
 /** search for new Rooms to visit **/
+#visitNewRoom{
+	position:absolute;
+	top:0px;
+	border:2px solid;
+	border-color:#FDCB5A #FFFFFF #FFFFFF #FDCB5A;
+	border-radius: 10px 10px;
+	height:130px;
+	z-index:-1;
+}
 #fsearchRoom{
+	position:relative;
 	font-size:24px;
-	
+	left:50%;
+	margin-left:-280px;
+	top:50px;
 }
 #usernameSearchLabel{
 	position:relative;
 	float:left;
 	top:-3px;
+	
 }
 #usernameSearch{
 	position:relative;
 	float:left;
 	left:30px;
 	width:300px;
-	
+	height:22px;
+	font-size:20px;
 }
 #searchRoomButton{
 	position:absolute;	
@@ -533,7 +571,8 @@ for all tables the same**/
 #visitNewRoomListTable{
 	position:absolute;
 	width:50%;
-	top:40px;
+	top:130px;
+	left:30px;	
 }
 
 

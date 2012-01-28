@@ -1,5 +1,3 @@
-
-	
 //offset from the externals/katajs/ back to the root dir
 var kata_base_offset = "../../"; 
 Kata.WEB_WORKERS_ENABLED = false;		
@@ -29,15 +27,15 @@ var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I n
 //script User.js). In this way, the core of the 
 //application is the first object's script(the user).
 function connect(address, mesh, name, roomId){          	            	
-		
-		
+
+
 		this.address= SpaceURL;
 		this.username = name;
 		this.world = mesh;
 		this.roomId = roomId;
-		
+
 		$("#loginButton").attr("disabled", true);
-		
+
 	  	Kata.require([
 	  		   		'katajs/oh/MainThread.js',	//need that to create MainThread object
 	  		   		'katajs/oh/plugins/sirikata/SirikataSpaceConnection.js',	//to use the sirikata://... protocol
@@ -58,7 +56,7 @@ function graphicsReady() {
 			world: this.world,
 			loc:{scale: "1.0"},	//just to match the code..
 	}	
-	
+
 	try{     
    	
    		window.kata = new Kata.MainThread(
@@ -66,8 +64,8 @@ function graphicsReady() {
    			"User", scriptArgs
    		);			   			
 			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));
-			//chats = new ChatUI(window.kata.getChannel(), this.username, 300);
-			//chats.create("Chat");
+			chats = new ChatUI(window.kata.getChannel(), this.username, 300);
+			chats.create("Chat");
    }
    catch(err){
    	alert(err);
@@ -76,16 +74,16 @@ function graphicsReady() {
 }
 
 function loadGFX(){
-	Kata.GraphicsSimulation.initializeDriver(driver,"static/meshes/scene.xml3d", graphicsReady);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
+	Kata.GraphicsSimulation.initializeDriver(driver,"static/meshes/scene.xml3d", graphicsReady); 		  
 }
 
-function connectVisitor(address, name, esh){
+function connectVisitor(address, name, mesh){
 	this.address = address;
 	this.username = name;
 	this.world = mesh;
-	
+
 	$("#loginButton").attr("disabled", true);
-	
+
   	Kata.require([
   		   		'katajs/oh/MainThread.js',	//need that to create MainThread object
   		   		'katajs/oh/plugins/sirikata/SirikataSpaceConnection.js',	//to use the sirikata://... protocol
@@ -104,18 +102,16 @@ function graphicsReadyVisitor() {
 			world: this.world,
 			visual: {mesh:avatarURL},					
 			loc:{scale: "1.0"},	//just to match the code..
-			
+
 	}	
-	
+
 	try{     
    	
    		window.kata = new Kata.MainThread(
    			kata_base_offset + "scripts/VisitorScript.js", 
    			"Visitor", scriptArgs
    		);			   			
-			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));
-			//chats = new ChatUI(window.kata.getChannel(), this.username, 300);
-			//chats.create("Chat");
+			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));                         		   		 	
    }
    catch(err){
    	alert(err);
@@ -124,9 +120,6 @@ function graphicsReadyVisitor() {
 }
 
 function loadGFXVisitor(){
-	Kata.GraphicsSimulation.initializeDriver(driver, "static/meshes/scene.xml3d", graphicsReadyVisitor);	//null -> es wird am Anfang keine "Welt" geladen, die nicht in einem OH ist sondern nur angezeigt wird. 		  
+	Kata.GraphicsSimulation.initializeDriver(driver, "static/meshes/scene.xml3d", graphicsReadyVisitor);	 		  
 }
-
-
-
 

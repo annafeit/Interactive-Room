@@ -13,7 +13,7 @@
     $stmt->execute();
    
     #insert in "owns" table
-    $stmt2 = $db->prepare("INSERT INTO owns (roomId, owner) VALUES ( (select max(id) from room where mesh == :mesh and preview == :preview and title == :title), :username)");           
+    $stmt2 = $db->prepare("INSERT INTO owns (roomId, owner, online) VALUES ( (select max(id) from room where mesh == :mesh and preview == :preview and title == :title), :username, 1)");           
     $stmt2->bindParam(':username', $_REQUEST['username']);  
     $stmt2->bindParam(':mesh', $_REQUEST['mesh']);
     $stmt2->bindParam(':preview', $_REQUEST['preview']);

@@ -4,7 +4,7 @@
     $db = new PDO('sqlite:../DB/DBInteractiveRoom');  
     $db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     #prepare Statement
-    $stmt2 = $db->prepare("SELECT title, lastUpdate, mesh, preview, id, owner FROM room JOIN owns WHERE roomId == id AND owner == :owner and roomId not in (SELECT roomId from visits where visitor == :username)");           
+    $stmt2 = $db->prepare("SELECT title, lastUpdate, mesh, preview, id, owner FROM room JOIN owns WHERE roomId == id AND owner == :owner and roomId not in (SELECT roomId from visits where visitor == :username) ORDER BY lastUpdate DESC");           
     $stmt2->bindParam(':username', $_POST['username']);    
     $stmt2->bindParam(':owner', $_POST['owner']);    
     #execute statement
