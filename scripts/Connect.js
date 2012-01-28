@@ -111,7 +111,9 @@ function graphicsReadyVisitor() {
    			kata_base_offset + "scripts/VisitorScript.js", 
    			"Visitor", scriptArgs
    		);			   			
-			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));                         		   		 	
+			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));
+			chats = new ChatUI(window.kata.getChannel(), this.username, 300);
+			chats.create("Chat");
    }
    catch(err){
    	alert(err);

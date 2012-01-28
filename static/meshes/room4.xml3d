@@ -12,6 +12,15 @@
 		    </float>
 		</shader>
 		
+		<shader id="transparentMaterial" script="urn:xml3d:shader:phong">		    
+		    <float3 name="reflectionColor">
+		    	0.4 0.4 0.4
+		    </float3>		    
+		    <float name="transparency">
+		    	1.0
+		    </float>
+		</shader>
+		
         <lightshader id="light" script="urn:xml3d:lightshader:point">
 		    <float3 name="intensity">1.0 1.0 1.0</float3>
 		    <float3 name="attenuation">1 0 0</float3>
@@ -140,28 +149,29 @@
 	    </data>
     </defs>
     
-    <view id="door" position="580 150 -175" orientation="0 1 0 1.57" center="300 50 -175"/>       
+    <view id="top" position="580 250 -175" orientation="0 1 0 1.57" center="300 100 -175"/>       
+    <view id="firstPerson" position="300 100 -175" orientation="0 1 0 1.57" center="300 100 -175"/>
     
      <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />
 	</group>
 	     		  
-    <group id="floor" style="shader:url(#material)">
+    <group id="floor" type="floor" shader="#material">
       <mesh src="#floorData" type="triangles"/>
     </group>
-    <group id="ceiling" style="shader:url(#material)">
+    <group id="ceiling" type="ceiling" shader="#material">
       <mesh src="#ceilingData" type="triangles"/>
     </group>
-    <group id="wall1" style="shader:url(#material)">
+    <group id="wall1" type="wall" shader="#material">
       <mesh src="#wall1Data" type="triangles"/>
     </group>
-    <group id="wall2" style="shader:url(#material)">
+    <group id="wall2" type="wall" shader="#material">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group id="wall3" style="shader:url(#material)">
+    <group id="wall3" type="wall" shader="#material">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
-    <group id="wall4" style="shader:url(#material)">
+    <group id="wall4" type="wall" shader="#material">
       <mesh src="#wall4Data" type="triangles"/>
     </group>   
 </xml3d>

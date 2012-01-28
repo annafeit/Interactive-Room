@@ -5,23 +5,30 @@
 	    <transform id="centerTransform" translation="200 150 -200"/>
 	 
 	        
-		<shader id="material" script="urn:xml3d:shader:phong">
+		<shader id="materialFloor" script="urn:xml3d:shader:phong">
 		    <float3 name="diffuseColor">
-		    	0.6 0.6 0.6
+		    	1.0 1.0 1.0
 		    </float3>
 		    <float name="ambientIntensity">
-		    	0.7
+		    	1.0
 		    </float>
+		    <texture name="diffuseTexture" wrapS="repeat" wrapT="repeat">
+		      <img src="static/meshes/texFloor.jpeg"/>
+		    </texture>
 		</shader>
 		
-		<shader id="materialCenter" script="urn:xml3d:shader:phong">
+		<shader id="materialWall" script="urn:xml3d:shader:phong">
 		    <float3 name="diffuseColor">
-		    	1.3 0.4 0.8
+		    	1.0 1.0 1.0
 		    </float3>
 		    <float name="ambientIntensity">
-		    	0.7
+		    	1.0
 		    </float>
+		    <texture name="diffuseTexture" wrapS="repeat" wrapT="repeat">
+		      <img src="static/meshes/texWall.jpeg"/>
+		    </texture>
 		</shader>
+				
 		
 		<shader id="transparentMaterial" script="urn:xml3d:shader:phong">		    
 		    <float3 name="reflectionColor">
@@ -32,9 +39,18 @@
 		    </float>
 		</shader>
 		
-        <lightshader id="light" script="urn:xml3d:lightshader:point">
+		<lightshader id="light" script="urn:xml3d:lightshader:point">
 		    <float3 name="intensity">1.0 1.0 1.0</float3>
 		    <float3 name="attenuation">1 0 0</float3>
+		</lightshader>
+		
+		<lightshader id="spotLight" script="urn:xml3d:lightshader:spot">
+		  <float3 name="intensity">0.9 0.4 0.4</float3>
+		  <float3 name="attenuation">0 0 1</float3>
+		  <float3 name="direction">0 1 0</float3>
+		  <float  name="beamWidth">45.0</float>
+		  <float  name="cutOffAngle">45.0</float>
+		  <bool   name="castShadow">true</bool>
 		</lightshader>
 
 	    
@@ -327,43 +343,47 @@
     
            
     <group transform="#lightTransform" >
-	 <light shader="#light" intensity="0.8" />
+	 <light shader="#light" intensity="1.0" />
+    </group>
+    
+    <group transform="#lightTransform" >
+	 <light shader="#spotLight" intensity="1.0" />
     </group>
      		  
-    <group transform = "wallTransform" id="floor1" type="floor" shader = "#material">
+    <group transform = "wallTransform" id="floor1" type="floor" shader = "#materialFloor">
       <mesh src="#floor1Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="floor2" type="floor" shader = "#material">
+    <group transform = "wallTransform" id="floor2" type="floor" shader = "#materialFloor">
       <mesh src="#floor2Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="ceiling1" type="ceiling" shader = "#material">
+    <group transform = "wallTransform" id="ceiling1" type="ceiling" shader = "#materialWall">
       <mesh src="#ceiling1Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="ceiling2" type="ceiling" shader = "#material">
+    <group transform = "wallTransform" id="ceiling2" type="ceiling" shader = "#materialWall">
       <mesh src="#ceiling2Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall1" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall1" type="wall" shader = "#materialWall">
       <mesh src="#wall1Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall2" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall2" type="wall" shader = "#materialWall">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall3" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall3" type="wall" shader = "#materialWall">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall4" type="wall" shader= "#material" >
+    <group transform = "wallTransform" id="wall4" type="wall" shader= "#materialWall" >
       <mesh src="#wall4Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall5" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall5" type="wall" shader = "#materialWall">
       <mesh src="#wall5Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall6" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall6" type="wall" shader = "#materialWall">
       <mesh src="#wall6Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall7" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall7" type="wall" shader = "#materialWall">
       <mesh src="#wall7Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall8" type="wall" shader = "#material">
+    <group transform = "wallTransform" id="wall8" type="wall" shader = "#materialWall">
       <mesh src="#wall8Data" type="triangles"/>
     </group>
     <!--<group id="center" shader = "#materialCenter" transform="#centerTransform">

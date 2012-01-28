@@ -3,7 +3,8 @@ var Visitor={};
 Kata.require([
 	'katajs/oh/GraphicsScript.js',
 	kata_base_offset + 'scripts/Utils.js',
-	kata_base_offset + 'scripts/behavior/visit/Visit.js'
+	kata_base_offset + 'scripts/behavior/visit/Visit.js',
+	kata_base_offset + 'scripts/behavior/chat/Chat.js'
 ], function() {
 	/**
 	* Simulate inheritance from GraphicsScript by defining a super variable
@@ -23,7 +24,7 @@ Kata.require([
 		this.username = args.username;
 		this.space=args.space;	
 		this.roomMesh = args.world;	
-		
+
 		/*
 		 * "camera" mode: moving camera by drag 
 		 * "furniture" mode: moving furniture by drag and drop
@@ -31,7 +32,7 @@ Kata.require([
 		this.mode="camera";
 		this.activeFurniture;
 		this.initiator = false;
-				
+
 		//to save which key is pressed
 		this.keyIsDown = {};
 		//initialize
@@ -43,21 +44,29 @@ Kata.require([
 		this.keyIsDown[this.Keys.A] = false;
 		this.keyIsDown[this.Keys.S] = false;
 		this.keyIsDown[this.Keys.D] = false;
-		
+
 		this.furnitureShaders = {red: null, green: null, normal: null};
 		this.centerFurniture = new Array();
-		
+
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
-		
-		
-		
+
+
+
 		//for sending messages
 		this.visitBehavior = 
 			new Kata.Behavior.Visit(
 				this, "visitor"	
 		);
 		
+		this.mChatBehavior =
+            new Kata.Behavior.Chat(
+                args.name, this,
+                Kata.bind(this.chatEnterEvent, this),
+                Kata.bind(this.chatExitEvent, this),
+                Kata.bind(this.chatMessageEvent, this)
+            );
+
 		//connect to the spaceServer with method 'connect' of parent's parent class
 		//last argument must always be a callback (->Kata.bind), a method that's invoked upon completion
 		this.connect(args, null, Kata.bind(this.connected, this));		
@@ -66,8 +75,8 @@ Kata.require([
 	* Simulate inheritance from GraphicsScript by extending the Visitor class with the methods of the parent(SUPER) class
 	*/
 	Kata.extend(Visitor, SUPER);
-	
-	
+
+
 	/**
 	* I think: This registers the "near" objects in this.mRemotePresences (with it's presence).
 	* Then the script can use the presences to send messages to the hostedObjects via presence._sendHostedObjectMessage
@@ -110,31 +119,31 @@ Kata.require([
 		Kata.error('Failed to connect viewer to '+ space+'. Reason: ' + reason);
 		throw "error";
 		}		
-		
+
 		//save world presence
 		this.presence = presence;
-		
+
 		this.presence.setQueryHandler(Kata.bind(this.proxEvent, this));
         this.presence.setQuery(0);   
-	
+
 		//display the object
 		this.enableGraphicsViewport(this.presence,0);
-		
+
         //save the activeView
         var id = this.xml3d.activeView;
         this.camera = document.getElementById(id);		
-		
+
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
 		$(".furniture").live("click",function(){thus.createFurniture(this)});
-		$("#firstPersonView").click(function(){thus.setCamToView("top")});
+		$("#firstPersonView").click(function(){thus.setCamToView("firstPerson")});
 		$("#topView").click(function(){thus.setCamToView("top")});
-						
+
         //set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
         this.syncCamera(); 
 	}
-	
+
 	Visitor.prototype.accessConfirmationRequest = function(){
 		//send access confirmation request
 		var args = {visitor: this.username, mode: null};
@@ -143,8 +152,8 @@ Kata.require([
 		$("#modalDialogVisitor").append("<p>Please wait until the owner of the room authorizes your acces</p>");
 		$("#modalDialogVisitor").dialog("open");
 	}
-	
-	
+
+
 	Visitor.prototype.createFurniture = function(obj){
 		if(this.mode=="camera"){
 			var prev = obj.getAttribute("preview");
@@ -168,7 +177,7 @@ Kata.require([
 					},'json');
 		}
     } 
-	
+
 	Visitor.prototype.destroyFurniture = function (groupId){
 		if(this.initiator){
 			var args = {
@@ -184,7 +193,7 @@ Kata.require([
         this.camera = document.getElementById(activeViewId);
         
         var materials = document.getElementsByTagName("shader");	    
-	     
+
 	     //finds id of material-shader and transparent-shader
 	     for (var i = 0; i<materials.length; i++){
 	    	 var material = materials[i].id;
@@ -200,21 +209,21 @@ Kata.require([
  		     if (material.substr(0,19) == "transparentMaterial"){
  		    	this.transparentMaterial = material;
 	    	 }
-	 	    
+
 	     }
 	}
-	
+
 	  /**
 	* Sets the camera to the view with the given name
 	*/
-    User.prototype.setCamToView = function(v){
+    Visitor .prototype.setCamToView = function(v){
 	     var views = document.getElementsByTagName("view");
 	     var view;
-	     
+	     var l = v.length;
 	     //finds the viewpoint of the given view
 	     for (var i = 0; i<views.length; i++){
 	    	 view = views[i];
-	    	 if (view.id.substr(0,4) == v){
+	    	 if (view.id.substr(0,l) == v){
 	    		 break;
 	    	 }
 	     }
@@ -245,7 +254,7 @@ Kata.require([
 	     this.syncCamera();	     	    
     };
 
-	
+
 	/**
 	* check if the camera is out of the room and make walls invisible if this is true.
 	*/
@@ -258,7 +267,7 @@ Kata.require([
 		var rayNeg = this.xml3d.createXML3DRay();		
 		rayNeg.origin = this.camera.position;
 		rayNeg.direction = this.camera.getDirection().negate();
-				
+
 		var rt1 = Helper.rayIntersectsWalls(ray);
 		var rt2 = Helper.rayIntersectsWalls(rayNeg);
 		if (!(rt1 && rt2)){
@@ -270,7 +279,7 @@ Kata.require([
 			this.setShaderSolid();
 		}
 	}
-	
+
 
 	Visitor.prototype.setShaderTransparent = function(wall){
 		if(this.hiddenWall && this.hiddenWall != wall){
@@ -293,9 +302,9 @@ Kata.require([
 		}
 		this.xml3d.update();
 	}
-	
 
-	
+
+
 	Visitor.prototype.setShaderSolid = function(){	
 		var groups = document.getElementsByTagName("group");		
 		for (var i =0;i<groups.length;i++)
@@ -304,14 +313,40 @@ Kata.require([
 			if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
 				obj.setAttribute("shader", "#"+this.material );				
 			}
-			
+
 		}
 		this.xml3d.update();
 		this.hiddenWall = null;
 	}
+	
+	Visitor.prototype.createChatEvent = function(action, name, msg) {
+        var evt = {
+            action : action,
+            name : name
+        };
+        if (msg)
+            evt.msg = msg;
+        return new Kata.ScriptProtocol.FromScript.GUIMessage("chat", evt);
+    };
+    Visitor.prototype.chatEnterEvent = function(remote, name) {
+        this._sendHostedObjectMessage(this.createChatEvent('enter', name));
+        var remote_pres = this.getRemotePresence(remote);
+        if (remote_pres) this.updateGFX(remote_pres);
+    };
+    Visitor.prototype.chatExitEvent = function(remote, name, msg) {
+        this._sendHostedObjectMessage(this.createChatEvent('exit', name, msg));
+    };
+    Visitor.prototype.chatMessageEvent = function(remote, name, msg) {
+        this._sendHostedObjectMessage(this.createChatEvent('say', name, msg));
+    };
+    
+    Visitor.prototype.handleChatGUIMessage = function(msg) {
+        var revt = msg.event;
+        this.mChatBehavior.chat(revt);
+    };
 
-	
-	
+
+
 	//Enum for Keycode
 	Visitor.prototype.Keys = {
 		UP : 38,
@@ -331,9 +366,11 @@ Kata.require([
 	var turnSpeed = 15;	
 	var zoomSpeed = 10;
 	var moveSpeed = 10;
-		
+
 	//Handle messages from GUI
 	Visitor.prototype._handleGUIMessage = function (channel, msg) {
+		if (msg.msg == 'chat')
+            this.handleChatGUIMessage(msg);
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
 				this.setCamToView("top");
@@ -375,21 +412,22 @@ Kata.require([
 							this.visitBehavior.sendMessage("mode", args);
 							return;
 						}
-					}					
+					}
+					//else for both ifs
 					var args = {
 						initiator: this.presence.mID,						
 						};
-					
+
 					this.visitBehavior.sendMessage("mode", args);
 				}				
 			}
-						
+
 		}
 		if(msg.msg == "doubleclick"){
 			//move and rotate camera such that it looks at the center of the object that was clicked on.			
 			var mesh  = this.xml3d.getElementByPoint(msg.x, msg.y);
 			var obj = Helper.getFurnitureGroup(mesh);
-			
+
 			var furn = this.furnitureFromXML3D(obj);
 			if (furn){	
 				var pos = Helper.objWorldCenter(obj);
@@ -419,7 +457,7 @@ Kata.require([
 					}
 				}
 			}
-							
+
 		}		
 		if(msg.msg == "drag" && this.mode == "furniture"){
 			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2 && this.initiator){
@@ -472,7 +510,7 @@ Kata.require([
 			}
 		}
 		if(msg.msg == "wheel"){
-			
+
 			if(msg.dy > 0){
 				// zoom in 
 				var i = msg.dy;
@@ -493,7 +531,7 @@ Kata.require([
 		if(msg.msg == "keyup"){
 			this.keyIsDown[msg.keyCode] = false;
 		}
-		
+
 		if (msg.msg == "keydown"){			
             this.ctrl = msg.ctrlKey;
             this.keyIsDown[msg.keyCode] = true;
@@ -563,11 +601,11 @@ Kata.require([
 	            }
             }
 		}
-	
+
 		this.updateGFX(this.presence);
-	
+
 	};
-	
+
 	/*
 	 * Helper functions for placing. 
 	 * 
@@ -591,7 +629,7 @@ Kata.require([
 			}
 		}
 	}
-		
+
 	/*
 	 * Methods to handle incoming messages from owner:
 	 * handleChangeMode: updates the mode and activeFurniture and checks if it was the initiator of the furniture mode
@@ -612,11 +650,11 @@ Kata.require([
 			this.initiator = false;
 		}
 	} 
-	
+
 	Visitor.prototype.handleChangeShader = function(msg){
 		var group = document.getElementById(msg.groupId);
 		var color = msg.color;
-		
+
 		if(group){
 			if(color == "normal"){
 				var parent = group.parentElement;
@@ -640,14 +678,14 @@ Kata.require([
 					}
 				}
 			}
-			
+
 			this.xml3d.update();
 		}
 		else{			
 			this.activeFurnitureUpdate = msg;
 		}
 	}
-	
+
 	Visitor.prototype.handleFurnitureInfo = function(msg){
 		var mesh = document.getElementById(msg.groupId);
 		if (mesh){
@@ -657,8 +695,8 @@ Kata.require([
 			this.centerFurniture.push(msg);
 		}
 	}
-	
-	
+
+
 	Visitor.prototype.centerMesh = function(mesh, x, y, z){
 		var transform = document.getElementById(mesh.transform);
 		if(!transform){
@@ -668,12 +706,12 @@ Kata.require([
 		transform.translation.y = y;
 		transform.translation.z = z;
 	}
-		
-	
+
+
 	Visitor.prototype.handleAccessConfirmation = function(msg){
 		if(msg.confirmation){
 			$("#modalDialogVisitor").dialog("close");
-			
+
 		}
 		else{
 			$("#modalDialogVisitor").empty();
@@ -686,8 +724,8 @@ Kata.require([
                                    ] );
 		}
 	}
-	
-		
+
+
 	/*
 	 * Functions to control the camera.
 	 * 
@@ -708,8 +746,8 @@ Kata.require([
 	 * change position/direction of the tmp-camera and assign it to the presence. Position of actual camera
 	 * in the scene is then changed automatically
 	 */
-	
-		
+
+
 	var speed=2;
 	/**
 	 * 
@@ -724,7 +762,7 @@ Kata.require([
 		this.camCenterDistance = (cam.position.subtract(this.center)).length();				  
 		return cam;
 	}
-	
+
 	/**
 	 * helper function to update the presence's position and orientation
 	 * position: XML3DVec3
@@ -742,7 +780,7 @@ Kata.require([
 	     this.presence.setLocation(loc);
 	     this.syncCamera();
 	}
-	
+
 	/**
 	 * Helper function to move the Center
 	 * The center's y-coordinate (height) neer changes
@@ -751,8 +789,8 @@ Kata.require([
 		this.center.x = this.center.x + x;		
 		this.center.z = this.center.z + z;		
 	}
-	
-	
+
+
 	/**
 	 * Helper function to correct the Distance from the cam to the center
 	 */
@@ -760,7 +798,7 @@ Kata.require([
 		var dist = cam.position.subtract(this.center);
 		if(update){
 			this.camCenterDistance = dist.length();
-					
+
 		}
 		else{
 	        var diff = dist.length() - this.camCenterDistance;
@@ -773,7 +811,7 @@ Kata.require([
 		}
         return cam;
 	}
-	
+
 	/**
 	 * Helper function to change the camera's Up vector to be parallel to the y-axis
 	 */
@@ -785,7 +823,7 @@ Kata.require([
 		cam.setUpVector(newUp);		
 		return cam;
 	}
-	
+
 	/**
 	 * Helper function to compute the angle between a vector and the y-axis
 	 */
@@ -797,12 +835,12 @@ Kata.require([
 		var alpha = (vec.dot(yAxis)) / (vec.length() * yAxis.length());  
 		return alpha;
 	}
-	
-		
+
+
 	Visitor.prototype.turnRight = function(){	
 		//make cam parallel to floor		
 		var cam = this.setCamUpToY(this.camera);		
-		
+
 		var orientMat = cam.orientation.toMatrix();		
 		//x-axis in camera coordinate system
 		var orXX = orientMat.m11 * speed;
@@ -818,11 +856,11 @@ Kata.require([
         cam = this.correctCenterCamDistance(cam, false);                
         this.updatePresence(cam.position, cam.orientation);       
 	}
-	
+
 	Visitor.prototype.turnLeft = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);
-		
+
 		var orientMat = cam.orientation.toMatrix();		
 		//x-axis in camera coordinate system
 		var orXX = orientMat.m11 * speed;
@@ -839,17 +877,17 @@ Kata.require([
         
         this.updatePresence(cam.position, cam.orientation);  
 	}
-	
-	
+
+
 	Visitor.prototype.turnUp = function(){
 		var cam = this.camera;
-		
+
 		//angle of camDirection to y-Axis in the range of 90° - 180°
 		var angle = this.angleToY(cam.getDirection());
 		if(angle < -0.98){
 			return;
 		}
-		
+
 		var orientMat = cam.orientation.toMatrix();		
 		//y-axis in camera coordinate system
 		var orYX = orientMat.m21 * speed;        
@@ -869,13 +907,13 @@ Kata.require([
 	}
 	Visitor.prototype.turnDown = function(){
 		var cam = this.camera;
-		
+
 		//angle of camDirection to y-Axis in the range of 90° - 180°
 		var angle = this.angleToY(cam.getDirection());
 		if(angle > 0){
 			return;
 		}
-		
+
 		var orientMat = cam.orientation.toMatrix();
 		//y-axis in camera coordinate system
 		var orYX = orientMat.m21 * speed;        
@@ -893,11 +931,11 @@ Kata.require([
        
         this.updatePresence(cam.position, cam.orientation);
 	}
-	
+
 	Visitor.prototype.moveRight = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
-		
+
 		var orientMat = cam.orientation.toMatrix();
 		//x-axis in camera coordinate system
 		var orXX = orientMat.m11 * speed;
@@ -920,7 +958,7 @@ Kata.require([
 	Visitor.prototype.moveLeft = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
-		
+
 		var orientMat = cam.orientation.toMatrix();
 		//x-axis in camera coordinate system
 		var orXX = orientMat.m11 * speed;
@@ -941,7 +979,7 @@ Kata.require([
 	Visitor.prototype.moveUp = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
-		
+
 		var orientMat = cam.orientation.toMatrix();
 		//z-axis in camera coordinate system
 		var orZX = orientMat.m31 * speed;
@@ -962,7 +1000,7 @@ Kata.require([
 	Visitor.prototype.moveDown = function(){
 		//make cam parallel to floor	
 		var cam = this.setCamUpToY(this.camera);		
-		
+
 		var orientMat = cam.orientation.toMatrix();
 		//z-axis in camera coordinate system
 		var orZX = orientMat.m31 * speed;
@@ -1000,10 +1038,10 @@ Kata.require([
 	}
 	Visitor.prototype.zoomOut = function(){
 		var cam = this.camera;		
-		
+
 		var dir = cam.getDirection();
 		dir.normalize();
-		
+
         //change position in direction of camera's x-axis
         cam.position.x = cam.position.x - (dir.x * speed);
         cam.position.y = cam.position.y - (dir.y * speed);
@@ -1023,4 +1061,3 @@ Kata.require([
 
 
 }, kata_base_offset + "scripts/VisitorScript.js");
-
