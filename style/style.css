@@ -14,9 +14,8 @@ orange: #F6B03F
 .textOrange{
 	font-family:sans-serif;
 	color:#FDCB5A;
-	font-size:50px;	
-	text-shadow: 0px -2px 0px #E19932,
-                  0px 2px 5px #FFFFFF;
+	font-size:30px;	
+	text-shadow: 0px -1px 0px #E19932                  
 }
 body{	
 	background-color:#feea79;	
@@ -28,7 +27,7 @@ body{
 	bottom:0px;
 	width:110%;
 	height:110%;
-	background-image: url(../static/bg.jpeg) ;
+	background-image: url(../static/bg5.jpeg) ;
 	background-size: auto 100%;
 	background-repeat: no-repeat;
 	background-position:right top;
@@ -36,7 +35,7 @@ body{
 	;
 }
 xml3d{
-	background-color:#feea79;
+	background-color:#AAAAAA;
 }
 .loginFont{
 	font-family:sans-serif;
@@ -93,9 +92,9 @@ input{
 	/*position and size*/
 	position:absolute;
 	height:200px;
-	width:600px;
+	width:400px;
 	left:50px;
-	top:70%;
+	bottom:30px;
 }
 #flogin{
 	position:absolute;
@@ -106,44 +105,48 @@ input{
 }
 .loginInput{
 	position:absolute;	
-	left:150px;
+	left:180px;
 	height:18px;
 	width:250px;	
 	color:#AC0200;
-	font-size:24px;	
+	font-size:18px;	
 	
 }
-#server-address{
+#address{
 	position:absolute;
-	top:5px;
+	margin-top:5px;
 	height:18px;
 }
 #username{
 	position:absolute;
 	top:75px;
-	height:30px;
-	left:300px;	
 }
 #password{
 	position:absolute;
-	top:130px;
-	height:30px;
-	left:300px;
+	top:110px;
+	
 }
 #buttons{
 	float:left;
 	position:absolute;	
 	width:100%;
-	top:180px;
+	bottom:10px;
+	right:50px;
 		
 }
 #loginButton{
 	position:absolute;
 	right:25px;
+	width:90px;
+	height:30px;
+	font-size:20px;
 }
 #registerButton{
 	position:absolute;
 	right:140px;
+	width:90px;
+	height:30px;
+	font-size:20px;
 }
 
 
@@ -213,7 +216,7 @@ input{
 	box-shadow:  0px 0px 20px #A32500;
 	height:200px;
 	width:200px;
-	top:150px;	
+	top:100px;	
 	left:50%;
 
 }
@@ -357,14 +360,14 @@ input{
 /** choose existing room to edit **/
 .editRoom{
 	position:absolute;
-	top:450px;
+	top:350px;
 	width:900px;		
 	left:50%;		
 	margin-left:-450px;
 	height:50%;
 }
 #editRoom{
-	top:400px;
+	top:350px;
 	border:2px solid;
 	border-color:#FDCB5A #FFFFFF #FFFFFF #FDCB5A;
 	border-radius: 10px 10px;
@@ -385,9 +388,10 @@ input{
 }
 
 #descriptionEditRoom{
-	position:relative;
-	top:30px;
+	position:absolute;
+	top:20px;
 	left:35px;
+	font-size:22px;
 }
 	.roomTable{
 		position:relative;
@@ -423,7 +427,7 @@ input{
 for all tables the same**/
 #previewAndButton{
 	position:absolute;
-	top:500px;
+	top:400px;
 	height:50%;
 	left:50%;
 	margin-left:50px;
@@ -450,7 +454,7 @@ for all tables the same**/
 /** choose shared rooms**/
 #editSharedRooms{
 	position:absolute;
-	top:400px;
+	top:350px;
 	z-index:-1;
 }
 

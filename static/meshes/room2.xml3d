@@ -4,14 +4,21 @@
 	    <transform id="lightTransform1" translation="100 240 -200"/>
 	    <transform id="lightTransform2" translation="500 240 -200"/>
 	    
-		<shader id="material" script="urn:xml3d:shader:phong">
-		    <float3 name="diffuseColor">
-		    0.6 0.6 0.6
-		    </float3>
-		    <float name="ambientIntensity">
-		    0.7
-		    </float>
-		</shader>
+		<shader id="materialFloor" script="urn:xml3d:shader:phong">
+	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
+	            <float name="ambientIntensity">0.2</float>
+	            <texture name="diffuseTexture">
+			<img src="static/meshes/textures/texFloor1.jpeg"/>
+		    </texture>
+	        </shader>
+		
+		<shader id="materialWall" script="urn:xml3d:shader:phong">
+	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
+	            <float name="ambientIntensity">0.2</float>
+	            <texture name="diffuseTexture">
+			<img src="static/meshes/textures/texWall1.jpeg"/>
+		    </texture>
+	        </shader>
 		
 		<shader id="transparentMaterial" script="urn:xml3d:shader:phong">		    
 		    <float3 name="reflectionColor">

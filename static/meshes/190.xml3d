@@ -158,23 +158,23 @@
        </float>
       </shader>
      </defs>
-    <group id="shelf" type="onWall" transform="#t_CERAMICS_1__190_DRESS">
-     <group shader="#_190_DRESSER_2" transform="#t_CERAMICS_1__190_DRESS">
+    <group id="shelf" type="onFloor" transform="#t_CERAMICS_1__190_DRESS">
+     <group shader="#_190_DRESSER_2" >
       <mesh src="#CERAMICS_1__190_DRESS_data" type="triangles"/>
      </group>
-     <group shader="#_190_DRESSER_1" transform="#t_NONVARIAN3__190_DRESS">
+     <group shader="#_190_DRESSER_1" >
       <mesh src="#NONVARIAN3__190_DRESS_data" type="triangles"/>
      </group>
-     <group shader="#_190_DRESSER_IM7" transform="#t_NONVARIAN2__190_DRESS">
+     <group shader="#_190_DRESSER_IM7" >
       <mesh src="#NONVARIAN2__190_DRESS_data" type="triangles"/>
      </group>
-     <group shader="#_190_DRESSER_IM7" transform="#t_NONVARIAN1__190_DRESS">
+     <group shader="#_190_DRESSER_IM7" >
       <mesh src="#NONVARIAN1__190_DRESS_data" type="triangles"/>
      </group>
-     <group shader="#_190_DRESSER_1" transform="#t_NONVARIAN0__190_DRESS">
+     <group shader="#_190_DRESSER_1" >
       <mesh src="#NONVARIAN0__190_DRESS_data" type="triangles"/>
      </group>
-     <group shader="#_190_DRESSER_IM7" transform="#t_NONVARIANT__190_DRESS">
+     <group shader="#_190_DRESSER_IM7" >
       <mesh src="#NONVARIANT__190_DRESS_data" type="triangles"/>
      </group>
    </group> 

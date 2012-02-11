@@ -95,7 +95,7 @@
        </float>
       </shader>
      </defs>
-     <group id="shelf" type="onWall" transform="#t_NONVARIAN0__192_DRESS">
+     <group id="shelf" type="onFloor" transform="#t_NONVARIAN0__192_DRESS">
      <group shader="#_192_DRESSER_1" >
       <mesh src="#NONVARIAN0__192_DRESS_data" type="triangles"/>
      </group>

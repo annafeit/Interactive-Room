@@ -10,7 +10,7 @@ var address;
 var username;
 var world;
 var db;
-var SpaceURL = "sirikata://" + window.location.hostname + ":7777"; //TODO do I need that??
+var SpaceURL = "sirikata://" + "localhost" + ":7777"; 
 
 
 
@@ -64,8 +64,8 @@ function graphicsReady() {
    			"User", scriptArgs
    		);			   			
 			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));
-			chats = new ChatUI(window.kata.getChannel(), this.username, 300);
-			chats.create("Chat");
+			//chats = new ChatUI(window.kata.getChannel(), this.username, 300);
+			//chats.create("Chat");
    }
    catch(err){
    	alert(err);
@@ -78,7 +78,7 @@ function loadGFX(){
 }
 
 function connectVisitor(address, name, mesh){
-	this.address = address;
+	this.address = SpaceURL;
 	this.username = name;
 	this.world = mesh;
 
@@ -112,8 +112,8 @@ function graphicsReadyVisitor() {
    			"Visitor", scriptArgs
    		);			   			
 			graphics = new Kata.GraphicsSimulation(driver, window.kata.getChannel(), document.getElementById("room"));
-			chats = new ChatUI(window.kata.getChannel(), this.username, 300);
-			chats.create("Chat");
+			//chats = new ChatUI(window.kata.getChannel(), this.username, 300);
+			//chats.create("Chat");
    }
    catch(err){
    	alert(err);

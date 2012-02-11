@@ -3,7 +3,7 @@
     <xml3d activeView="#Camera" style="width: 800px; height: 600px; background-color:rgb(14,56,102);" xmlns="http://www.xml3d.org/2009/xml3d">
      <defs id="mainDef">
       
-      <transform id="t_CLOTH_3__2_HOCKER_2VA" rotation="1.000000 0.000000 0.000000 -1.570000" scale="1 1 1 " translation="0 0 0"/>
+      <transform id="t_CLOTH_3__2_HOCKER_2VA" rotation="1.000000 0.000000 0.000000 -1.570000" scale="1 1 1" translation="0 0 0"/>
  
       <data id="CLOTH_3__2_HOCKER_2VA_data">
        <int name="index">

@@ -208,31 +208,31 @@
       </shader>
      </defs>
      <group id="armchair" type="onFloor" transform="#t_CLOTH_1827__152_SESSE">
-     <group shader="#_152_SESSEL_11" transform="#t_METAL_GLO2__152_SESSE">
+     <group shader="#_152_SESSEL_11" >
       <mesh src="#METAL_GLO2__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_11" transform="#t_METAL_GLO1__152_SESSE">
+     <group shader="#_152_SESSEL_11" >
       <mesh src="#METAL_GLO1__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_11" transform="#t_METAL_GLO0__152_SESSE">
+     <group shader="#_152_SESSEL_11" >
       <mesh src="#METAL_GLO0__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_11" transform="#t_METAL_GLOS__152_SESSE">
+     <group shader="#_152_SESSEL_11" >
       <mesh src="#METAL_GLOS__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_10ma" transform="#t_NONVARIAN2__152_SESSE">
+     <group shader="#_152_SESSEL_10ma" >
       <mesh src="#NONVARIAN2__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_10ma" transform="#t_NONVARIAN1__152_SESSE">
+     <group shader="#_152_SESSEL_10ma" >
       <mesh src="#NONVARIAN1__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_10ma" transform="#t_NONVARIAN0__152_SESSE">
+     <group shader="#_152_SESSEL_10ma" >
       <mesh src="#NONVARIAN0__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_10ma" transform="#t_NONVARIANT__152_SESSE">
+     <group shader="#_152_SESSEL_10ma">
       <mesh src="#NONVARIANT__152_SESSE_data" type="triangles"/>
      </group>
-     <group shader="#_152_SESSEL_10VA" transform="#t_CLOTH_1827__152_SESSE">
+     <group shader="#_152_SESSEL_10VA">
       <mesh src="#CLOTH_1827__152_SESSE_data" type="triangles"/>
      </group>
     

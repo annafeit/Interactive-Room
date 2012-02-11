@@ -100,7 +100,7 @@ Kata.require([
         this.setCameraPosOrient(this.presence.predictedPosition(now),
                                 this.presence.predictedOrientation(now),
                                 0.1); //lag:0.1 just to match the code...
-        this.checkWalls(); 
+        //this.checkWalls(); 
     };
          
     
@@ -111,7 +111,7 @@ Kata.require([
 		//handle connection failure
 		if (presence == null){
 		Kata.error('Failed to connect viewer to '+ space+'. Reason: ' + reason);
-		throw "error";
+		throw reason;
 		}
 		
 		//save world presence
