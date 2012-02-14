@@ -77,7 +77,7 @@ Kata.require([
 	            this.parent.accessConfirmationRequest();
 	        }
     	}
-    }
+    };
     
     /**
      * if a visitor disappears, delete him from the list
@@ -292,7 +292,7 @@ Kata.require([
             odp_port.send(owner.dest, this._serializeMessage(container_msg));
     	}
     		
-    }
+    };
     
     //currently only used by owner
     Kata.Behavior.Visit.prototype.sendMessageTo = function(type, args, visitor){
@@ -329,7 +329,7 @@ Kata.require([
 		//send message to the visitor
 		var odp_port = this._getPort(visitor.presence);
 		odp_port.send(visitor.dest, this._serializeMessage(container_msg));     
-    }
+    };
 
 }, '../../scripts/behavior/visit/Visit.js');
  

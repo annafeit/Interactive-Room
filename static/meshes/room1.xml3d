@@ -17,7 +17,15 @@
 	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
 	            <float name="ambientIntensity">0.2</float>
 	            <texture name="diffuseTexture">
-			<img src="static/meshes/textures/texWall1.jpeg"/>
+			<img src="static/meshes/textures/texWall7a.jpeg"/>
+		    </texture>
+	        </shader>
+		
+		<shader id="materialWall2" script="urn:xml3d:shader:phong">
+	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
+	            <float name="ambientIntensity">0.2</float>
+	            <texture name="diffuseTexture">
+			<img src="static/meshes/textures/texWall7.jpeg"/>
 		    </texture>
 	        </shader>
 				
@@ -54,9 +62,9 @@
 	            
 	            <float3 name="position">
 	            	0 0 0
-	            	0 0 -400
-	            	400 0 -400
-	            	400 0 0 
+	            	0 0 -800
+	            	600 0 -800
+	            	600 0 0 
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -79,10 +87,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	400 0 -100
-	            	400 0 -300
-	            	600 0 -300 
-	            	600 0 -100 
+	            	600 0 -300
+	            	600 0 -500
+	            	900 0 -500 
+	            	900 0 -300 
 	            </float3>
 	            
 	            <float3 name="normal">	            	
@@ -108,9 +116,9 @@
 	            
 	            <float3 name="position">
 	            	0 250 0
-	            	0 250 -400
-	            	400 250 -400
-	            	400 250 0
+	            	0 250 -800
+	            	600 250 -800
+	            	600 250 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -133,10 +141,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	400 250 -100
-	            	400 250 -300
-	            	600 250 -300 
-	            	600 250 -100 
+	            	600 250 -300
+	            	600 250 -500
+	            	900 250 -500 
+	            	900 250 -300 
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -161,8 +169,8 @@
 	            <float3 name="position">
 	            	0 0 0
 	            	0 250 0
-	            	0 250 -400
-	            	0 0 -400
+	            	0 250 -800
+	            	0 0 -800
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -185,10 +193,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	0 0 -400
-	            	0 250 -400
-	            	400 250 -400
-	            	400 0 -400
+	            	0 0 -800
+	            	0 250 -800
+	            	600 250 -800
+	            	600 0 -800
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -213,8 +221,8 @@
 	            <float3 name="position">
 	            	0 0 0
 					0 250 0
-					400 250 0
-					400 0 0
+					600 250 0
+					600 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -237,10 +245,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	600 0 -100
-	            	600 250 -100
-	            	600 250 -300
-	            	600 0 -300
+	            	900 0 -300
+	            	900 250 -300
+	            	900 250 -500
+	            	900 0 -500
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -263,10 +271,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            	
-					400 0 0
-					400 250 0
-					400 250 -100
-					400 0 -100
+					600 0 0
+					600 250 0
+					600 250 -300
+					600 0 -300
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -289,10 +297,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	400 0 -300  
-	            	400 250 -300
-	            	400 250 -400
-	            	400 0 -400
+	            	600 0 -500  
+	            	600 250 -500
+	            	600 250 -800
+	            	600 0 -800
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -315,10 +323,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	400 0 -100
-	            	400 250 -100
-	            	600 250 -100
-	            	600 0 -100   
+	            	600 0 -300
+	            	600 250 -300
+	            	900 250 -300
+	            	900 0 -300   
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -341,10 +349,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	400 0 -300
-	            	400 250 -300
-	            	600 250 -300
-	            	600 0 -300    
+	            	800 0 -500
+	            	800 250 -500
+	            	900 250 -500
+	            	900 0 -500    
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -363,7 +371,7 @@
 	    
     </defs>
     
-    <view id="top" position="-70 250 -200" orientation="0 1 0 -1.57" center="200 100 -200"/>
+    <view id="top" position="50 300 -200" orientation="0 1 0 -1.57" center="200 100 -200"/>
     <view id="firstPerson" position="200 100 -200" orientation="0 1 0 -1.57" center="210 100 -200"/>
     
            
@@ -393,7 +401,7 @@
     <group transform = "wallTransform" id="wall2" type="wall" shader = "#materialWall">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall3" type="wall" shader = "#materialWall">
+    <group transform = "wallTransform" id="wall3" type="wall" shader = "#materialWall2">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
     <group transform = "wallTransform" id="wall4" type="wall" shader= "#materialWall" >
@@ -402,13 +410,13 @@
     <group transform = "wallTransform" id="wall5" type="wall" shader = "#materialWall">
       <mesh src="#wall5Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall6" type="wall" shader = "#materialWall">
+    <group transform = "wallTransform" id="wall6" type="wall" shader = "#materialWall2">
       <mesh src="#wall6Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall7" type="wall" shader = "#materialWall">
+    <group transform = "wallTransform" id="wall7" type="wall" shader = "#materialWall2">
       <mesh src="#wall7Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall8" type="wall" shader = "#materialWall">
+    <group transform = "wallTransform" id="wall8" type="wall" shader = "#materialWall2">
       <mesh src="#wall8Data" type="triangles"/>
     </group>
    

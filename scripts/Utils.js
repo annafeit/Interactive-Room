@@ -334,6 +334,23 @@ Kata.require([
 			else return y;
 		}
 		
+		Helper.contains = function(arr, el){
+			for (var i = 0; i< arr.length; i++){
+				if (arr[i] == el){
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		Helper.gradToRad = function(grad){
+			return ((grad * Math.PI * 2) / 360);
+		}
+		
+		Helper.radToGrad = function(rad){
+			return ((rad * 360) / (2 * Math.PI));
+		}
+		
 	
 		
 	

@@ -4,7 +4,8 @@ Kata.require([
 	'katajs/oh/GraphicsScript.js',
 	kata_base_offset + 'scripts/Utils.js',
 	kata_base_offset + 'scripts/behavior/visit/Visit.js',
-	kata_base_offset + 'scripts/behavior/chat/Chat.js'
+	kata_base_offset + 'scripts/behavior/chat/Chat.js',
+	kata_base_offset + 'scripts/behavior/Camera.js'
 ], function() {
 	/**
 	* Simulate inheritance from GraphicsScript by defining a super variable
@@ -29,8 +30,7 @@ Kata.require([
 		/**"camera" mode: moving camera by drag 
 		 * "furniture" mode: moving furniture by drag and drop
 		 */		
-		this.mode="camera";	 
-		
+				
 		//to store all furniture of the room
 		this.furniture = new Array();
 		this.activeFurniture;
@@ -38,18 +38,6 @@ Kata.require([
 		//the initiator of the current (furniture) mode
 		this.initiator = null;
 		
-		//to save which key is pressed
-		this.keyIsDown = {};
-		//initialize
-		this.keyIsDown[this.Keys.UP] = false;
-		this.keyIsDown[this.Keys.DOWN] = false;
-		this.keyIsDown[this.Keys.RIGHT] = false;
-		this.keyIsDown[this.Keys.LEFT] = false;
-		this.keyIsDown[this.Keys.W] = false;
-		this.keyIsDown[this.Keys.A] = false;
-		this.keyIsDown[this.Keys.S] = false;
-		this.keyIsDown[this.Keys.D] = false;
-		this.keyIsDown[this.Keys.DEL] = false;
 		
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
@@ -92,17 +80,7 @@ Kata.require([
         	Kata.warn("Camera wiped object");
         }
     };
-
-    
-    /** Camera sync */
-    User.prototype.syncCamera = function() {
-        var now = new Date();
-        this.setCameraPosOrient(this.presence.predictedPosition(now),
-                                this.presence.predictedOrientation(now),
-                                0.1); //lag:0.1 just to match the code...
-        //this.checkWalls(); 
-    };
-         
+     
     
 	/**
 	* Callback that is triggered when object is connected to the space
@@ -133,14 +111,8 @@ Kata.require([
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
 		$(".furniture").live("click",function(){thus.createFurniture(this, false)});
-		$("#firstPersonView").click(function(){thus.setCamToView("firstPerson")});
-		$("#topView").click(function(){thus.setCamToView("top")});
 		
-        //set up camera sync
-        this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
-        this.syncCamera();       
-		
-		document.userScript = this;
+		document.userScript = this;				
 	};
 	
     /**
@@ -252,140 +224,11 @@ Kata.require([
         		    			});
     				}
     			},'json');    	
-    }
-
-	User.prototype.parseScene = function(){
-		//camera
-        var activeViewId = this.xml3d.activeView;
-        this.camera = document.getElementById(activeViewId);
-        
-        var materials = document.getElementsByTagName("shader");
-	    var material;
-	    var transparent;
-	     
-	     //finds id of material-shader and transparent-shader
-	     for (var i = 0; i<materials.length; i++){
-	    	 material = materials[i].id;
-	    	 if (material.substr(0,8) == "material" && material.substr(0,14) != "materialCenter"){
-	    		 break;
-	    	 }
-	     }
-	     for (var i = 0; i<materials.length; i++){
-	    	 transparent = materials[i].id;
-	    	 if (transparent.substr(0,19) == "transparentMaterial"){
-	    		 break;
-	    	 }
-	     }
-	     this.material = material;
-	     this.transparentMaterial = transparent;
-	}
-	
-	  /**
-	* Sets the camera to the view with the given name
-	*/
-    User.prototype.setCamToView = function(v){
-	     var views = document.getElementsByTagName("view");
-	     var view;
-	     var l = v.length;
-	     //finds the viewpoint of the given view
-	     for (var i = 0; i<views.length; i++){
-	    	 view = views[i];
-	    	 if (view.id.substr(0,l) == v){
-	    		 break;
-	    	 }
-	     }
-    	 //set center variable
-    	 var s = view.getAttribute("center").split(" "); 
-    	 this.center = this.xml3d.createXML3DVec3();
-    	 this.center.x = s[0];
-    	 this.center.y = s[1];
-    	 this.center.z = s[2];     	 
-    	 
-    	 var view = this.lookAt(this.center, view);
-    	 
-    	//set initial distance from cam to center
-    	 var dist = view.position.subtract(this.center);
- 		 this.camCenterDistance = dist.length(); 		
- 		 
-    	 //set presence position
-	     var now = new Date();
-	     var loc = this.presence.predictedLocationAtTime(now);
-	     var p = view.position;
-	     var o = view.orientation;
-	 
-	     loc.pos = [p.x, p.y, p.z];
-	     var or = Kata._helperQuatFromAxisAngle([o.axis.x, o.axis.y, o.axis.z], o.angle);
-	     loc.orient = or;
-	 
-	     this.presence.setLocation(loc);
-	     this.syncCamera();	     	    
-    };
-    
-
-	
-	/**
-	* check if the camera is out of the room and make walls invisible if this is true.
-	*/
-	User.prototype.checkWalls = function(){
-		//create ray with origin in camera and direction in camera direction
-		var ray = this.xml3d.createXML3DRay();
-		ray.origin = this.camera.position;		
-		ray.direction = this.camera.getDirection();
-		//create ray with origin in camera and direction in opposite camera direction
-		var rayNeg = this.xml3d.createXML3DRay();		
-		rayNeg.origin = this.camera.position;
-		rayNeg.direction = this.camera.getDirection().negate();
-				
-		var rt1 = Helper.rayIntersectsWalls(ray);
-		var rt2 = Helper.rayIntersectsWalls(rayNeg);
-		if (!(rt1 && rt2)){
-			//outside of the room (not a wall on both sides of the camera)
-			if(rt1)
-				this.setShaderTransparent(rt1.wall);							
-		}
-		else{
-			this.setShaderSolid();
-		}
-	}
-	
-
-	User.prototype.setShaderTransparent = function(wall){
-		if(this.hiddenWall && this.hiddenWall != wall){
-			this.setShaderSolid();			
-		}
-		if(wall){				
-			wall.setAttribute("shader", "#"+this.transparentMaterial );
-			this.hiddenWall = wall;
-		}
-		else{
-			//set shader of all walls transparent
-			var groups = document.getElementsByTagName("group");		
-			for (var i =0;i<groups.length;i++)
-			{
-				var obj = groups[i];
-				if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
-					obj.setAttribute("shader", "#"+this.transparentMaterial );				
-				}
-			}
-		}
-		this.xml3d.update();
-	}
+    }	
 	
 
 	
-	User.prototype.setShaderSolid = function(){	
-		var groups = document.getElementsByTagName("group");		
-		for (var i =0;i<groups.length;i++)
-		{
-			var obj = groups[i];
-			if(obj.getAttribute("type") == "wall" || obj.getAttribute("type") == "ceiling"){
-				obj.setAttribute("shader", "#"+this.material );				
-			}
-			
-		}
-		this.xml3d.update();
-		this.hiddenWall = null;
-	}
+	
 
 	
 	User.prototype.createChatEvent = function(action, name, msg) {
@@ -415,18 +258,7 @@ Kata.require([
     };
 
 	
-	//Enum for Keycode
-	User.prototype.Keys = {
-		UP : 38,
-		DOWN : 40,
-		LEFT : 37,
-		RIGHT : 39,
-		W : 87,
-		A : 65,
-		S : 83,
-		D : 68,
-		DEL:46
-	};
+
 
 	var lastClick = -Number.MAX_VALUE;
 	var lastDragEvent;
@@ -445,10 +277,13 @@ Kata.require([
 	            this.handleChatGUIMessage(msg);
 		if(msg.msg=="loaded"){
 			if (msg.mesh==this.roomMesh){
-				this.setCamToView("top");
-				this.parseScene();
+				//behavior for navigating the camera
+				this.cameraBehavior = 
+					new Kata.Behavior.Camera(
+						this, this.camera, this.xml3d	
+					);
+				
 				this.fillRoom();
-			
 			}
 			else{
 				for(var i = 0; i<this.furniture.length; i++){
@@ -574,10 +409,13 @@ Kata.require([
 			}
 		}
 		if(msg.msg == "keyup"){
-			this.keyIsDown[msg.keyCode] = false;
+			/*this.keyIsDown[msg.keyCode] = false;*/
+			
 		}
 		
-		if (msg.msg == "keydown"){			
+		if (msg.msg == "keydown"){
+			
+			/*
             this.ctrl = msg.ctrlKey;
             this.keyIsDown[msg.keyCode] = true;
                        
@@ -650,7 +488,7 @@ Kata.require([
             	if(this.activeFurniture){
             		this.activeFurniture.presence.disconnect();
             	}
-            }
+            }*/
 		}
 	
 		this.updateGFX(this.presence);
@@ -935,7 +773,7 @@ Kata.require([
 	
 	/**
 	 * Helper function to move the Center
-	 * The center's y-coordinate (height) neer changes
+	 * The center's y-coordinate (height) never changes
 	 */
 	User.prototype.moveCenter = function(x, z){
 		this.center.x = this.center.x + x;		
