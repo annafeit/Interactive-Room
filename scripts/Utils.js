@@ -351,6 +351,26 @@ Kata.require([
 			return ((rad * 360) / (2 * Math.PI));
 		}
 		
+		/**
+		 * vec: array
+		 * rotation: XML3DRotation, the rotation that defines the other coordinate system
+		 */
+		Helper.vecInWorldCoord = function(rotation, vec){
+			this.xml3d = document.getElementsByTagName("xml3d")[0];
+			
+			var newVec = this.xml3d.createXML3DVec3();
+			newVec.x = vec[0];
+			newVec.y = vec[1];
+			newVec.z = vec[2];
+			
+	    	var orient = this.xml3d.createXML3DRotation();
+	    	var axis = rotation.axis;
+	    	var angle = rotation.angle * (-1);
+	    	orient.setAxisAngle(axis, angle);
+	    	
+	    	return orient.rotateVec3(newVec);
+		}
+		
 	
 		
 	

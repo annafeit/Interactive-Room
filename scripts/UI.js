@@ -323,12 +323,14 @@ function initRoom(){
 		}
 	});
 	
-	$("#camUpDownSlider").slider({
+	$("#predefinedViews").buttonset();
+	
+	$("#camZoomSlider").slider({
 		orientation: "vertical",
 		range: "min",
-		min: -90,
-		max: 90,
-		value: 60,
+		min: -500,
+		max: -50, 
+		step:1
 	});
 	
 	$(".furniture").live("mouseover",function(){

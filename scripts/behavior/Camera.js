@@ -19,8 +19,7 @@ Kata.require([
         this.parent = parent;
         this.parent.addBehavior(this);
 
-        this.cameraMode = "top";
-        this.mode = "camera";
+        this.cameraMode = "top";        
         
         this.camera = cam;
         this.xml3d = xml3d;
@@ -31,23 +30,47 @@ Kata.require([
 		this.keyIsDown[this.Keys.UP] = false;
 		this.keyIsDown[this.Keys.DOWN] = false;
 		this.keyIsDown[this.Keys.RIGHT] = false;
-		this.keyIsDown[this.Keys.LEFT] = false;
+		this.keyIsDown[this.Keys.LEFT] = false;		
 		this.keyIsDown[this.Keys.W] = false;
 		this.keyIsDown[this.Keys.A] = false;
 		this.keyIsDown[this.Keys.S] = false;
 		this.keyIsDown[this.Keys.D] = false;
+		this.keyIsDown[this.Keys.BILDUP] = false;
+		this.keyIsDown[this.Keys.BILDDOWN] = false;
+		this.keyIsDown[this.Keys.COMMA] = false;
+		this.keyIsDown[this.Keys.DOT] = false;
 		this.keyIsDown[this.Keys.DEL] = false;
+		this.keyIsDown[this.Keys.CTRL] = false;
 		
 		this.parseScene();
 		this.setCamToView("top");		
 		
+		this.speed = 15;
+		this.moveSpeed = 50;
 		
 		//set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
         this.syncCamera();                
     }; 
     
-    
+  //Enum for Keycode
+	Kata.Behavior.Camera.prototype.Keys = {
+		UP : 38,
+		DOWN : 40,
+		LEFT : 37,
+		RIGHT : 39,
+		W : 87,
+		A : 65,
+		S : 83,
+		D : 68,
+		DEL:46,
+		BILDUP: 33,
+		BILDDOWN: 34,
+		COMMA: 188,
+		DOT: 190,
+		CTRL:17
+	};
+	
     Kata.Behavior.Camera.prototype.parseScene = function(){
 		//camera
         var activeViewId = this.xml3d.activeView;
@@ -83,33 +106,87 @@ Kata.require([
 		
 		$("#camLeft").mousedown(function(){thus.setVelocity("left")});
 		$("#camLeft").mouseup(function(){thus.disableVelocity(true, false)});
+		$("#camLeft").mouseleave(function(){thus.disableVelocity(true, false)});
 		
 		$("#camRight").mousedown(function(){thus.setVelocity("right")});
 		$("#camRight").mouseup(function(){thus.disableVelocity(true, false)});
+		$("#camRight").mouseleave(function(){thus.disableVelocity(true, false)});
 		
 		$("#camUp").mousedown(function(){thus.setVelocity("up")});
 		$("#camUp").mouseup(function(){thus.disableVelocity(true, false)});
+		$("#camUp").mouseleave(function(){thus.disableVelocity(true, false)});
 		
 		$("#camDown").mousedown(function(){thus.setVelocity("down")});
 		$("#camDown").mouseup(function(){thus.disableVelocity(true, false)});
+		$("#camDown").mouseleave(function(){thus.disableVelocity(true, false)});
 		
 		$("#camTurnRight").mousedown(function(){thus.setAngularVelocity("right")});
-		$("#camTurnRight").mouseup(function(){thus.disableVelocity(false, true)});
+		$("#camTurnRight").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnRight").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)});
 		
 		$("#camTurnLeft").mousedown(function(){thus.setAngularVelocity("left")});
-		$("#camTurnLeft").mouseup(function(){thus.disableVelocity(false, true)});
+		$("#camTurnLeft").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnLeft").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)});
 		
 		$("#camTurnUp").mousedown(function(){thus.setAngularVelocity("up")});
-		$("#camTurnUp").mouseup(function(){thus.disableVelocity(false, true)});
+		$("#camTurnUp").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnUp").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)} );
 		
 		$("#camTurnDown").mousedown(function(){thus.setAngularVelocity("down")});
-		$("#camTurnDown").mouseup(function(){thus.disableVelocity(false, true)});
+		$("#camTurnDown").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnDown").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)});
 		
 		$("#camZoomSlider").slider("option", "value",  (-1)*this.camCenterDistance);
 		$("#camZoomSlider").bind( "slide", function(event, ui) {
 			  thus.zoomTo((ui.value * (-1)));
 			});
     };
+    
+    Kata.Behavior.Camera.prototype.keydown = function(msg){    	    	
+    	//execute this only once!
+    	if(this.keyIsDown[msg.keyCode]){
+    		return;
+    	}    	
+    	this.keyIsDown[msg.keyCode] = true;    	
+    	
+    	if(this.keyIsDown[this.Keys.UP] || this.keyIsDown[this.Keys.W]){
+    		this.setVelocity("up");
+    	}
+    	if (this.keyIsDown[this.Keys.DOWN] || this.keyIsDown[this.Keys.S]) {
+    		this.setVelocity("down");
+    	}
+    	if (this.keyIsDown[this.Keys.LEFT] || this.keyIsDown[this.Keys.A]) {
+    		this.setVelocity("left");
+    	}
+    	if (this.keyIsDown[this.Keys.RIGHT] || this.keyIsDown[this.Keys.D]) {
+    		this.setVelocity("right");    		
+    	}
+    	if (this.keyIsDown[this.Keys.BILDUP]) {
+    		this.setAngularVelocity("up");    		
+    	}
+    	if (this.keyIsDown[this.Keys.BILDDOWN]) {
+    		this.setAngularVelocity("down");    		
+    	}
+    	if (this.keyIsDown[this.Keys.COMMA]) {
+    		this.setAngularVelocity("right");    		
+    	}
+    	if (this.keyIsDown[this.Keys.DOT]) {
+    		this.setAngularVelocity("left");		
+    	}
+    	if (this.keyIsDown[this.Keys.DEL]){
+        	//TODO doesnt work. delete the active Furniture
+        	if(this.parent.activeFurniture){
+        		this.parent.activeFurniture.presence.disconnect();
+        	}
+        }
+    }
+    
+    Kata.Behavior.Camera.prototype.keyup = function(msg){
+    	this.keyIsDown[msg.keyCode] = false;
+    	this.release(); 
+		this.disableVelocity(true, true);
+		
+    }
     
     /**
 	* Sets the camera to the view with the given name
@@ -250,6 +327,12 @@ Kata.require([
 	} 
     
 	Kata.Behavior.Camera.prototype.zoomTo = function(dist) {
+		if(dist < 100){
+			this.changeCameraMode("firstPerson");
+		}
+		else{
+			this.changeCameraMode("top");
+		}
 		diff = Math.round(this.camCenterDistance) - dist;		
 		
 		var dir = this.camera.getDirection().negate();
@@ -263,13 +346,13 @@ Kata.require([
 	
     Kata.Behavior.Camera.prototype.setVelocity = function(dir) {
     	var avMat = Kata.QuaternionToRotation(this.parent.presence.predictedOrientation(new Date()));
-    	var avSpeed = 50;
-    	var avXX = avMat[0][0] * avSpeed;
-        var avXY = avMat[0][1] * avSpeed;
-        var avXZ = avMat[0][2] * avSpeed;
-        var avZX = avMat[2][0] * avSpeed;
-        var avZY = avMat[2][1] * avSpeed;
-        var avZZ = avMat[2][2] * avSpeed;
+    	
+    	var avXX = avMat[0][0] * this.moveSpeed;
+        var avXY = avMat[0][1] * this.moveSpeed;
+        var avXZ = avMat[0][2] * this.moveSpeed;
+        var avZX = avMat[2][0] * this.moveSpeed;
+        var avZY = avMat[2][1] * this.moveSpeed;
+        var avZZ = avMat[2][2] * this.moveSpeed;
         
         if (dir == "right")
         	this.parent.presence.setVelocity([avXX, avXY, avXZ]);
@@ -285,9 +368,10 @@ Kata.require([
     }
     
     Kata.Behavior.Camera.prototype.setAngularVelocity = function(dir) {
-    	if(this.cameraMode == "firstPerson"){
-	    	var full_rot_seconds = 10.0;    	        
-	    	var yaxis = this.camYAxisInWorldCoord();
+    	var full_rot_seconds = 10.0;  
+    	if(this.cameraMode == "firstPerson"){	    	  	        
+    		var y = {0: 0 , 1: 1, 2 : 0};
+	    	var yaxis = Helper.vecInWorldCoord(this.camera.orientation, y);
 	    	
 	        if (dir == "right")
 	        	this.parent.presence.setAngularVelocity(
@@ -298,18 +382,34 @@ Kata.require([
 	                    Kata.Quaternion.fromAxisAngle([yaxis.x, yaxis.y, yaxis.z], 2.0*Math.PI/full_rot_seconds)
 	                );
 	        if (dir == "up")
-	        	this.parent.presence.setAngularVelocity(
-	                    Kata.Quaternion.fromAxisAngle([1, 0, 0], 2.0*Math.PI/full_rot_seconds)
+	        	this.parent.presence.setAngularVelocity(	        			
+	                    Kata.Quaternion.fromAxisAngle([1, 0, 0], -2.0*Math.PI/full_rot_seconds)
 	                );
 	        if (dir == "down")
 	        	this.parent.presence.setAngularVelocity(
-	                    Kata.Quaternion.fromAxisAngle([1, 0, 0], -2.0*Math.PI/full_rot_seconds)
+	                    Kata.Quaternion.fromAxisAngle([1, 0, 0], 2.0*Math.PI/full_rot_seconds)
 	                );
     	}
-    	else{
+    	else{    		
     		
+            this.pressed = true;
+            if (dir == "up")
+            	 this.turnTimer = setInterval(Kata.bind(this.turnUpDown, this, "up"), 100);            	
+            if (dir == "down")            	
+            	this.turnTimer = setInterval(Kata.bind(this.turnUpDown, this, "down"), 100);
+            if (dir == "right")
+            	this.turnTimer = setInterval(Kata.bind(this.turnRightLeft, this, "right"), 100);
+            if (dir == "left")
+            	this.turnTimer = setInterval(Kata.bind(this.turnRightLeft, this, "left"), 100);
+            
     	}
+    	
 	        this.parent.updateGFX(this.parent.presence)
+    }
+    
+    Kata.Behavior.Camera.prototype.release = function(){
+    	window.clearInterval(this.turnTimer);
+    	this.turnTimer = null;
     }
         
     Kata.Behavior.Camera.prototype.disableVelocity = function(move, turn) {
@@ -323,49 +423,26 @@ Kata.require([
     	this.moveCenter();
     	this.parent.updateGFX(this.parent.presence)
     }
-    
-    Kata.Behavior.Camera.prototype.camYAxisInWorldCoord = function(){
-    	var or = this.camera.orientation;
-    	var orient = this.xml3d.createXML3DRotation();
-    	var axis = or.axis;
-    	var angle = or.angle * (-1);
-    	orient.setAxisAngle(axis, angle);
-    	
-    	var vec = this.xml3d.createXML3DVec3();
-    	vec.x = 0;
-    	vec.y = 1;
-    	vec.z = 0;
-    	
-    	return orient.rotateVec3(vec);
-    }
-    
-    Kata.Behavior.Camera.prototype.turnDown = function(){
-		var cam = this.camera;
-		
-		//angle of camDirection to y-Axis in the range of 0° - 180°
-		var angle = this.angleToY(cam.getDirection());
-		if(angle > 0.98){
-			return;
+  
+    /**
+	 * Helper function to correct the Distance from the cam to the center
+	 */
+    Kata.Behavior.Camera.prototype.correctCamCenterDistance = function(cam, update){		
+		var dist = cam.position.subtract(this.center);
+		if(update){
+			this.camCenterDistance = dist.length();
 		}
-		
-		var orientMat = cam.orientation.toMatrix();
-		//y-axis in camera coordinate system
-		var orYX = orientMat.m21 * speed;        
-        var orYY = orientMat.m22 * speed;
-        var orYZ = orientMat.m23 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x - orYX;
-        cam.position.y = cam.position.y - orYY;
-        cam.position.z = cam.position.z - orYZ;
-        
-        //change camera's direction such that it looks at the center         
-        cam = this.lookAt(this.center, cam);
-        cam = this.correctCenterCamDistance(cam, false);
-       
-        this.updatePresence(cam.position, cam.orientation);
-	}
-                
+		else{
+	        var diff = dist.length() - this.camCenterDistance;
+	        if (diff != 0){
+	        	var dir = cam.getDirection();
+	        	dir = dir.normalize();
+	        	cam.position.x = cam.position.x + (dir.x * diff);
+	        	cam.position.z = cam.position.z + (dir.z * diff);
+	        }      
+		}
+        return cam;
+	}            
     
     /**
 	 * Helper function to move the Center
@@ -375,18 +452,7 @@ Kata.require([
     	this.center = this.camera.position.add(dir.scale(this.camCenterDistance));		
 	}
     
-	//Enum for Keycode
-	Kata.Behavior.Camera.prototype.Keys = {
-		UP : 38,
-		DOWN : 40,
-		LEFT : 37,
-		RIGHT : 39,
-		W : 87,
-		A : 65,
-		S : 83,
-		D : 68,
-		DEL:46
-	};
+	
 	
 	Kata.Behavior.Camera.prototype.lookAt = function(point, cam){
 		var vector = point.subtract(cam.position);
@@ -408,8 +474,253 @@ Kata.require([
 		var alpha = Math.acos((vec.dot(yAxis)) / (vec.length() * yAxis.length()));  
 		return alpha;
 	}
-    
-    
+	
+	/**
+	 * Helper function to change the camera's Up vector to be parallel to the y-axis
+	 */
+	Kata.Behavior.Camera.prototype.setCamUpToY = function(cam){
+		var newUp = this.xml3d.createXML3DVec3();
+		newUp.x = 0;
+		newUp.y = 1;
+		newUp.z = 0;
+		cam.setUpVector(newUp);		
+		return cam;
+	}
+	
+	Kata.Behavior.Camera.prototype.centerToObject = function(msg){
+		//move and rotate camera such that it looks at the center of the object that was clicked on.
+		var mesh  = this.xml3d.getElementByPoint(msg.x, msg.y);
+		var obj = Helper.getFurnitureGroup(mesh);
+		var furn = this.parent.furnitureFromXML3D(obj);
+		if (furn){	
+			var pos = Helper.objWorldCenter(obj);
+			var point = this.xml3d.createXML3DVec3();
+			point.x = pos.x;
+			point.y = pos.y;
+			point.z = pos.z;
+			var cam = this.setCamUpToY(this.camera);
+			cam = this.lookAt(point, cam);
+			this.updatePresence(cam.position, cam.orientation);
+		}
+	}
+	
+	
+	
+	Kata.Behavior.Camera.prototype.turnUpDown = function(dir){		
+		var cam = this.camera;
+		var sign = 1;
+		if (dir == "down") 
+			sign = -1;
+		
+		//angle of camDirection to y-Axis in the range of 90° - 180°
+		var angle = this.angleToY(cam.getDirection());
+		if((angle >= 3.0 && dir == "up") || (angle <= 0.5 && dir == "down")){
+			return;
+		}
+		
+		var orientMat = cam.orientation.toMatrix();		
+		//y-axis in camera coordinate system
+		var orYX = orientMat.m21 * this.speed * sign;        
+        var orYY = orientMat.m22 * this.speed * sign;
+        var orYZ = orientMat.m23 * this.speed * sign;
+        
+        //change position in direction of camera's y-axis
+        cam.position.x = cam.position.x + orYX;
+        cam.position.y = cam.position.y + orYY;
+        cam.position.z = cam.position.z + orYZ;
+        
+        //change camera's direction such that it looks at the center         
+        cam = this.lookAt(this.center, cam);
+        cam = this.correctCamCenterDistance(cam, false);
+       
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	
+	Kata.Behavior.Camera.prototype.turnRightLeft = function(dir){	
+		//make cam parallel to floor		
+		var cam = this.setCamUpToY(this.camera);
+		var sign = -1
+		if (dir == "left") 
+			sign = 1;
+		
+		var orientMat = cam.orientation.toMatrix();		
+		//x-axis in camera coordinate system
+		var orXX = orientMat.m11 * this.speed * sign;
+        var orXZ = orientMat.m13 * this.speed * sign;
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + orXX;
+        cam.position.z = cam.position.z + orXZ;
+        
+        //change camera's direction such that it looks at the center 
+        //and correct it's distance to center
+        cam = this.lookAt(this.center, cam);
+        cam = this.correctCamCenterDistance(cam, false);                
+        this.updatePresence(cam.position, cam.orientation);       
+	}
+	
+	Kata.Behavior.Camera.prototype.zoomInOut = function(dir){		
+		var cam = this.camera;
+		
+		var sign = -1
+		if (dir == "out") 
+			sign = 1;
+		
+		if(dist < 100){
+			this.changeCameraMode("firstPerson");
+		}
+		else{
+			this.changeCameraMode("top");
+		}
+		
+		if ((this.camCenterDistance < 10) && (dir=="in")){
+			return;
+		}
+		var dir = cam.getDirection();
+        dir.normalize();
+        
+        //change position in direction of camera's x-axis
+        cam.position.x = cam.position.x + (dir.x * this.speed);
+        cam.position.y = cam.position.y + (dir.y * this.speed);
+        cam.position.z = cam.position.z + (dir.z * this.speed);
+        
+        //update distance of camera to center 
+        this.correctCamCenterDistance(cam, true);
+        
+        this.updatePresence(cam.position, cam.orientation);
+	}
+	
+	//horizontal or vertical
+	var prevDir = null;
+	var prevDirExact = null;
+	
+	
+	Kata.Behavior.Camera.prototype.turnByDrag = function(msg){				
+		if ((prevDir == null) || (prevDirExact == null)){
+			//set initial direction
+			if (Math.abs(msg.dx) > Math.abs(msg.dy)){
+				//Mouse moved more horizontally
+				prevDir = "horizontal";
+				if (msg.dx > 1){
+					this.setAngularVelocity("right");
+					prevDirExact = "right";
+				}
+				if (msg.dx < -1){
+					this.setAngularVelocity("left");
+					prevDirExact = "left";
+				}				
+				return;
+			}
+			if (Math.abs(msg.dx) < Math.abs(msg.dy)){
+				//Mouse moved more vertical
+				prevDir = "vertical"
+				if (msg.dy > 1){
+					this.setAngularVelocity("up");
+					prevDirExact = "up";
+				}
+				if (msg.dy < -1){
+					this.setAngularVelocity("down");
+					prevDirExact = "down";
+				}				
+				return;
+			}
+		}
+	
+		//Check direction while dragging
+		if (prevDir == "horizontal"){
+			//Check if it is still horizontal (with a big tolerance) 
+			if(Math.abs(msg.dyCurrent) > 5){
+				prevDir = "vertical"
+				this.disableVelocity(false, true);
+				this.release();
+				if (msg.dy > 1){
+					this.setAngularVelocity("up");
+					prevDirExact = "up";
+				}
+				if (msg.dy < -1){
+					this.setAngularVelocity("down");
+					prevDirExact = "down";
+				}				
+				return;
+				
+			}
+			//Check if direction has changed
+			if ((prevDirExact == "right") && (msg.dxCurrent < -1)){
+				prevDirExact = "left";
+				this.disableVelocity(false, true);
+				this.release();
+				this.setAngularVelocity("left");
+				return;
+			}
+			if ((prevDirExact == "left") && (msg.dxCurrent > 1)){
+				prevDirExact = "right";
+				this.disableVelocity(false, true);
+				this.release();
+				this.setAngularVelocity("right");
+				return;
+			}
+		
+		}
+		//Check direction while dragging
+		if (prevDir == "vertical"){
+			//Check if it is still horizontal (with a big tolerance) 
+			if(Math.abs(msg.dxCurrent) > 5){
+				prevDir = "horizontal"
+				this.disableVelocity(false, true);
+				this.release();
+				
+				if (msg.dx > 1){
+					this.setAngularVelocity("right");
+					prevDirExact = "right";
+				}
+				if (msg.dx < -1){
+					this.setAngularVelocity("left");
+					prevDirExact = "left";
+				}				
+				return;
+				
+			}
+			//Check if direction has changed
+			if ((prevDirExact == "up") && (msg.dyCurrent < -1)){
+				prevDirExact = "down";
+				this.disableVelocity(false, true);
+				this.release();
+				this.setAngularVelocity("down");
+				return;
+			}
+			if ((prevDirExact == "down") && (msg.dyCurrent > 1)){
+				prevDirExact = "up";
+				this.disableVelocity(false, true);
+				this.release();
+				this.setAngularVelocity("up");
+				return;
+			}
+		}			
+		
+	}
+	
+	Kata.Behavior.Camera.prototype.drop = function(){
+		prevDir = null;
+		prevDirExact = null;
+		
+		this.disableVelocity(false, true);
+		this.release();
+	}
+	
+	Kata.Behavior.Camera.prototype.changeCameraMode = function(mode){
+		if (mode == "firstPerson"){
+			$("#topViewLabel").removeClass('ui-state-active ui-state-hover');
+			$("#firstPersonViewLabel").addClass('ui-state-active ui-state-hover');
+			this.speed = 5;
+		}
+		else{
+			$("#firstPersonViewLabel").removeClass('ui-state-active ui-state-hover');
+			$("#topViewLabel").addClass('ui-state-active ui-state-hover');
+			this.speed = 15;
+		}
+		this.cameraMode = mode;
+	}
+	
     
 }, '../../scripts/behavior/Camera.js');
 

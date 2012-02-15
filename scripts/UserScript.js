@@ -29,7 +29,8 @@ Kata.require([
 		
 		/**"camera" mode: moving camera by drag 
 		 * "furniture" mode: moving furniture by drag and drop
-		 */		
+		 */
+		this.mode = "camera";
 				
 		//to store all furniture of the room
 		this.furniture = new Array();
@@ -230,7 +231,11 @@ Kata.require([
 	
 	
 
-	
+	/****
+	 * 
+	 * CHAT STUFF
+	 * 
+	 ****/
 	User.prototype.createChatEvent = function(action, name, msg) {
         var evt = {
             action : action,
@@ -262,10 +267,6 @@ Kata.require([
 
 	var lastClick = -Number.MAX_VALUE;
 	var lastDragEvent;
-	//the smaller the speed the faster the turning/moving/zooming
-	//no mathematical foundation, just a  guess
-		
-	
 	
 		
 	//Handle messages from GUI
@@ -323,172 +324,35 @@ Kata.require([
 				}
 			}			
 		}
-		if(msg.msg == "doubleclick"){
-			//move and rotate camera such that it looks at the center of the object that was clicked on.
-			var mesh  = this.xml3d.getElementByPoint(msg.x, msg.y);
-			var obj = Helper.getFurnitureGroup(mesh);
-			var furn = this.furnitureFromXML3D(obj);
-			if (furn){	
-				var pos = Helper.objWorldCenter(obj);
-				var point = this.xml3d.createXML3DVec3();
-				point.x = pos.x;
-				point.y = pos.y;
-				point.z = pos.z;
-				var cam = this.setCamUpToY(this.camera);
-				cam = this.lookAt(point, cam);
-				this.updatePresence(cam.position, cam.orientation);
-			}
-		}
+		
 		if(msg.msg =="mousemove"){
 			if(this.mode == "furniture" && (this.initiator == this.presence.mID))
 				this.activeFurniture.moveFurnitureToMouse(msg.x, msg.y);			
-		}		
+		}
+		/** camera Navigation **/
+		if(msg.msg == "doubleclick"){
+			this.cameraBehavior.centerToObject(msg);
+		}
 		if(msg.msg == "drag" && this.mode == "furniture"){
 			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2 && (this.initiator == this.presence.mID)){
 				this.activeFurniture.rotate(msg.dx, msg.dy);
 			}
 		}
-		/** camera Navigation **/
-		if(msg.msg == "drag" && (this.mode == "camera" || this.initiator != this.presence.mID)){
-			if (Math.abs(msg.dx) > Math.abs(msg.dy)){			
-				//mouse moved more horizontally
-				if(msg.dx > 0){					
-					//mouse moved to the right -> turn left
-					var i = msg.dx;
-					while (i>0){
-						this.turnLeft();
-						i = i - turnSpeed;
-					}
-				}
-				else{
-					//mouse moved to the left -> turn right
-					var i = -msg.dx;
-					while (i>0){
-						this.turnRight();
-						i = i - turnSpeed;
-					}
-				}
-			}
-			else { 
-				//mouse moved more vertically
-				if(msg.dy > 0){
-					//mouse moved down -> turn up
-					var i = msg.dy;
-					while (i>0){
-						this.turnUp();
-						i = i - turnSpeed;
-					}
-				}
-				else{
-					//mouse moved up -> turn down
-					var i = -msg.dy;
-					while (i>0){
-						this.turnDown();
-						i = i - turnSpeed;
-					}
-				}
-			}
-		}
 		if(msg.msg == "wheel"){
-			
-			if(msg.dy > 0){
-				// zoom in 
-				var i = msg.dy;
-				while (i>0){
-					this.zoomIn();
-					i = i - zoomSpeed;
-				}
-			}
-			else{
-				//zoom out
-				var i = -msg.dy;
-				while (i>0){
-					this.zoomOut();
-					i = i - zoomSpeed;
-				}
-			}
+			this.cameraBehavior.zoomTo(this.cameraBehavior.camCenterDistance + (msg.dy*(-0.1)));			
+		}		
+		if(msg.msg == "drag" && (this.mode == "camera" || this.initiator != this.presence.mID)){
+			this.cameraBehavior.turnByDrag(msg);
+		}
+		if(msg.msg == "drop" && (this.mode == "camera" || this.initiator != this.presence.mID)){
+			this.cameraBehavior.drop();
 		}
 		if(msg.msg == "keyup"){
-			/*this.keyIsDown[msg.keyCode] = false;*/
-			
+			this.cameraBehavior.keyup(msg);
 		}
 		
 		if (msg.msg == "keydown"){
-			
-			/*
-            this.ctrl = msg.ctrlKey;
-            this.keyIsDown[msg.keyCode] = true;
-                       
-            if (this.keyIsDown[this.Keys.UP] || this.keyIsDown[this.Keys.W]) {
-            	if (this.ctrl){
-            		var i = 0;
-            		while (i<turnSpeed){
-            			this.turnUp();
-            			i++;
-            		}					
-		        }
-	            else{	            	
-	            	var i = 0;
-            		while (i<moveSpeed){
-            			this.moveUp();
-            			i++;
-            		}
-	            }                
-            }
-            if (this.keyIsDown[this.Keys.DOWN] || this.keyIsDown[this.Keys.S]) {
-            	if (this.ctrl){
-            		var i = 0;
-	        		while (i<turnSpeed){
-	        			this.turnDown();
-	        			i++;
-	        		}
-            	}
-	            else{
-	            	var i = 0;
-            		while (i<moveSpeed){
-            			this.moveDown();
-            			i++;
-            		}
-	            }
-            }            
-            if (this.keyIsDown[this.Keys.LEFT] || this.keyIsDown[this.Keys.A]) {
-            	if (this.ctrl){
-            		var i = 0;
-	        		while (i<turnSpeed){
-	        			this.turnRight();
-	        			i++;
-	        		}
-            	}
-	            else{
-	            	var i = 0;
-            		while (i<moveSpeed){
-            			this.moveLeft();
-            			i++;
-            		}
-	            }
-            }
-            if (this.keyIsDown[this.Keys.RIGHT] || this.keyIsDown[this.Keys.D]) {
-            	if (this.ctrl){
-            		var i = 0;
-	        		while (i<turnSpeed){
-	        			this.turnLeft();
-	        			i++;
-	        		}
-            	}
-	            else{
-	            	var i = 0;
-            		while (i<moveSpeed){
-            			this.moveRight();
-            			i++;
-            		}
-	            }
-            }
-            if (this.keyIsDown[this.Keys.DEL]){
-            	//delete the active Furniture
-            	if(this.activeFurniture){
-            		this.activeFurniture.presence.disconnect();
-            	}
-            }*/
+			this.cameraBehavior.keydown(msg);
 		}
 	
 		this.updateGFX(this.presence);
