@@ -371,6 +371,13 @@ Kata.require([
 	    	return orient.rotateVec3(newVec);
 		}
 		
+		Helper.getCenterPoint = function(dist){
+			this.xml3d = document.getElementsByTagName("xml3d")[0];
+			this.cam = document.getElementById(this.xml3d.activeView);
+			var dir = this.cam.getDirection();
+			return this.cam.position.add(dir.scale(dist));
+		}
+		
 	
 		
 	

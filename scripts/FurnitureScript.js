@@ -30,7 +30,7 @@ Kata.require([
 		
 		this.inDB = args.inDB;
 		this.shader = "normal";
-		this.materials = {red: null, green: null, normal: null};
+		this.materials = {red: null, green: null, normal: null, yellow: null};
 		
 		
 		this.active = false;		
@@ -43,7 +43,15 @@ Kata.require([
 		
 		SUPER.constructor.call(this, channel, args, function(){});
 			
-		this.connect(args, null, Kata.bind(this.connected, this));	
+		this.connect(args, null, Kata.bind(this.connected, this));
+		if(args.visitorControl){
+			this.visitorControl = true;
+		}
+		else{
+			this.visitorControl = false;
+		}
+		if(args.visitor)
+			this.visitor = args.visitor;
 		
 	};
 
@@ -254,6 +262,8 @@ Kata.require([
 	}
 	
 	Furniture.prototype.changeShader = function(color){
+		if (color == "green" && this.visitorControl)
+			color = "yellow";
 		if(color != this.shader){
 			if(color == "normal"){
 				var parent = this.group.parentElement;
@@ -300,6 +310,9 @@ Kata.require([
 		    }
 		    if (material.substr(0,13) =="greenMaterial"){
 		    	this.materials.green = material;
+		    }
+		    if (material.substr(0,14) =="yellowMaterial"){
+		    	this.materials.yellow = material;
 		    }
 	    }
 	    

@@ -285,6 +285,7 @@ function logout(name, online, id, loc){
 			});
 }
 	
+var menuVisible = true;
 function initRoom(){
 
 	$("#menu-type").accordion({
@@ -292,6 +293,29 @@ function initRoom(){
 		navigation: true		
 	});				
 	
+	$("#menu-typeShow").mouseenter(function(){
+		$("#menu-typeShow a").css("font-weight", "bolder");
+		$("#menu-typeShow a").css("color", "black");
+	});
+	$("#menu-typeShow").mouseleave(function(){
+		$("#menu-typeShow a").css("font-weight", "normal");
+		$("#menu-typeShow a").css("color", "#444");
+	});
+	
+	$("#menu-typeShow").click(function(){
+		if(menuVisible){
+			$("#menu-type").hide();
+			$("#menu-typeShow").css("left", "0px");
+			menuVisible = false;
+			$("#menu-typeShow a").html("&gt; &gt; &gt;");
+		}
+		else{
+			$("#menu-type").show();
+			$("#menu-typeShow").css("left", "200px");
+			menuVisible = true;
+			$("#menu-typeShow a").html("&lt; &lt; &lt;");
+		}
+	});
 	
 	$("#furnitureBrowser").hide();
 	

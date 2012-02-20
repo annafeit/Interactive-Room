@@ -168,7 +168,7 @@ Kata.require([
         }
         if (container_msg.HasField("mode")) {
         	if(this.parent.handleChangeMode)
-        		this.parent.handleChangeMode(container_msg.mode);
+        		this.parent.handleChangeMode(container_msg.mode, this.visitors[src.presenceID()]);
         }
         if (container_msg.HasField("move")) {
         	if(this.parent.handleMove)
@@ -191,6 +191,14 @@ Kata.require([
         		this.parent.handleAccessConfirmation(container_msg.confirmAccess, this.visitors[src.presenceID()]);
         }
     };
+    
+    Kata.Behavior.Visit.prototype.getVisitorFromId = function(pId){
+    	for (i in this.visitors){
+    		if (this.visitors[i].dest.mObject == pId){
+    			return this.visitors[i];
+    		}
+    	}
+    }
     
     /**
      * sends a message to all visitors / to the owner (depending on this.type)
@@ -215,8 +223,8 @@ Kata.require([
     			case "mode":
     				msg = new Visit.Protocol.Mode();
 					msg.mode = args.mode;
-					msg.groupId = args.groupId;
-					msg.initiator = args.initiator;  	            
+					msg.groupId = args.groupId; 
+					msg.color = args.color;
     	            container_msg.mode = msg;
     	            break;
     			case "shader":
@@ -250,17 +258,19 @@ Kata.require([
 					msg = new Visit.Protocol.Mode();
 					msg.mode = args.mode;
 					msg.groupId = args.groupId;
-					msg.initiator = args.initiator;
+					msg.color = args.color;
 	    	        container_msg.mode = msg;
 	    	        break;
 				case "move":
 					msg = new Visit.Protocol.Move();
-					msg.hitPoint = args.hitPoint;				//of form "x y z"
+					msg.hitPoint = args.hitPoint;	//of form "x y z"
+					msg.groupId = args.groupId;
 					container_msg.move = msg;
 					break;
 				case "rotate":
 					msg = new Visit.Protocol.Rotate();
 					msg.rotate = args.rotate;			//of form "dx dy"
+					msg.groupId = args.groupId;
 					container_msg.rotate = msg;
 					break;
 				case "create":
@@ -303,8 +313,8 @@ Kata.require([
 			case "mode":
 				msg = new Visit.Protocol.Mode();
 				msg.mode = args.mode;
-				msg.mesh = args.mesh;
-				msg.initiator = args.initiator;  	            
+				msg.groupId = args.groupId;
+				msg.color = args.color; 
 	            container_msg.mode = msg;
 	            break;
 			case "shader":

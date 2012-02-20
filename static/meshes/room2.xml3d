@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
 	<defs>
-	    <transform id="lightTransform1" translation="100 240 -200"/>
-	    <transform id="lightTransform2" translation="500 240 -200"/>
+	    <transform id="lightTransform1" translation="450 200 -550"/>
+	    <transform id="lightTransform2" translation="750 200 -150"/>
+	    <transform id="lightTransform3" translation="150 200 -150"/>
 	    
 		<shader id="materialFloor" script="urn:xml3d:shader:phong">
 	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
 	            <float name="ambientIntensity">0.2</float>
 	            <texture name="diffuseTexture">
-			<img src="static/meshes/textures/texFloor1.jpeg"/>
+			<img src="static/meshes/textures/texFloor5.jpeg"/>
 		    </texture>
 	        </shader>
 		
@@ -29,34 +30,52 @@
 		    </float>
 		</shader>
 		
-        <lightshader id="light" script="urn:xml3d:lightshader:point">
-		    <float3 name="intensity">1.0 1.0 1.0</float3>
+		<lightshader id="light" script="urn:xml3d:lightshader:point">
+		    <float3 name="intensity">0.6 0.6 0.6</float3>
 		    <float3 name="attenuation">1 0 0</float3>
 		</lightshader>
 
+
 	    
-		<data id="floorData" >
+		<data id="floor1Data" >
 	            <int name="index">
 	            	0 1 2 
-	            	2 3 0
-	            	4 2 5
-	            	5 6 4
-	            	7 5 8 
-	            	8 9 7	            	
+	            	2 3 0           	
 	            </int>
 	            
 	            <float3 name="position">
 	            	0 0 0
-	            	0 0 -400
-	            	200 0 -400
-	            	200 0 0 
-	            	200 0 -150
-	            	400 0 -400
-	            	400 0 -150
-	            	400 0 0
-	            	600 0 -400
-	            	600 0 0
-	             
+	            	0 0 -300
+	            	300 0 -300
+	            	300 0 0 
+		    </float3>
+	            
+	            <float3 name="normal">
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            	0 1 0
+	            </float3>
+		    
+		    <float2 name="texcoord">
+			0.375 0.3
+			0.0 0.3
+			0.0 0.0
+			0.375 0.0
+		    </float2>
+			
+		</data>
+		<data id="floor2Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0           	
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 0 -300
+			0 0 -800
+			900 0 -800
+	            	900 0 -300
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -64,36 +83,83 @@
 	            	0 1 0
 	            	0 1 0
 	            	0 1 0
-	            	0 1 0
-	            	0 1 0
+	            </float3>
+		    
+		    <float2 name="texcoord">
+			1.0 1.0
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+		    </float2>
+			
+		  </data>
+		  <data id="floor3Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0           	
+	            </int>
+	            
+	            <float3 name="position">
+			600 0 0
+	            	600 0 -300
+			900 0 -300
+			900 0 0
+	            </float3>
+	            
+	            <float3 name="normal">
 	            	0 1 0
 	            	0 1 0
 	            	0 1 0
 	            	0 1 0
 	            </float3>
-	    </data>
-	    <data id="ceilingData" >
-	           <int name="index">
+		    
+		    <float2 name="texcoord">
+			0.375 0.3
+			0.0 0.3
+			0.0 0.0
+			0.375 0.0
+		    </float2>
+			
+		  </data>
+	   <data id="ceiling1Data" >
+	            <int name="index">
 	            	0 1 2 
-	            	2 3 0
-	            	4 2 5
-	            	5 6 4
-	            	7 5 8 
-	            	8 9 7	            	
+	            	2 3 0           	
 	            </int>
 	            
 	            <float3 name="position">
 	            	0 250 0
-	            	0 250 -400
-	            	200 250 -400
-	            	200 250 0 
-	            	200 250 -150
-	            	400 250 -400
-	            	400 250 -150
-	            	400 250 0
-	            	600 250 -400
-	            	600 250 0
-	             
+	            	0 250 -300
+	            	300 250 -300
+	            	300 250 0 
+		    </float3>
+	            
+	            <float3 name="normal">
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            	0 -1 0
+	            </float3>
+		    
+		    <float2 name="texcoord">
+			0.375 0.3
+			0.0 0.3
+			0.0 0.0
+			0.375 0.0
+		    </float2>
+			
+		</data>
+		<data id="ceiling2Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0           	
+	            </int>
+	            
+	            <float3 name="position">
+	            	0 250 -300
+			0 250 -800
+			900 250 -800
+	            	900 250 -300
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -101,14 +167,44 @@
 	            	0 -1 0
 	            	0 -1 0
 	            	0 -1 0
-	            	0 -1 0
-	            	0 -1 0
+	            </float3>
+		    
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
+			
+		  </data>
+		  <data id="ceiling3Data" >
+	            <int name="index">
+	            	0 1 2 
+	            	2 3 0           	
+	            </int>
+	            
+	            <float3 name="position">
+			600 250 0
+	            	600 250 -300
+			900 250 -300
+			900 250 0
+	            </float3>
+	            
+	            <float3 name="normal">
 	            	0 -1 0
 	            	0 -1 0
 	            	0 -1 0
 	            	0 -1 0
 	            </float3>
-	    </data>
+		    
+		    <float2 name="texcoord">
+			0.375 0.3
+			0.0 0.3
+			0.0 0.0
+			0.375 0.0
+		    </float2>
+			
+		  </data>
 	    <data id="wall1Data" >
 	            <int name="index">
 	            	0 1 2 
@@ -118,8 +214,8 @@
 	            <float3 name="position">
 	            	0 0 0
 	            	0 250 0 
-	            	200 250 0 
-	            	200 0 0
+	            	300 250 0 
+	            	300 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -128,6 +224,12 @@
 	            	0 0 -1
 	            	0 0 -1	            	
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	     <data id="wall2Data" >
 	            <int name="index">
@@ -138,8 +240,8 @@
 	            <float3 name="position">
 	            	0 0 0
 	            	0 250 0 
-	            	0 250 -400
-	            	0 0 -400
+	            	0 250 -800
+	            	0 0 -800
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -148,6 +250,12 @@
 	            	1 0 0
 	            	1 0 0
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall3Data" >
 	            <int name="index">
@@ -156,10 +264,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	0 0 -400 
-	            	0 250 -400
-	            	600 250 -400
-	            	600 0 -400
+	            	0 0 -800 
+	            	0 250 -800
+	            	900 250 -800
+	            	900 0 -800
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -168,6 +276,12 @@
 	            	0 0 1
 	            	0 0 1
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall4Data" >
 	            <int name="index">
@@ -176,10 +290,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            	
-	            	600 0 -400
-	            	600 250 -400
-	            	600 250 0
-	            	600 0 0
+	            	900 0 -800
+	            	900 250 -800
+	            	900 250 0
+	            	900 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -188,6 +302,12 @@
 	            	-1 0 0 
 	            	-1 0 0  
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall5Data" >
 	            <int name="index">
@@ -196,10 +316,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            	
-					400 0 0
-					400 250 0
-					600 250 0
-	            	600 0 0
+			600 0 0
+			600 250 0
+			900 250 0
+	            	900 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -208,6 +328,12 @@
 	            	0 0 -1
 	            	0 0 -1  
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall6Data" >
 	            <int name="index">
@@ -216,10 +342,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	400 0 -150
-	            	400 250 -150
-	            	400 250 0
-	            	400 0 0
+	            	600 0 -300
+	            	600 250 -300
+	            	600 250 0
+	            	600 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -228,6 +354,12 @@
 	            	1 0 0 
 	            	1 0 0  
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall7Data" >
 	            <int name="index">
@@ -236,10 +368,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	200 0 -150
-	            	200 250 -150
-	            	400 250 -150
-	            	400 0 -150
+	            	300 0 -300
+	            	300 250 -300
+	            	600 250 -300
+	            	600 0 -300
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -248,6 +380,12 @@
 	            	0 0 -1
 	            	0 0 -1  
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall8Data" >
 	            <int name="index">
@@ -256,10 +394,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	200 0 0
-	            	200 250 0 
-	            	200 250 -150
-	            	200 0 -150   
+	            	300 0 0
+	            	300 250 0 
+	            	300 250 -300
+	            	300 0 -300
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -268,47 +406,68 @@
 	            	0 0 -1
 	            	0 0 -1  
 	            </float3>
+		     <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
     </defs>
            
-    <view id="top" position="300 250 -480" orientation="0 1 0 3.14" center="300 100 -275"/>
-    <view id="firstPerson" position="300 100 -380" orientation="0 1 0 -1.57" center="300 100 -380"/>
+    <view id="top" position="450 700 -825" orientation="0 1 0 3.14" center="450 100 -480"/>
+    <view id="firstPerson" position="450 120 -800" orientation="0 1 0 -1.57" center="450 120 -795"/>
     
     <group id="light1" transform="#lightTransform1" >
 	 <light shader="#light" intensity="0.8" />
-	</group>
-	<group id="light2" transform="#lightTransform2" >
+    </group>
+    <group id="light2" transform="#lightTransform2" >
 	 <light shader="#light" intensity="0.8" />
-	</group>
+    </group>
+    <group id="light2" transform="#lightTransform3" >
+	 <light shader="#light" intensity="0.8" />
+    </group>
 	     		  
-    <group id="floor" type="floor" shader = "#material">
-      <mesh src="#floorData" type="triangles"/>
+    <group id="floor1" type="floor" shader = "#materialFloor">
+      <mesh src="#floor1Data" type="triangles"/>
     </group>
-    <group id="ceiling" type="ceiling" shader = "#material">
-      <mesh src="#ceilingData" type="triangles"/>
+    <group id="floor2" type="floor" shader = "#materialFloor">
+      <mesh src="#floor2Data" type="triangles"/>
     </group>
-    <group id="wall1" type="wall" shader = "#material">
+    <group id="floor3" type="floor" shader = "#materialFloor">
+      <mesh src="#floor3Data" type="triangles"/>
+    </group>
+    <group id="ceiling1" type="ceiling" shader = "#materialWall">
+      <mesh src="#ceiling1Data" type="triangles"/>
+    </group>
+    <group id="ceiling2" type="ceiling" shader = "#materialWall">
+      <mesh src="#ceiling2Data" type="triangles"/>
+    </group>
+    <group id="ceiling3" type="ceiling" shader = "#materialWall">
+      <mesh src="#ceiling3Data" type="triangles"/>
+    </group>
+    <group id="wall1" type="wall" shader = "#materialWall">
       <mesh src="#wall1Data" type="triangles"/>
     </group>
-    <group id="wall2" type="wall" shader = "#material">
+    <group id="wall2" type="wall" shader = "#materialWall">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group id="wall3" type="wall" shader = "#material">
+    <group id="wall3" type="wall" shader = "#materialWall">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
-    <group id="wall4" type="wall" shader = "#material">
+    <group id="wall4" type="wall" shader = "#materialWall">
       <mesh src="#wall4Data" type="triangles"/>
     </group>
-    <group id="wall5" type="wall" shader = "#material">
+    <group id="wall5" type="wall" shader = "#materialWall">
       <mesh src="#wall5Data" type="triangles"/>
     </group>
-    <group id="wall6" type="wall" shader = "#material">
+    <group id="wall6" type="wall" shader = "#materialWall">
       <mesh src="#wall6Data" type="triangles"/>
     </group>
-    <group id="wall7" type="wall" shader = "#material">
+    <group id="wall7" type="wall" shader = "#materialWall">
       <mesh src="#wall7Data" type="triangles"/>
     </group>
-    <group id="wall8" type="wall" shader = "#material">
+    <group id="wall8" type="wall" shader = "#materialWall">
       <mesh src="#wall8Data" type="triangles"/>
     </group>
 </xml3d>

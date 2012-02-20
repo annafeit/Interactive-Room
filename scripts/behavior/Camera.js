@@ -46,7 +46,7 @@ Kata.require([
 		this.setCamToView("top");		
 		
 		this.speed = 15;
-		this.moveSpeed = 50;
+		this.moveSpeed = 100;
 		
 		//set up camera sync
         this.mCamUpdateTimer = setInterval(Kata.bind(this.syncCamera, this), 60);
@@ -90,56 +90,104 @@ Kata.require([
 	    	 }
 	     }	   
 	    for (var i = 0; i<materials.length; i++){
-	    	 transparent = materials[i].id;
-	    	 if (transparent.substr(0,19) == "transparentMaterial"){
-	    		 break;
+	    	 material = materials[i].id;
+	    	 if (material.substr(0,19) == "transparentMaterial"){
+	    		 this.transparentMaterial = material;	    		 
+	    	 }
+	    	 if(this.parent.furnitureShaders){
+	    		 if (material.substr(0,11) =="redMaterial"){
+	  		    	this.parent.furnitureShaders["red"] = material;
+	  		     }
+	  		     if (material.substr(0,13) =="greenMaterial"){
+	  		    	this.parent.furnitureShaders["green"] = material;
+	  		     }
+	  		     if (material.substr(0,14) =="yellowMaterial"){
+	  		    	this.parent.furnitureShaders["yellow"] = material;
+	  		     }
 	    	 }
 	     }
 	    
-	     this.transparentMaterial = transparent;
+	     
 	}
     
     Kata.Behavior.Camera.prototype.setupButtons = function(angleVec) {    	
     	var thus = this;
 	    $("#firstPersonView").click(function(){thus.setCamToView("firstPerson")});
 		$("#topView").click(function(){thus.setCamToView("top")});
+		$("#listButton").click(function(){
+			var vec = Helper.getCenterPoint(thus.camCenterDistance);			
+			console.log("camera pos: "+thus.camera.position.x + ", "+ thus.camera.position.y + ", "+ thus.camera.position.z);
+			console.log("Center: "+vec.x + ", "+ vec.y + ", "+ vec.z);
+			});
 		
 		$("#camLeft").mousedown(function(){thus.setVelocity("left")});
 		$("#camLeft").mouseup(function(){thus.disableVelocity(true, false)});
 		$("#camLeft").mouseleave(function(){thus.disableVelocity(true, false)});
+		$("#camLeft").focusout(function(){thus.disableVelocity(true, false)});
 		
 		$("#camRight").mousedown(function(){thus.setVelocity("right")});
 		$("#camRight").mouseup(function(){thus.disableVelocity(true, false)});
 		$("#camRight").mouseleave(function(){thus.disableVelocity(true, false)});
+		$("#camRight").focusout(function(){thus.disableVelocity(true, false)});
 		
 		$("#camUp").mousedown(function(){thus.setVelocity("up")});
 		$("#camUp").mouseup(function(){thus.disableVelocity(true, false)});
 		$("#camUp").mouseleave(function(){thus.disableVelocity(true, false)});
+		$("#camUp").focusout(function(){thus.disableVelocity(true, false)});
 		
 		$("#camDown").mousedown(function(){thus.setVelocity("down")});
 		$("#camDown").mouseup(function(){thus.disableVelocity(true, false)});
 		$("#camDown").mouseleave(function(){thus.disableVelocity(true, false)});
+		$("#camDown").focusout(function(){thus.disableVelocity(true, false)});
 		
 		$("#camTurnRight").mousedown(function(){thus.setAngularVelocity("right")});
-		$("#camTurnRight").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
-		$("#camTurnRight").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnRight").mouseup(function(){thus.release(); thus.disableVelocity(true , true)});
+		$("#camTurnRight").mouseleave(function(){thus.release(); thus.disableVelocity(true, true)});
+		$("#camTurnRight").focusout(function(){thus.release(); thus.disableVelocity(true, true)});
 		
 		$("#camTurnLeft").mousedown(function(){thus.setAngularVelocity("left")});
-		$("#camTurnLeft").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
-		$("#camTurnLeft").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnLeft").mouseup(function(){thus.release(); thus.disableVelocity(true, true)});
+		$("#camTurnLeft").mouseleave(function(){thus.release(); thus.disableVelocity(true, true)});
+		$("#camTurnLeft").focusout(function(){thus.release(); thus.disableVelocity(true, true)});
 		
 		$("#camTurnUp").mousedown(function(){thus.setAngularVelocity("up")});
-		$("#camTurnUp").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
-		$("#camTurnUp").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)} );
+		$("#camTurnUp").mouseup(function(){thus.release(); thus.disableVelocity(true, true)});
+		$("#camTurnUp").mouseleave(function(){thus.release(); thus.disableVelocity(true, true)} );
+		$("#camTurnUp").focusout(function(){thus.release(); thus.disableVelocity(true, true)} );
 		
 		$("#camTurnDown").mousedown(function(){thus.setAngularVelocity("down")});
-		$("#camTurnDown").mouseup(function(){thus.release(); thus.disableVelocity(false, true)});
-		$("#camTurnDown").mouseleave(function(){thus.release(); thus.disableVelocity(false, true)});
+		$("#camTurnDown").mouseup(function(){thus.release(); thus.disableVelocity(true, true)});
+		$("#camTurnDown").mouseleave(function(){thus.release(); thus.disableVelocity(true, true)});
+		$("#camTurnDown").focusout(function(){thus.release(); thus.disableVelocity(true, true)});
 		
 		$("#camZoomSlider").slider("option", "value",  (-1)*this.camCenterDistance);
 		$("#camZoomSlider").bind( "slide", function(event, ui) {
 			  thus.zoomTo((ui.value * (-1)));
 			});
+		
+		$("#cornerTopLeft").mouseenter(function(){thus.setVelocity("upleft");});
+		$("#cornerTopLeft").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#cornerTopRight").mouseenter(function(){thus.setVelocity("upright");});
+		$("#cornerTopRight").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#cornerBottomLeft").mouseenter(function(){thus.setVelocity("downleft");});
+		$("#cornerBottomLeft").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#cornerBottomRight").mouseenter(function(){thus.setVelocity("downright");});
+		$("#cornerBottomRight").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#borderTop").mouseenter(function(){thus.setVelocity("up");});
+		$("#borderTop").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#borderBottom").mouseenter(function(){thus.setVelocity("down");});
+		$("#borderBottom").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#borderRight").mouseenter(function(){thus.setVelocity("right");});
+		$("#borderRight").mouseleave(function(){thus.disableVelocity(true, false);});
+		
+		$("#borderLeft").mouseenter(function(){thus.setVelocity("left");});
+		$("#borderLeft").mouseleave(function(){thus.disableVelocity(true, false);});
     };
     
     Kata.Behavior.Camera.prototype.keydown = function(msg){    	    	
@@ -344,6 +392,28 @@ Kata.require([
 		
 	}
 	
+	
+	/*
+	 * Functions to control the camera.
+	 * 
+	 * Turning:
+	 * 	the camera turns around the center: position and direction of camera changes
+	 * 	max: turning right or left is unlimited,
+	 * 		 turning up and down only in the range from 0 - 180° to the y-axis.
+	 * Moving:
+	 *  The camera moves parallel to the floor 
+	 * 	max: position of the center outside the walls
+	 *  position of the camera changes, position of the center changes the same way
+	 * Zooming: 
+	 * 	the camera moves in the looking direction 
+	 *  max. until it has (nearly) the same position as the center. 	 
+	 * 	The center doesn't change but the distance from camera to center changes
+	 * 
+	 * Implementation:
+	 * change position/direction of the tmp-camera and assign it to the presence. Position of actual camera
+	 * in the scene is then changed automatically
+	 */
+	
     Kata.Behavior.Camera.prototype.setVelocity = function(dir) {
     	var avMat = Kata.QuaternionToRotation(this.parent.presence.predictedOrientation(new Date()));
     	
@@ -362,6 +432,14 @@ Kata.require([
         	this.parent.presence.setVelocity([-avZX, 0, -avZZ]);
         if (dir == "down")
         	this.parent.presence.setVelocity([avZX, 0 , avZZ]);
+        if (dir == "upleft")
+        	this.parent.presence.setVelocity([(-avZX) + (-avXX), 0, (-avZZ) + (-avXZ)]);
+        if (dir == "downleft")
+        	this.parent.presence.setVelocity([(avZX) + (-avXX), 0, (avZZ) + (-avXZ)]);
+        if (dir == "upright")
+        	this.parent.presence.setVelocity([(-avZX) + (avXX), 0, (-avZZ) + (avXZ)]);
+        if (dir == "downright")
+        	this.parent.presence.setVelocity([(avZX) + (avXX), 0, (avZZ) + (avXZ)]);
         
         this.moveCenter();
         this.parent.updateGFX(this.parent.presence)
@@ -394,13 +472,13 @@ Kata.require([
     		
             this.pressed = true;
             if (dir == "up")
-            	 this.turnTimer = setInterval(Kata.bind(this.turnUpDown, this, "up"), 100);            	
+            	 this.turnTimer = setInterval(Kata.bind(this.turnUpDown, this, "up"), 60);            	
             if (dir == "down")            	
-            	this.turnTimer = setInterval(Kata.bind(this.turnUpDown, this, "down"), 100);
+            	this.turnTimer = setInterval(Kata.bind(this.turnUpDown, this, "down"), 60);
             if (dir == "right")
-            	this.turnTimer = setInterval(Kata.bind(this.turnRightLeft, this, "right"), 100);
+            	this.turnTimer = setInterval(Kata.bind(this.turnRightLeft, this, "right"), 60);
             if (dir == "left")
-            	this.turnTimer = setInterval(Kata.bind(this.turnRightLeft, this, "left"), 100);
+            	this.turnTimer = setInterval(Kata.bind(this.turnRightLeft, this, "left"), 60);
             
     	}
     	
@@ -629,7 +707,7 @@ Kata.require([
 		//Check direction while dragging
 		if (prevDir == "horizontal"){
 			//Check if it is still horizontal (with a big tolerance) 
-			if(Math.abs(msg.dyCurrent) > 5){
+			if(Math.abs(msg.dyCurrent) > 10){
 				prevDir = "vertical"
 				this.disableVelocity(false, true);
 				this.release();
@@ -664,7 +742,7 @@ Kata.require([
 		//Check direction while dragging
 		if (prevDir == "vertical"){
 			//Check if it is still horizontal (with a big tolerance) 
-			if(Math.abs(msg.dxCurrent) > 5){
+			if(Math.abs(msg.dxCurrent) > 10){
 				prevDir = "horizontal"
 				this.disableVelocity(false, true);
 				this.release();

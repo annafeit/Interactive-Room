@@ -85,7 +85,7 @@ Visit.Protocol.Mode = PROTO.Message("Visit.Protocol.Mode",{
 		type: function(){return PROTO.string;},
 		id: 2
 	},
-	initiator: {
+	color: {
 		options: {},
 		multiplicity: PROTO.optional,
 		type: function(){return PROTO.string;},
@@ -97,6 +97,12 @@ Visit.Protocol.Move = PROTO.Message("Visit.Protocol.Move",{
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
 		id: 1
+	},
+	groupId: {
+		options: {},
+		multiplicity: PROTO.required,
+		type: function(){return PROTO.string;},
+		id: 2
 	}});
 Visit.Protocol.Rotate = PROTO.Message("Visit.Protocol.Rotate",{
 	rotate: {
@@ -104,6 +110,12 @@ Visit.Protocol.Rotate = PROTO.Message("Visit.Protocol.Rotate",{
 		multiplicity: PROTO.required,
 		type: function(){return PROTO.string;},
 		id: 1
+	},
+	groupId: {
+		options: {},
+		multiplicity: PROTO.required,
+		type: function(){return PROTO.string;},
+		id: 2
 	}});
 Visit.Protocol.Shader = PROTO.Message("Visit.Protocol.Shader",{
 	groupId: {

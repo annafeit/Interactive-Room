@@ -620,7 +620,7 @@ for all tables the same**/
 	right:10px;
 	height:100px;
 	margin-top:0px;
-	
+	z-index:10;
 }
 #camButton{
 	background-image:url(../static/icons/cam.png);
@@ -845,13 +845,37 @@ for all tables the same**/
 
 
 /** menu **/
+#menu-typeShow{
+	position:absolute;
+	width:15px;
+	height:40px;
+	left:200px;
+	border-radius:0px 5px 5px 0px;	
+	top:20%;
+	margin-top:2px;
+	margin-left:-2px;
+	background-color:#FFF0D6;
+	border:1px solid lightGrey; 
+	z-index:10;
+}
+	#menu-typeShow a{
+		color:#444;
+		font-size:14px;
+		position:absolute;
+		left:4px;
+		top:4px;
+		line-height:80%;
+		fontweight:bold;
+		cursor:default;
+	}
 #menu-type{
 	position:absolute;
-	width:20%;
-	height:500px;
+	width:200px;
+	height:auto;
 	top:20%;
 	left:0%;	
 	overflow:hidden;
+	z-index:11;
 }
 	.category{
 		text-decoration:none;
@@ -878,6 +902,7 @@ for all tables the same**/
 	bottom:0%;
 	left:50%;
 	margin-left:-395px;
+	z-index: 10;
 }
 
 #furnitureContent{	
@@ -995,5 +1020,101 @@ for all tables the same**/
 	position:relative;
 	left:15px;
 	
+}
+#shoppingList{
+	display:none;
+	position:absolute;
+	width:500px;
+	top:100px;
+	left:50%;
+	margin-left:-250px;
+	height:auto;
+	border:1px solid lighGrey;
+	background-image:url(../static/icons/shoppingList.png);
+	background-size:100% auto;
+	background-repeat:repeat-y;
+	box-shadow:5px 5px 10px #222;	
+	overflow:auto;
+}
+.shoppingListEntry{
+	position:relative;
+	float:left;
+	width:450px;
+	height:auto;
+	left:20px;	
+	font-family:sans-serif;
+	color:#460000;
+	font-size:28px;
+}
+.shoppingListPreview{
+	float:left;
+	height:100px;	
+	width: 100px;
+	background-size:100px 100px;
+}
+.shoppingListName{
+	position:relative;
+	float:left;
+	left:20px;
+	top:30px;
+}
+.shoppingListPrice{
+	float:left;
+	position:relative;
+	top:30px;
+	right:-200px;
+}
+/*BORDER*/
+.viewBorder{
+	position:absolute;
+	z-index:9;
+}
+.corner{
+	height:20px;
+	width:20px;
+}
+#cornerTopLeft{
+	top:0px;
+	left:0px;
+}
+#cornerTopRight{
+	top:0px;
+	right:0px;
+}
+#cornerBottomRight{
+	bottom:0px;
+	right:0px;
+}
+#cornerBottomLeft{
+	bottom:0px;
+	left:0px;
+}
+#borderTop{
+	top:0px;
+	left:0px;
+	width:100%;
+	height:20px;
+	z-index:8;
+}
+#borderBottom{
+	bottom:0px;
+	left:0px;
+	width:100%;
+	height:20px;
+	z-index:8;
+}
+#borderLeft{
+	bottom:0px;
+	left:0px;
+	height:100%;
+	width:20px;
+	z-index:8;
+}
+#borderRight{
+	bottom:0px;
+	right:0px;
+	height:100%;
+	width:20px;
+	z-index:8;
 }
 

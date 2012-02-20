@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
 	<defs>		
-	    <transform id="lightTransform" translation="200 200 -200"/>
-	    <transform id="centerTransform" translation="200 150 -200"/>
-	 
+	    <transform id="lightTransform1" translation="800 200 -400"/>
+	    <transform id="lightTransform2" translation="300 200 -400"/>
 	        
 		<shader id="materialFloor" script="urn:xml3d:shader:phong">
 	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
@@ -40,20 +39,10 @@
 		</shader>
 		
 		<lightshader id="light" script="urn:xml3d:lightshader:point">
-		    <float3 name="intensity">1.0 1.0 1.0</float3>
+		    <float3 name="intensity">0.6 0.6 0.6</float3>
 		    <float3 name="attenuation">1 0 0</float3>
 		</lightshader>
 		
-		<lightshader id="spotLight" script="urn:xml3d:lightshader:spot">
-		  <float3 name="intensity">0.9 0.4 0.4</float3>
-		  <float3 name="attenuation">0 0 1</float3>
-		  <float3 name="direction">0 1 0</float3>
-		  <float  name="beamWidth">45.0</float>
-		  <float  name="cutOffAngle">45.0</float>
-		  <bool   name="castShadow">true</bool>
-		</lightshader>
-
-	    
 		<data id="floor1Data" >
 	            <int name="index">
 	            	0 1 2 
@@ -100,10 +89,10 @@
 	            	0 1 0
 	            </float3>
 		     <float2 name="texcoord">
-			1.0 0.0
+			0.3 0.0
 			0.0 0.0
-			0.0 1.0
-			1.0 1.0
+			0.0 0.3
+			0.3 0.3
 		
 			
 		    </float2>
@@ -115,10 +104,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	0 250 0
-	            	0 250 -800
-	            	600 250 -800
-	            	600 250 0
+	            	0 200 0
+	            	0 200 -800
+	            	600 200 -800
+	            	600 200 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -141,10 +130,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	600 250 -300
-	            	600 250 -500
-	            	900 250 -500 
-	            	900 250 -300 
+	            	600 200 -300
+	            	600 200 -500
+	            	900 200 -500 
+	            	900 200 -300 
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -168,8 +157,8 @@
 	            
 	            <float3 name="position">
 	            	0 0 0
-	            	0 250 0
-	            	0 250 -800
+	            	0 200 0
+	            	0 200 -800
 	            	0 0 -800
 	            </float3>
 	            
@@ -194,8 +183,8 @@
 	            
 	            <float3 name="position">
 	            	0 0 -800
-	            	0 250 -800
-	            	600 250 -800
+	            	0 200 -800
+	            	600 200 -800
 	            	600 0 -800
 	            </float3>
 	            
@@ -220,9 +209,9 @@
 	            
 	            <float3 name="position">
 	            	0 0 0
-					0 250 0
-					600 250 0
-					600 0 0
+			0 200 0
+			600 200 0
+			600 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -246,8 +235,8 @@
 	            
 	            <float3 name="position">
 	            	900 0 -300
-	            	900 250 -300
-	            	900 250 -500
+	            	900 200 -300
+	            	900 200 -500
 	            	900 0 -500
 	            </float3>
 	            
@@ -271,10 +260,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            	
-					600 0 0
-					600 250 0
-					600 250 -300
-					600 0 -300
+			600 0 0
+			600 200 0
+			600 200 -300
+			600 0 -300
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -298,8 +287,8 @@
 	            
 	            <float3 name="position">	            						
 	            	600 0 -500  
-	            	600 250 -500
-	            	600 250 -800
+	            	600 200 -500
+	            	600 200 -800
 	            	600 0 -800
 	            </float3>
 	            
@@ -324,8 +313,8 @@
 	            
 	            <float3 name="position">	            						
 	            	600 0 -300
-	            	600 250 -300
-	            	900 250 -300
+	            	600 200 -300
+	            	900 200 -300
 	            	900 0 -300   
 	            </float3>
 	            
@@ -349,9 +338,9 @@
 	            </int>
 	            
 	            <float3 name="position">	            						
-	            	800 0 -500
-	            	800 250 -500
-	            	900 250 -500
+	            	600 0 -500
+	            	600 200 -500
+	            	900 200 -500
 	            	900 0 -500    
 	            </float3>
 	            
@@ -371,16 +360,15 @@
 	    
     </defs>
     
-    <view id="top" position="50 300 -200" orientation="0 1 0 -1.57" center="200 100 -200"/>
-    <view id="firstPerson" position="200 100 -200" orientation="0 1 0 -1.57" center="210 100 -200"/>
+    <view id="top" position="60 600 -400" orientation="0 1 0 -1.57" center="260 150 -400"/>
+    <view id="firstPerson" position="200 120 -400" orientation="0 1 0 -1.57" center="205 120 -400"/>
     
            
-    <group transform="#lightTransform" >
+    <group transform="#lightTransform1" >
 	 <light shader="#light" intensity="1.0" />
     </group>
-    
-    <group transform="#lightTransform" >
-	 <light shader="#spotLight" intensity="1.0" />
+    <group transform="#lightTransform2" >
+	 <light shader="#light" intensity="1.0" />
     </group>
      		  
     <group transform = "wallTransform" id="floor1" type="floor" shader = "#materialFloor">
@@ -401,13 +389,13 @@
     <group transform = "wallTransform" id="wall2" type="wall" shader = "#materialWall">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall3" type="wall" shader = "#materialWall2">
+    <group transform = "wallTransform" id="wall3" type="wall" shader = "#materialWall">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall4" type="wall" shader= "#materialWall" >
+    <group transform = "wallTransform" id="wall4" type="wall" shader= "#materialWall2" >
       <mesh src="#wall4Data" type="triangles"/>
     </group>
-    <group transform = "wallTransform" id="wall5" type="wall" shader = "#materialWall">
+    <group transform = "wallTransform" id="wall5" type="wall" shader = "#materialWall2">
       <mesh src="#wall5Data" type="triangles"/>
     </group>
     <group transform = "wallTransform" id="wall6" type="wall" shader = "#materialWall2">

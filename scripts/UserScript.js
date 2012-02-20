@@ -34,11 +34,13 @@ Kata.require([
 				
 		//to store all furniture of the room
 		this.furniture = new Array();
+		this.furnitureLock = new Array();
 		this.activeFurniture;
 		this.loadedFurnitures = new Array();
 		//the initiator of the current (furniture) mode
 		this.initiator = null;
 		
+		this.shoppingListVisible = false;
 		
 		//call parent constructor
 		SUPER.constructor.call(this, channel, args, function(){});
@@ -112,6 +114,35 @@ Kata.require([
 		var thus = this;
 		//attach a handler for the click-event of all current AND future elements with class furniture
 		$(".furniture").live("click",function(){thus.createFurniture(this, false)});
+		$("#listButton").click(function(){			
+			if(this.shopppingListVisible){
+				this.shopppingListVisible = false;
+				$("#shoppingList").hide();
+				$("#shoppingList").empty();
+			}
+			else{
+				for (var i = 0; i<thus.furniture.length; i++){
+					var pic;
+					var price;
+					var name;
+					$.post('scripts/getFurnitureInfo.php', {id: thus.furniture[i].furnitureId}, function(data, jqxhr){
+						pic = data[0].preview;
+						price = data[0].price;
+						name  = data[0].name;
+						$("#shoppingList").append("<div class='shoppingListEntry'> " +
+								"					<div class='shoppingListPreview' style='background-image: url("+pic+");'/> " +
+								"					<a class='shoppingListName'>" + name + "</a>" +
+								"					<a class='shoppingListPrice'>" + price +"€"+ "</a>" +
+								"				  </div>");
+						 
+					},'json');
+				}
+				this.shopppingListVisible = true;
+				$("#shoppingList").show();
+			}
+		});
+				
+				
 		
 		document.userScript = this;				
 	};
@@ -135,19 +166,24 @@ Kata.require([
     	//only if object isn't already in DB (and now was recreated) 
 	    if(!obj.inDB){
 	    	//if object was not placed correctly from beginning, it's active and the application is in furniture-mode
-	    	if(obj.active){
+	    	if(obj.active && (!obj.visitorControl)){
 	    		this.changeMode(obj);
 	    	}
-	    	//if it was placed correctly, it's not active and we can write it in the DB
-	    	else{
-				//get furniture position and orientation
-				var pos = obj.getPosition();
-				var or = obj.getOrientation();
-				$.post('scripts/createFurniture.php', {furnitureId: obj.furnitureId, roomId: this.roomId, position: pos, orientation: or}, 
-						function(data, jqxhr){
-							obj.dbID = data[0];
-						},'json');
-			}
+	    	else{ if(obj.visitor && obj.active){
+	    			this.handleChangeMode({mode:"furniture", groupId: obj.group.id}, this.visitBehavior.getVisitorFromId(obj.visitor));
+	    		}
+	    	
+		    	//if it was placed correctly, it's not active and we can write it in the DB
+		    	else{
+					//get furniture position and orientation
+					var pos = obj.getPosition();
+					var or = obj.getOrientation();
+					$.post('scripts/createFurniture.php', {furnitureId: obj.furnitureId, roomId: this.roomId, position: pos, orientation: or}, 
+							function(data, jqxhr){
+								obj.dbID = data[0];
+							},'json');
+				}
+	    	}
 	    }
     	
     }
@@ -163,7 +199,6 @@ Kata.require([
 	    			function(data, jqxhr){     				
 	    				var url = kata_base_offset + data[0];
 	    				//create new object in world   
-	    				thus.initiator = thus.presence.mID;
 	    		    	thus.createObject(kata_base_offset + "scripts/FurnitureScript.js",
 	    		    			"Furniture",
 	    		    			{ space:thus.space,    		    		
@@ -271,9 +306,6 @@ Kata.require([
 		
 	//Handle messages from GUI
 	User.prototype._handleGUIMessage = function (channel, msg) {
-		var turnSpeed = 15;	
-		var zoomSpeed = 10;	
-		var moveSpeed = 10;
 		if (msg.msg == 'chat')
 	            this.handleChatGUIMessage(msg);
 		if(msg.msg=="loaded"){
@@ -309,7 +341,7 @@ Kata.require([
 			}
 			else{
 				lastClick = msg.event.timeStamp;
-				if(this.mode == "camera" || (this.mode=="furniture" && this.initiator == this.presence.mID)){
+				
 					var furn = null;
 					var mesh = this.xml3d.getElementByPoint(msg.x, msg.y);
 					if(mesh){										
@@ -317,34 +349,39 @@ Kata.require([
 						furn = this.furnitureFromXML3D(obj);
 					}
 					
-					if (furn ||(this.mode=="furniture")){	
-						this.initiator = this.presence.mID;
-						this.changeMode(furn);
+					if (furn && this.mode == "camera"){							
+						if(this.requestFurn(furn)){
+							this.changeMode(furn);
+						}						
 					}
-				}
+					else{ 
+						if(this.mode == "furniture"){
+							this.changeMode(furn);
+						}
+					}
 			}			
 		}
 		
 		if(msg.msg =="mousemove"){
-			if(this.mode == "furniture" && (this.initiator == this.presence.mID))
+			if(this.mode == "furniture")
 				this.activeFurniture.moveFurnitureToMouse(msg.x, msg.y);			
+		}
+		if(msg.msg == "drag" && this.mode == "furniture"){
+			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2){
+				this.activeFurniture.rotate(msg.dx, msg.dy);
+			}
 		}
 		/** camera Navigation **/
 		if(msg.msg == "doubleclick"){
 			this.cameraBehavior.centerToObject(msg);
 		}
-		if(msg.msg == "drag" && this.mode == "furniture"){
-			if(Math.abs(msg.dx)>2 && Math.abs(msg.dy)>2 && (this.initiator == this.presence.mID)){
-				this.activeFurniture.rotate(msg.dx, msg.dy);
-			}
-		}
 		if(msg.msg == "wheel"){
 			this.cameraBehavior.zoomTo(this.cameraBehavior.camCenterDistance + (msg.dy*(-0.1)));			
 		}		
-		if(msg.msg == "drag" && (this.mode == "camera" || this.initiator != this.presence.mID)){
+		if(msg.msg == "drag" && this.mode == "camera"){
 			this.cameraBehavior.turnByDrag(msg);
 		}
-		if(msg.msg == "drop" && (this.mode == "camera" || this.initiator != this.presence.mID)){
+		if(msg.msg == "drop" && this.mode == "camera"){
 			this.cameraBehavior.drop();
 		}
 		if(msg.msg == "keyup"){
@@ -381,6 +418,31 @@ Kata.require([
 		}
 	}
 	
+	User.prototype.requestFurn = function(furn){
+		if (this.furnitureLock[furn.presence.mID]){
+			return false;
+		}
+		else{
+			this.furnitureLock[furn.presence.mID] = true;
+			return true;
+		}
+	}
+	
+	User.prototype.releaseFurn = function(furn, color){		
+		if((this.activeFurniture && this.activeFurniture.shader == "red") || color == "red"){
+			return false;
+		}
+		else{
+			furn.setActive(false);											
+			furn.changeShader("normal");
+			this.furnitureLock[furn.presence.mID] = false;
+			if(this.activeFurniture == furn){
+				this.activeFurniture = null;
+			}
+			return true;
+		}
+	}
+	
 	/**
 	 * changes mode and activeFurniture in userscript, changes active state and shader of furniture
 	 * furn: the furniture that was clicked on
@@ -392,42 +454,16 @@ Kata.require([
 			this.mode = "furniture";
 			this.activeFurniture = furn;
 			this.activeFurniture.setActive(true);
+			this.activeFurniture.visitorControl = false;
 			//change shader
 			if (this.activeFurniture.shader == "normal"){				
 				this.activeFurniture.changeShader("green");
 			} 
 			   
 		}
-		else if(!(this.activeFurniture.shader == "red")){
-				if (this.activeFurniture == furn || !(furn)){
-					this.mode = "camera";
-					this.activeFurniture.setActive(false);											
-					this.activeFurniture.changeShader("normal");				
-					this.activeFurniture = null;
-				}
-				else{
-					this.activeFurniture.setActive(false);								
-					this.activeFurniture.changeShader("normal");
-					furn.setActive(true);
-					if (furn.shader == "normal"){				
-						furn.changeShader("green");
-					}
-					this.activeFurniture = furn;
-				}
-		}	
-		if (this.mode == "furniture"){
-			var args = {
-				initiator: this.initiator,
-				mode: this.mode,
-				groupId: this.activeFurniture.group.id
-				};
+		else if(this.releaseFurn(this.activeFurniture)){
+				this.mode = "camera";
 		}
-		else{
-			var args = {
-					mode: this.mode				
-				};
-		}
-		this.visitBehavior.sendMessage("mode", args);
 	}
 	
 	/**
@@ -445,10 +481,11 @@ Kata.require([
 	
 	/*
 	 * Methods to handle incoming messages from visitors:
-	 * changeMode:	changes the mode depending on msg.groupId (the object that was clicked on)
-	 * 			  	furniture -> camera: checks if the initiator is also this.initiator (initiator of furniture mode)
-	 * 			  	camera -> furniture: set this.initiator to initiator.
-	 * 			  	the method "changeMode" sends the message to all visitors that the mode has changed.
+	 * changeMode:	mode = "furniture" for requesting the lock on a furnitue
+	 * 				checks if the lock is free. If not do nothing.
+	 * 				If free, lock object, change shader of requested object, send permit msg.
+	 * 				mode = "camera" for releasing a furniture.
+	 * 				release the furniture.
 	 * 
 	 * move:		moves the activeFurniture to the given position
 	 * rotate: 		rotates the activeFurniture by the given coordinates
@@ -457,36 +494,51 @@ Kata.require([
 	 * destroy: 	destroys the given object 
 	 * 	
 	 */	
-	User.prototype.handleChangeMode = function(msg){
-		if (this.mode == "camera" || this.initiator == msg.initiator){
-			var obj = document.getElementById(msg.groupId);		
-			var furn = this.furnitureFromXML3D(obj);
-			if (furn ||(this.mode=="furniture")){	
-				this.initiator = msg.initiator;
-				this.changeMode(furn);			
+	User.prototype.handleChangeMode = function(msg, dest){
+		var obj = document.getElementById(msg.groupId);		
+		var furn = this.furnitureFromXML3D(obj);
+		if (msg.mode == "furniture"){
+			if (this.requestFurn(furn)){
+				furn.setActive(true);
+				furn.changeShader("yellow");
+				furn.visitorControl = true;
+				var args = {
+						mode: "furniture",
+						groupId: msg.groupId,
+				}
+				this.visitBehavior.sendMessageTo("mode", args, dest);
 			}
+		}
+		if (msg.mode == "camera"){
+			//mode changes automatically in visitorscript if shader changes to normal
+			this.releaseFurn(furn, msg.color)
 		}
 	} 
 	
 	User.prototype.handleMove = function(msg){
-		if(this.activeFurniture){
+		var obj = document.getElementById(msg.groupId);		
+		var furn = this.furnitureFromXML3D(obj);
+		if(furn){
 			var coord = msg.hitPoint.split(" ");
 			var x = parseInt(coord[0]);
 			var y = parseInt(coord[1]);
 			var z = parseInt(coord[2]);
-			this.activeFurniture.moveFurnitureToMouse(null, null, {x:x, y:y, z:z} );
+			furn.moveFurnitureToMouse(null, null, {x:x, y:y, z:z} );
 		}
 	}
 	
 	User.prototype.handleRotate = function(msg){
-		var coord = msg.rotate.split(" ");
-		var x = parseInt(coord[0]);
-		var y = parseInt(coord[1]);
-		this.activeFurniture.rotate(x, y);
+		var obj = document.getElementById(msg.groupId);		
+		var furn = this.furnitureFromXML3D(obj);
+		if(furn){
+			var coord = msg.rotate.split(" ");
+			var x = parseInt(coord[0]);
+			var y = parseInt(coord[1]);
+			furn.rotate(x, y);
+		}
 	}
 	
-	User.prototype.handleCreate = function(msg){
-		this.initiator = msg.initiator;
+	User.prototype.handleCreate = function(msg){		
 		this.createObject(kata_base_offset + "scripts/FurnitureScript.js",
     			"Furniture",
     			{ space:this.space,    		    		
@@ -496,8 +548,10 @@ Kata.require([
     			  inDB:msg.inDB,
     			  type:msg.type,
     			  name:msg.name,
-    			  loc:{scale: "1.0"} //just to match the code..
-    			});   
+    			  visitor:msg.initiator,
+    			  visitorControl: true,
+    			  loc:{scale: "1.0"} //just to match the code..    			  
+    			});
 	}
 	
 	User.prototype.handleDestroy = function(msg){
@@ -508,38 +562,27 @@ Kata.require([
 	 * send mode, activeFurniture and color of activeFurniture
 	 */
 	User.prototype.sendRoomConfiguration = function(dest){		
-		if (this.mode == "furniture"){
-			var args = {
-				initiator: this.initiator,
-				mode: this.mode,
-				groupId: this.activeFurniture.group.id
-				};
-			
-			var args2 = {
-				groupId: this.activeFurniture.group.id,
-				color: this.activeFurniture.shader
-				};
-			
-			this.visitBehavior.sendMessageTo("shader", args2, dest);				
-		}
-		else{
-			var args = {
-					mode: this.mode				
-				};
-		}
+		
 		for (var i = 0;i<this.furniture.length;i++){			
 			var furn = this.furniture[i];
 			var transform = document.getElementById(furn.group.transform);
 			
-			var args3 = {
+			var args = {
 				groupId:furn.group.id,
 				x:transform.translation.x,
 				y:transform.translation.y,
 				z:transform.translation.z,
 			};				
-			this.visitBehavior.sendMessageTo("furnitureInfo", args3, dest);
+			this.visitBehavior.sendMessageTo("furnitureInfo", args, dest);
+			
+			if(furn.shader != "normal"){
+				var args2 = {
+					groupId: furn.groupId,
+					color: furn.shader
+				}
+				this.visitBehavior.sendMessageTo("shader", args, dest);
+			}
 		}
-		this.visitBehavior.sendMessageTo("mode", args, dest);		
 	}
 	
 	User.prototype.transformationChanged = function(group, x,y,z){
@@ -577,352 +620,6 @@ Kata.require([
 		}
 	}
 	
-
-	
-	
-	/*
-	 * Functions to control the camera.
-	 * 
-	 * Turning:
-	 * 	the camera turns around the center: position and direction of camera changes
-	 * 	max: turning right or left is unlimited,
-	 * 		 turning up and down only in the range from parallel to floor until parallel to y-axis.
-	 * Moving:
-	 *  The camera moves parallel to the floor 
-	 * 	max: position of the center outside the walls
-	 *  position of the camera changes, position of the center changes the same way
-	 * Zooming: 
-	 * 	the camera moves in the looking direction 
-	 *  max. until it has (nearly) the same position as the center. 	 
-	 * 	The center doesn't change but the distance from camera to center changes
-	 * 
-	 * Implementation:
-	 * change position/direction of the tmp-camera and assign it to the presence. Position of actual camera
-	 * in the scene is then changed automatically
-	 */
-	
-		
-	var speed=2;
-	/**
-	 * 
-	 * point: XML3DVec3
-	 * camera: XML3D view
-	 */	
-	User.prototype.lookAt = function(point, cam){
-		var vector = point.subtract(cam.position);
-		vector = vector.normalize();
-		cam.setDirection(vector);
-		this.center = point;
-		this.camCenterDistance = (cam.position.subtract(this.center)).length();				  
-		return cam;
-	}
-	
-	/**
-	 * helper function to update the presence's position and orientation
-	 * position: XML3DVec3
-	 * orientation: XML3DRotation 
-	 */
-	User.prototype.updatePresence = function (position, orientation){
-		 var now = new Date();
-	     var loc = this.presence.predictedLocationAtTime(now);		     
-	     //create location
-	     loc.pos = [position.x, position.y, position.z];
-	     var or = Kata._helperQuatFromAxisAngle(
-	                    [orientation.axis.x, orientation.axis.y, orientation.axis.z],
-	                    orientation.angle);
-	     loc.orient = or;		 
-	     this.presence.setLocation(loc);
-	     this.syncCamera();
-	}
-	
-	/**
-	 * Helper function to move the Center
-	 * The center's y-coordinate (height) never changes
-	 */
-	User.prototype.moveCenter = function(x, z){
-		this.center.x = this.center.x + x;		
-		this.center.z = this.center.z + z;
-		this.moveCenterCube(x, z);		
-	}
-	
-	/**
-	 * Helper function to move the center cube
-	 */
-	User.prototype.moveCenterCube = function(x, z){
-		//finds the transformation of the cube
-		var transformations = document.getElementsByTagName("transform");
-		var trans;
-	    for (var i = 0; i<transformations.length; i++){
-		    trans = transformations[i];
-		    if (trans.id.substr(0,6) == "center"){
-		    	break;
-		    }
-	    }
-	    trans.translation.x = trans.translation.x + x;
-	    trans.translation.z = trans.translation.z + z;
-	}
-	
-	/**
-	 * Helper function to correct the Distance from the cam to the center
-	 */
-	User.prototype.correctCenterCamDistance = function(cam, update){		
-		var dist = cam.position.subtract(this.center);
-		if(update){
-			this.camCenterDistance = dist.length();
-					
-		}
-		else{
-	        var diff = dist.length() - this.camCenterDistance;
-	        if (diff != 0){
-	        	var dir = cam.getDirection();
-	        	dir = dir.normalize();
-	        	cam.position.x = cam.position.x + (dir.x * diff);
-	        	cam.position.z = cam.position.z + (dir.z * diff);
-	        }      
-		}
-        return cam;
-	}
-	
-	/**
-	 * Helper function to change the camera's Up vector to be parallel to the y-axis
-	 */
-	User.prototype.setCamUpToY = function(cam){
-		var newUp = this.xml3d.createXML3DVec3();
-		newUp.x = 0;
-		newUp.y = 1;
-		newUp.z = 0;
-		cam.setUpVector(newUp);		
-		return cam;
-	}
-	
-	/**
-	 * Helper function to compute the angle between a vector and the y-axis
-	 */
-	User.prototype.angleToY = function(vec){
-		var yAxis = this.xml3d.createXML3DVec3();
-		yAxis.x = 0;
-		yAxis.y = 1;
-		yAxis.z = 0;
-		var alpha = (vec.dot(yAxis)) / (vec.length() * yAxis.length());  
-		return alpha;
-	}
-	
-		
-	User.prototype.turnRight = function(){	
-		//make cam parallel to floor		
-		var cam = this.setCamUpToY(this.camera);		
-		
-		var orientMat = cam.orientation.toMatrix();		
-		//x-axis in camera coordinate system
-		var orXX = orientMat.m11 * speed;
-        var orXZ = orientMat.m13 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x + orXX;
-        cam.position.z = cam.position.z + orXZ;
-        
-        //change camera's direction such that it looks at the center 
-        //and correct it's distance to center
-        cam = this.lookAt(this.center, cam);
-        cam = this.correctCenterCamDistance(cam, false);                
-        this.updatePresence(cam.position, cam.orientation);       
-	}
-	
-	User.prototype.turnLeft = function(){
-		//make cam parallel to floor	
-		var cam = this.setCamUpToY(this.camera);
-		
-		var orientMat = cam.orientation.toMatrix();		
-		//x-axis in camera coordinate system
-		var orXX = orientMat.m11 * speed;
-        var orXZ = orientMat.m13 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x - orXX;
-        cam.position.z = cam.position.z - orXZ;
-        
-        //change camera's direction such that it looks at the center 
-        //and correct it's distance to center
-        cam = this.lookAt(this.center, cam);        
-        cam = this.correctCenterCamDistance(cam, false);
-        
-        this.updatePresence(cam.position, cam.orientation);  
-	}
-	
-	
-	User.prototype.turnUp = function(){
-		var cam = this.camera;
-		
-		//angle of camDirection to y-Axis in the range of 90° - 180°
-		var angle = this.angleToY(cam.getDirection());
-		if(angle < -0.98){
-			return;
-		}
-		
-		var orientMat = cam.orientation.toMatrix();		
-		//y-axis in camera coordinate system
-		var orYX = orientMat.m21 * speed;        
-        var orYY = orientMat.m22 * speed;
-        var orYZ = orientMat.m23 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x + orYX;
-        cam.position.y = cam.position.y + orYY;
-        cam.position.z = cam.position.z + orYZ;
-        
-        //change camera's direction such that it looks at the center         
-        cam = this.lookAt(this.center, cam);
-        cam = this.correctCenterCamDistance(cam, false);
-       
-        this.updatePresence(cam.position, cam.orientation);
-	}
-	User.prototype.turnDown = function(){
-		var cam = this.camera;
-		
-		//angle of camDirection to y-Axis in the range of 0° - 180°
-		var angle = this.angleToY(cam.getDirection());
-		if(angle > 0.98){
-			return;
-		}
-		
-		var orientMat = cam.orientation.toMatrix();
-		//y-axis in camera coordinate system
-		var orYX = orientMat.m21 * speed;        
-        var orYY = orientMat.m22 * speed;
-        var orYZ = orientMat.m23 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x - orYX;
-        cam.position.y = cam.position.y - orYY;
-        cam.position.z = cam.position.z - orYZ;
-        
-        //change camera's direction such that it looks at the center         
-        cam = this.lookAt(this.center, cam);
-        cam = this.correctCenterCamDistance(cam, false);
-       
-        this.updatePresence(cam.position, cam.orientation);
-	}
-	
-	User.prototype.moveRight = function(){
-		//make cam parallel to floor	
-		var cam = this.setCamUpToY(this.camera);		
-		
-		var orientMat = cam.orientation.toMatrix();
-		//x-axis in camera coordinate system
-		var orXX = orientMat.m11 * speed;
-		var orXY = orientMat.m12 * speed;
-        var orXZ = orientMat.m13 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x + orXX;
-        cam.position.y = cam.position.y + orXY;
-        cam.position.z = cam.position.z + orXZ;
-        
-        //move the center, change camera's direction such that it looks at the center 
-        //and correct it's distance to center
-        this.moveCenter(orXX, orXZ);        
-        cam = this.lookAt(this.center, cam);        
-        cam = this.correctCenterCamDistance(cam, false);
-        
-        this.updatePresence(cam.position, cam.orientation);    
-	}
-	User.prototype.moveLeft = function(){
-		//make cam parallel to floor	
-		var cam = this.setCamUpToY(this.camera);		
-		
-		var orientMat = cam.orientation.toMatrix();
-		//x-axis in camera coordinate system
-		var orXX = orientMat.m11 * speed;
-        var orXZ = orientMat.m13 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x - orXX;
-        cam.position.z = cam.position.z - orXZ;
-        
-        //move the center, change camera's direction such that it looks at the center 
-        //and correct it's distance to center
-        this.moveCenter(-orXX, -orXZ);        
-        cam = this.lookAt(this.center, cam);        
-        cam = this.correctCenterCamDistance(cam, false);
-        
-        this.updatePresence(cam.position, cam.orientation);
-	}
-	User.prototype.moveUp = function(){
-		//make cam parallel to floor	
-		var cam = this.setCamUpToY(this.camera);		
-		
-		var orientMat = cam.orientation.toMatrix();
-		//z-axis in camera coordinate system
-		var orZX = orientMat.m31 * speed;
-        var orZZ = orientMat.m33 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x - orZX;
-        cam.position.z = cam.position.z - orZZ;
-        
-        //move the center, change camera's direction such that it looks at the center 
-        //and correct it's distance to center
-        this.moveCenter(-orZX, -orZZ);        
-        cam = this.lookAt(this.center, cam);        
-        cam = this.correctCenterCamDistance(cam, false);
-        
-        this.updatePresence(cam.position, cam.orientation);
-	}
-	User.prototype.moveDown = function(){
-		//make cam parallel to floor	
-		var cam = this.setCamUpToY(this.camera);		
-		
-		var orientMat = cam.orientation.toMatrix();
-		//z-axis in camera coordinate system
-		var orZX = orientMat.m31 * speed;
-        var orZZ = orientMat.m33 * speed;
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x + orZX;
-        cam.position.z = cam.position.z + orZZ;
-        
-        //move the center, change camera's direction such that it looks at the center 
-        //and correct it's distance to center
-        this.moveCenter(orZX, orZZ);        
-        cam = this.lookAt(this.center, cam);        
-        cam = this.correctCenterCamDistance(cam, false);
-        
-        this.updatePresence(cam.position, cam.orientation);
-	}
-	User.prototype.zoomIn = function(){		
-		var cam = this.camera;		
-		if (this.camCenterDistance < 5){
-			return;
-		}
-		var dir = cam.getDirection();
-        dir.normalize();
-        
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x + (dir.x * speed);
-        cam.position.y = cam.position.y + (dir.y * speed);
-        cam.position.z = cam.position.z + (dir.z * speed);
-        
-        //update distance of camera to center 
-        this.correctCenterCamDistance(cam, true);
-        
-        this.updatePresence(cam.position, cam.orientation);
-	}
-	User.prototype.zoomOut = function(){
-		var cam = this.camera;		
-		
-		var dir = cam.getDirection();
-		dir.normalize();
-		
-        //change position in direction of camera's x-axis
-        cam.position.x = cam.position.x - (dir.x * speed);
-        cam.position.y = cam.position.y - (dir.y * speed);
-        cam.position.z = cam.position.z - (dir.z * speed);
-        
-        //update distance of camera to center 
-        this.correctCenterCamDistance(cam, true);
-        
-        this.updatePresence(cam.position, cam.orientation);
-	}
 	
 
 

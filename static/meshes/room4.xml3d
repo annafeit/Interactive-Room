@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <xml3d id="scene" xmlns="http://www.xml3d.org/2009/xml3d" style="width:100%; height:100%;" activeView="#defaultView" >
 	<defs>
-	    <transform id="lightTransform" translation="300 240 -175"/>
+	    <transform id="lightTransform" translation="450 200 -300"/>
 	    
-		<shader id="material" script="urn:xml3d:shader:phong">
-		    <float3 name="diffuseColor">
-		    0.6 0.6 0.6
-		    </float3>
-		    <float name="ambientIntensity">
-		    0.7
-		    </float>
-		</shader>
+		<shader id="materialFloor" script="urn:xml3d:shader:phong">
+	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
+	            <float name="ambientIntensity">0.2</float>
+	            <texture name="diffuseTexture">
+			<img src="static/meshes/textures/texFloor9.jpeg"/>
+		    </texture>
+	        </shader>
+		
+		<shader id="materialWall" script="urn:xml3d:shader:phong">
+	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
+	            <float name="ambientIntensity">0.2</float>
+	            <texture name="diffuseTexture">
+			<img src="static/meshes/textures/texWall11.jpeg"/>
+		    </texture>
+	        </shader>
+		<shader id="materialWall2" script="urn:xml3d:shader:phong">
+	            <float3 name="diffuseColor">1.0 0.9 0.8</float3>
+	            <float name="ambientIntensity">0.2</float>
+	            <texture name="diffuseTexture">
+			<img src="static/meshes/textures/texWall11a.jpeg"/>
+		    </texture>
+	        </shader>
 		
 		<shader id="transparentMaterial" script="urn:xml3d:shader:phong">		    
 		    <float3 name="reflectionColor">
@@ -21,7 +35,7 @@
 		    </float>
 		</shader>
 		
-        <lightshader id="light" script="urn:xml3d:lightshader:point">
+		<lightshader id="light" script="urn:xml3d:lightshader:point">
 		    <float3 name="intensity">1.0 1.0 1.0</float3>
 		    <float3 name="attenuation">1 0 0</float3>
 		</lightshader>
@@ -35,9 +49,9 @@
 	            
 	            <float3 name="position">
 	            	0 0 0
-	            	0 0 -350
-	            	600 0 -350
-	            	600 0 0
+	            	0 0 -900
+	            	900 0 -900
+	            	900 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -46,6 +60,12 @@
 	            	0 1 0
 	            	0 1 0	            		            	
 	            </float3>
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="ceilingData" >
 	            <int name="index">
@@ -55,9 +75,9 @@
 	            
 	            <float3 name="position">
 	            	0 250 0
-	            	0 250 -350
-	            	600 250 -350
-	            	600 250 0
+	            	0 250 -600
+	            	900 250 -600
+	            	900 250 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -66,6 +86,12 @@
 	            	0 -1 0
 	            	0 -1 0	            		            	
 	            </float3>
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall1Data" >
 	            <int name="index">
@@ -76,8 +102,8 @@
 	            <float3 name="position">
 	            	0 0 0
 	            	0 250 0 
-	            	600 250 0 
-	            	600 0 0
+	            	900 250 0 
+	            	900 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -86,6 +112,12 @@
 	            	0 0 -1
 	            	0 0 -1	            	
 	            </float3>
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	     <data id="wall2Data" >
 	            <int name="index">
@@ -96,8 +128,8 @@
 	            <float3 name="position">
 	            	0 0 0
 	            	0 250 0 
-	            	0 250 -350
-	            	0 0 -350
+	            	0 250 -600
+	            	0 0 -600
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -106,6 +138,12 @@
 	            	1 0 0
 	            	1 0 0
 	            </float3>
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall3Data" >
 	            <int name="index">
@@ -114,10 +152,10 @@
 	            </int>
 	            
 	            <float3 name="position">
-	            	0 0 -350
-	            	0 250 -350
-	            	600 250 -350
-	            	600 0 -350
+	            	0 0 -600
+	            	0 250 -600
+	            	900 250 -600
+	            	900 0 -600
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -126,6 +164,12 @@
 	            	0 0 1
 	            	0 0 1
 	            </float3>
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
 	    <data id="wall4Data" >
 	            <int name="index">
@@ -134,10 +178,10 @@
 	            </int>
 	            
 	            <float3 name="position">	            	
-	            	600 0-350
-	            	600 250 -350
-	            	600 250 0
-	            	600 0 0
+	            	900 0-600
+	            	900 250 -600
+	            	900 250 0
+	            	900 0 0
 	            </float3>
 	            
 	            <float3 name="normal">
@@ -146,32 +190,38 @@
 	            	-1 0 0 
 	            	-1 0 0  
 	            </float3>
+		    <float2 name="texcoord">
+			0.0 1.0
+			0.0 0.0
+			1.0 0.0
+			1.0 1.0
+		    </float2>
 	    </data>
     </defs>
     
-    <view id="top" position="580 250 -175" orientation="0 1 0 1.57" center="300 100 -175"/>       
-    <view id="firstPerson" position="300 100 -175" orientation="0 1 0 1.57" center="300 100 -175"/>
+    <view id="top" position="430 680 115" orientation="0 1 0 0" center="430 100 -310"/>       
+    <view id="firstPerson" position="300 120 50" orientation="0 1 0 0" center="300 120 45"/>
     
      <group transform="#lightTransform" >
 	 <light shader="#light" intensity="0.8" />
 	</group>
 	     		  
-    <group id="floor" type="floor" shader="#material">
+    <group id="floor" type="floor" shader="#materialFloor">
       <mesh src="#floorData" type="triangles"/>
     </group>
-    <group id="ceiling" type="ceiling" shader="#material">
+    <group id="ceiling" type="ceiling" shader="#materialWall">
       <mesh src="#ceilingData" type="triangles"/>
     </group>
-    <group id="wall1" type="wall" shader="#material">
+    <group id="wall1" type="wall" shader="#materialWall">
       <mesh src="#wall1Data" type="triangles"/>
     </group>
-    <group id="wall2" type="wall" shader="#material">
+    <group id="wall2" type="wall" shader="#materialWall">
       <mesh src="#wall2Data" type="triangles"/>
     </group>
-    <group id="wall3" type="wall" shader="#material">
+    <group id="wall3" type="wall" shader="#materialWall">
       <mesh src="#wall3Data" type="triangles"/>
     </group>
-    <group id="wall4" type="wall" shader="#material">
+    <group id="wall4" type="wall" shader="#materialWall2">
       <mesh src="#wall4Data" type="triangles"/>
     </group>   
 </xml3d>

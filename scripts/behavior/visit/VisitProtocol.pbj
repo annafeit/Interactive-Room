@@ -31,17 +31,19 @@ message Destroy {
 
 //to tell that the mode has changed or to ask for changing the mode
 message Mode {
-  optional string mode = 1;	//the new mode, only set by owner, when visitor sends this message, the owner infers the new mode
-  optional string groupId = 2;	//the mesh of the new active object, only if changing to furniture mode
-  optional string initiator = 3;	//the initiator of the current (furniture) mode. Only the initiator can send move and rotate messages in furniture mode
+  optional string mode = 1;	//the mode, the visitor requests for itself
+  optional string groupId = 2;	//the mesh of the active object  
+  optional string color = 3; 	// the color of the active object (only when changing back to camera mode)	
 }
 
 message Move {
   required string hitPoint = 1;	//"x y z" the point where the mouse hits the wall
+  required string groupId = 2;
 }
 
 message Rotate {
   required string rotate = 1;	//"dx dy"
+  required string groupId = 2;
 }
 
 message Shader{

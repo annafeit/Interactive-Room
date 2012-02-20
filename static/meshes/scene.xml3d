@@ -16,6 +16,14 @@
 			<float name="ambientIntensity">
 			    0.7
 			</float>
+	    </shader>
+	     <shader id="yellowMaterial" script="urn:xml3d:shader:phong">
+			<float3 name="diffuseColor">
+			    1.0 1.0 0.0
+			</float3>
+			<float name="ambientIntensity">
+			    0.7
+			</float>
 	    </shader>	
 	</defs>
 </xml3d>
