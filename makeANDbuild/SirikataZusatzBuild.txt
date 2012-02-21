@@ -1,0 +1,3 @@
+cd sirikata/build/cmake
+cmake _DCMAKE_BUILD_TYPE=Release .
+make 
